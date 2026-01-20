@@ -2365,3 +2365,7 @@ p {
     transform: none;
   }
 }
+
+button {
+  cursor: pointer;
+}
