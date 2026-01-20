@@ -74,34 +74,34 @@ export function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 py-12 px-4">
-      <div className="container mx-auto max-w-sm">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 py-8 px-4">
+      <div className="container mx-auto max-w-xs">
         {/* Back Button */}
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900 mb-6 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-neutral-600 hover:text-neutral-900 mb-4 transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Home</span>
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back</span>
         </button>
 
         {/* Signup Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-neutral-200 p-6">
+        <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-4">
           {/* Header */}
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-accent-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <User className="w-6 h-6 text-white" />
+          <div className="text-center mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <User className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-neutral-900 mb-1">Create Account</h1>
-            <p className="text-neutral-600">Join the AI Startup Idea Generator platform</p>
+            <h1 className="text-neutral-900 mb-1 text-xl">Create Account</h1>
+            <p className="text-neutral-600 text-sm">Join the platform</p>
           </div>
 
           {/* Google Signup Button */}
           <button
             onClick={handleGoogleSignup}
-            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border-2 border-neutral-300 rounded-xl hover:bg-neutral-50 transition-colors mb-5"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm border-2 border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors mb-3"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -119,36 +119,36 @@ export function Signup() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            <span className="text-neutral-700">Continue with Google</span>
+            <span className="text-neutral-700">Google</span>
           </button>
 
           {/* Divider */}
-          <div className="relative my-5">
+          <div className="relative my-3">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-neutral-200"></div>
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-white px-4 text-sm text-neutral-500">Or sign up with email</span>
+              <span className="bg-white px-2 text-xs text-neutral-500">Or with email</span>
             </div>
           </div>
 
           {/* Signup Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* Full Name */}
             <div>
-              <label htmlFor="fullName" className="block text-sm text-neutral-700 mb-1.5">
+              <label htmlFor="fullName" className="block text-xs text-neutral-700 mb-1">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="text"
                   id="fullName"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
-                  placeholder="Enter your full name"
-                  className={`w-full pl-10 pr-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                  placeholder="Your name"
+                  className={`w-full pl-8 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                     errors.fullName
                       ? 'border-primary-500 focus:ring-primary-200'
                       : 'border-neutral-300 focus:border-primary-500 focus:ring-primary-200'
@@ -156,25 +156,25 @@ export function Signup() {
                 />
               </div>
               {errors.fullName && (
-                <p className="text-sm text-primary-600 mt-1">{errors.fullName}</p>
+                <p className="text-xs text-primary-600 mt-0.5">{errors.fullName}</p>
               )}
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm text-neutral-700 mb-1.5">
-                Email Address
+              <label htmlFor="email" className="block text-xs text-neutral-700 mb-1">
+                Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="your.email@example.com"
-                  className={`w-full pl-10 pr-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                  placeholder="email@example.com"
+                  className={`w-full pl-8 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                     errors.email
                       ? 'border-primary-500 focus:ring-primary-200'
                       : 'border-neutral-300 focus:border-primary-500 focus:ring-primary-200'
@@ -182,25 +182,25 @@ export function Signup() {
                 />
               </div>
               {errors.email && (
-                <p className="text-sm text-primary-600 mt-1">{errors.email}</p>
+                <p className="text-xs text-primary-600 mt-0.5">{errors.email}</p>
               )}
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm text-neutral-700 mb-1.5">
+              <label htmlFor="password" className="block text-xs text-neutral-700 mb-1">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="password"
                   id="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Create a strong password"
-                  className={`w-full pl-10 pr-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                  placeholder="Password"
+                  className={`w-full pl-8 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                     errors.password
                       ? 'border-primary-500 focus:ring-primary-200'
                       : 'border-neutral-300 focus:border-primary-500 focus:ring-primary-200'
@@ -208,25 +208,25 @@ export function Signup() {
                 />
               </div>
               {errors.password && (
-                <p className="text-sm text-primary-600 mt-1">{errors.password}</p>
+                <p className="text-xs text-primary-600 mt-0.5">{errors.password}</p>
               )}
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm text-neutral-700 mb-1.5">
+              <label htmlFor="confirmPassword" className="block text-xs text-neutral-700 mb-1">
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="password"
                   id="confirmPassword"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  placeholder="Confirm your password"
-                  className={`w-full pl-10 pr-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                  placeholder="Confirm password"
+                  className={`w-full pl-8 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                     errors.confirmPassword
                       ? 'border-primary-500 focus:ring-primary-200'
                       : 'border-neutral-300 focus:border-primary-500 focus:ring-primary-200'
@@ -234,19 +234,22 @@ export function Signup() {
                 />
               </div>
               {errors.confirmPassword && (
-                <p className="text-sm text-primary-600 mt-1">{errors.confirmPassword}</p>
+                <p className="text-xs text-primary-600 mt-0.5">{errors.confirmPassword}</p>
               )}
             </div>
 
             {/* Submit Button */}
-            <Button type="submit" variant="primary" className="w-full">
+            <button 
+              type="submit" 
+              className="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg transition-colors text-sm"
+            >
               Create Account
-            </Button>
+            </button>
           </form>
 
           {/* Login Link */}
-          <p className="text-center text-sm text-neutral-600 mt-5">
-            Already have an account?{' '}
+          <p className="text-center text-xs text-neutral-600 mt-3">
+            Have an account?{' '}
             <button
               onClick={() => navigate('/login')}
               className="text-primary-600 hover:text-primary-700 transition-colors"
@@ -257,9 +260,8 @@ export function Signup() {
         </div>
 
         {/* Privacy Notice */}
-        <p className="text-xs text-neutral-500 text-center mt-4 px-4">
-          By creating an account, you agree to our Terms of Service and Privacy Policy.
-          This is a university project for demonstration purposes.
+        <p className="text-xs text-neutral-500 text-center mt-3 px-2">
+          University project for demonstration purposes.
         </p>
       </div>
     </div>

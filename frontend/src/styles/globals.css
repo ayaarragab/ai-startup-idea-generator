@@ -206,3 +206,7 @@ p {
   outline: 2px solid var(--color-primary-600);
   outline-offset: 2px;
 }
+
+button {
+  cursor: pointer;
+}
