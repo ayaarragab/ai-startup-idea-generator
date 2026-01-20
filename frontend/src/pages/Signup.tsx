@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import '../styles/signup.css';
+
 
 export function Signup() {
   const navigate = useNavigate();
@@ -84,15 +86,15 @@ export function Signup() {
           <ArrowLeft className="w-4 h-4" />
           <span>Back</span>
         </button>
-
+      <div className="flex items-center justify-center">
         {/* Signup Card */}
-        <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-4">
+        <div style={{width: '500px'}} className="bg-white rounded-xl shadow-lg border border-neutral-200 p-4">
           {/* Header */}
           <div className="text-center mb-4">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent-600 rounded-xl flex items-center justify-center mx-auto mb-2">
               <User className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-neutral-900 mb-1 text-xl">Create Account</h1>
+            <h3 className="text-neutral-900 mb-1 text-xl">Create Account</h3>
             <p className="text-neutral-600 text-sm">Join the platform</p>
           </div>
 
@@ -140,7 +142,7 @@ export function Signup() {
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <User className="user-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="text"
                   id="fullName"
@@ -166,7 +168,7 @@ export function Signup() {
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Mail className="email-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="email"
                   id="email"
@@ -192,7 +194,7 @@ export function Signup() {
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Lock className="pass-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="password"
                   id="password"
@@ -218,7 +220,7 @@ export function Signup() {
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Lock className="pass-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="password"
                   id="confirmPassword"
@@ -258,7 +260,7 @@ export function Signup() {
             </button>
           </p>
         </div>
-
+      </div>
         {/* Privacy Notice */}
         <p className="text-xs text-neutral-500 text-center mt-3 px-2">
           University project for demonstration purposes.
