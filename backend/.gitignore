@@ -1,0 +1,12 @@
+# Ignore node_modules directory
+node_modules/
+/node_modules/
+
+# Ignore environment variable files
+.env
+.env.test
+.env.example
+# Ignore client secret files with specific naming pattern
+client_secret_*.json
+sequelize.notes.md
+tests/*
