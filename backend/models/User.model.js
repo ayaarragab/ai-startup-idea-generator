@@ -18,9 +18,6 @@ const User = (sequelize, DataTypes) => {
       googleId: {
         type: DataTypes.STRING,
       },
-      githubId: {
-        type: DataTypes.STRING,
-      },
     },
     {
       tableName: 'users',

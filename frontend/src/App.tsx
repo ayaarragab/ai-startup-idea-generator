@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './providers/AuthProvider';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
@@ -11,6 +12,7 @@ import { Research } from './pages/Research';
 import { About } from './pages/About';
 import { Signup } from './pages/Signup';
 import { Login } from './pages/Login';
+import { ToastContainer } from 'react-toastify'
 
 type PageType = 'home' | 'generate' | 'idea-detail' | 'dashboard' | 'how-it-works' | 'research' | 'about';
 
@@ -28,6 +30,7 @@ export default function App() {
   };
 
   return (
+    <AuthProvider>
     <Router>
       <div className="min-h-screen flex flex-col">
         <Navigation />
@@ -50,5 +53,7 @@ export default function App() {
         <Footer />
       </div>
     </Router>
+    <ToastContainer position="top-right" autoClose={3000} />
+    </AuthProvider>
   );
 }
