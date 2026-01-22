@@ -55,15 +55,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
     if (res.status == 200) {
       toast.success("Signup successful! Redirecting to login...");
-      setUser(res.data);
-		  setIsAuthenticated(true);
       return true;
     } else if (res.status == 409) {
       toast.info("User already exists. Please login.");
       return true;
     } else {
       toast.error(res.data.error);      
-      setIsAuthenticated(false);
       return false;
     }
 	} catch (error: any) {    
@@ -71,6 +68,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		setIsAuthenticated(false);
 	}
   return false;
+  }
+
+  const login = async (email='', password='') => {
+    try {
+      const res = await axios.post('/auth/login', {
+        email, password
+      });
+      if (res.status == 200) {
+        toast.success("Login successful!");
+        setUser(res.data);
+        setIsAuthenticated(true);
+        return true;
+      } else {
+        toast.error(res.data.error);      
+        setIsAuthenticated(false);
+        return false;
+      }
+    } catch (error: any) {    
+      toast.error(error.response?.data?.error || "Login failed");
+      setIsAuthenticated(false);
+    }
+    return false;
   }
 
   const logout = async () => {
@@ -90,6 +109,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated,
         loading,
         signup,
+        login,
         logout,
         resetUser,
       }}

@@ -1,15 +1,15 @@
 import Router from 'express';
 import passport from "../auth/passport.auth.js";
-import { validateCredentials, authenticate } from '../middlewares/auth.middlewares.js';
+import { validateCredentialsSignup, validateCredentialsLogin, authenticate } from '../middlewares/auth.middlewares.js';
 import { signup, login, getCurrentUser, handleOAuthTokens } from '../auth/local.auth.js';
 import dotenv from "dotenv";
 
 const router = Router();
 dotenv.config()
 
-router.post('/signup', validateCredentials, signup);
+router.post('/signup', validateCredentialsSignup, signup);
 
-router.post('/login', validateCredentials, login);
+router.post('/login', validateCredentialsLogin, login);
 
 router.get('/me', authenticate, getCurrentUser)
 

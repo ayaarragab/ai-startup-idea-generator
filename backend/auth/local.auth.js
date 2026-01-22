@@ -5,24 +5,24 @@ dotenv.config()
 
 export const login = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    const user = await findUser(username, email);
+    const { email, password } = req.body;
+    const user = await findUser(email);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     return await handleExistingUser(user, password, res);
   } catch (error) {
     console.error("Error during login:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
 export const signup = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
-    const existingUser = await findUser(fullName, email);
+    const existingUser = await findUser(email);
 
     if (existingUser) {
       return res.status(409).json({ error: "User already exists" });

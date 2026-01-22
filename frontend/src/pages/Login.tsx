@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, LogIn, ArrowLeft } from 'lucide-react';
-
+import { useAuth } from '../providers/AuthProvider';
 
 export function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -44,12 +45,15 @@ export function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      // Demo: Simulate successful login
-      console.log('Login successful:', formData);
-      navigate('/');
+    if (validateForm()) {      
+      const success = await login(formData.email, formData.password);
+      if (success) {
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
+      }
     }
   };
 

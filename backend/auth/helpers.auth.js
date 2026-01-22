@@ -6,7 +6,7 @@ import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.js
 
 const { User } = db;
 
-export const findUser = async (fullName, email) => {
+export const findUser = async (email) => {
   const user = await User.findOne({
     where: { email },
   });
@@ -14,8 +14,9 @@ export const findUser = async (fullName, email) => {
   return user?.toJSON();
 };
 
-export const handleExistingUser = async (user, password, res) => {  
-  console.log(password,user.password);
+export const handleExistingUser = async (user, password, res) => {
+  console.log(password, user.password);
+  
   const isCorrectPassword = await comparePasswords(password, user.password);  
   if (isCorrectPassword) {
     const accessToken = generateAccessToken({

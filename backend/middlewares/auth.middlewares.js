@@ -3,7 +3,7 @@ import {
   validateRefreshToken,
 } from "../utils/jwt.utils.js";
 
-export const validateCredentials = (req, res, next) => {
+export const validateCredentialsSignup = (req, res, next) => {
   const { fullName, email, password } = req.body; // Extract email, password, and username from the request body
 
   // Regular expression to validate email format
@@ -35,6 +35,25 @@ export const validateCredentials = (req, res, next) => {
   // Check if password is provided and matches the regex
   if (!password || !passwordRegex.test(password)) {
     return res.status(400).json({ error: "Invalid password format" }); // Respond with error if password is invalid
+  }
+  // If email and password are valid, proceed to the next middleware or route handler
+  next();
+};
+
+export const validateCredentialsLogin = (req, res, next) => {
+  const { email, password } = req.body; // Extract email and password from the request body
+
+  // Regular expression to validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Check if email is provided and matches the regex
+  if (!email || !emailRegex.test(email)) {
+    return res.status(400).json({ error: "Invalid email format" }); // Respond with error if email is invalid
+  }
+
+  // Check if password is provided
+  if (!password) {
+    return res.status(400).json({ error: "Password is required" }); // Respond with error if password is missing
   }
   // If email and password are valid, proceed to the next middleware or route handler
   next();
