@@ -58,9 +58,7 @@ export function Login() {
   };
 
   const handleGoogleLogin = () => {
-    // Demo: Simulate Google login
-    console.log('Google login initiated');
-    navigate('/');
+    window.location.href = "http://localhost:5000/auth/google";
   };
 
   return (

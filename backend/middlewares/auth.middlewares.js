@@ -74,6 +74,7 @@ export const authenticate = (req, res, next) => {
       const { valid, decoded } = validateAccessToken(accessToken);
       if (valid) {
         req.user = decoded;
+        
         next();
       } else {
         return res.status(401).json({

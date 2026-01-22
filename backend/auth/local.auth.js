@@ -1,7 +1,13 @@
-import { findUser, handleExistingUser, handleNewUser, handleOAuthSignup } from "./helpers.auth.js";
+import {
+  findUser,
+  findUserById,
+  handleExistingUser,
+  handleNewUser,
+  handleOAuthSignup,
+} from "./helpers.auth.js";
 import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
 export const login = async (req, res) => {
   try {
@@ -11,7 +17,8 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
+    req.user = user;
+    
     return await handleExistingUser(user, password, res);
   } catch (error) {
     console.error("Error during login:", error);
@@ -37,10 +44,10 @@ export const signup = async (req, res) => {
 
 export const getCurrentUser = async (req, res) => {
   try {
-    const { username, email } = req.user;
-    const user = await findUser(username, email);
+    const { id } = req.user;
+    const user = await findUserById(id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
     return res.status(200).json(user);
   } catch (error) {
@@ -49,23 +56,30 @@ export const getCurrentUser = async (req, res) => {
   }
 };
 
-export const handleOAuthTokens = (req, res, user, info) => {  
-  if (info === 'registered') {
-    const { accessToken, refreshToken } = handleOAuthSignup({ email: user.email, username: user.username });
+export const handleOAuthTokens = (req, res, user, info) => {
+  req.user = user;
+  const { accessToken, refreshToken } = handleOAuthSignup({
+    email: user.email,
+    username: user.username,
+  });
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: false, // Set to true if using HTTPS
-      sameSite: "Strict",
-    });
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: false, // Set to true if using HTTPS
+    sameSite: "Strict",
+  });
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: false, // Set to true if using HTTPS
-      sameSite: "Strict",
-    });
-    return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/login`)
-  } else if (info === 'loggedin') {
-      return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/dashboard`)
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: false, // Set to true if using HTTPS
+    sameSite: "Strict",
+  });
+  if (info === "registered") {
+    return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/login`);
+  } else if (info === "loggedin") {
+    req.user = user;
+    return res.redirect(
+      `http://localhost:${process.env.FRONTEND_PORT}/dashboard`,
+    );
   }
-}
+};

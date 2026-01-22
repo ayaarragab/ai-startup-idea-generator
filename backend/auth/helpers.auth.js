@@ -14,8 +14,13 @@ export const findUser = async (email) => {
   return user?.toJSON();
 };
 
+export const findUserById = async (id) => {
+  const user = await User.findByPk(id);
+  
+  return user?.toJSON();
+} 
+
 export const handleExistingUser = async (user, password, res) => {
-  console.log(password, user.password);
   
   const isCorrectPassword = await comparePasswords(password, user.password);  
   if (isCorrectPassword) {
