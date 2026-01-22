@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from  '../providers/AuthProvider'
-import { toast } from 'react-toastify';
 
 export function Signup() {
   const navigate = useNavigate();
