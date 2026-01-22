@@ -48,16 +48,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signup = async (fullName='', email='', password='') => {
 	try {
-        const res = await axios.post('/auth/signup', {
-            email, password, fullName
-        });
-		setUser(res.data);
-		setIsAuthenticated(true);
-	} catch (error) {
-		toast.error("Signup failed. Please try again.");
-		console.error("Signup failed:", error);
+    const res = await axios.post('/auth/signup', {
+      email, password, fullName
+    });
+    if (res.status == 201) {
+      toast.success("Signup successful! Redirecting to login...");
+      setUser(res.data);
+		  setIsAuthenticated(true);
+      return true;
+    } else if (res.status == 200) {
+      toast.info("User already exists. Please login.");
+      return true;
+    } else {
+      toast.error(res.data.error);      
+      setIsAuthenticated(false);
+      return false;
+    }
+	} catch (error: any) {    
+		toast.error(error.response?.data?.error || "Signup failed");
 		setIsAuthenticated(false);
 	}
+  return false;
   }
 
   const logout = async () => {
@@ -84,6 +95,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
 
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+
+  return context;
+};
 export default AuthContext;

@@ -5,14 +5,15 @@ dotenv.config()
 
 export const signup = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-
-    const user = await findUser(username, email);
-    if (user) {
+    const { fullName, email, password } = req.body;
+    console.log({ fullName, email, password });
+    
+    const user = await findUser(fullName, email);
+    if (user) {      
       return await handleExistingUser(user, password, res);
     }
 
-    return await handleNewUser(username, email, password, res);
+    return await handleNewUser(fullName, email, password, res);
   } catch (error) {
     console.error("Error during signup:", error);
     return res.status(500).json({ message: "Internal server error" });

@@ -5,6 +5,7 @@ import session from 'express-session';
 import passport from './auth/passport.auth.js';
 import authRouter from './routers/auth.router.js';
 import dotenv from 'dotenv';
+import morgan from 'morgan';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(morgan('dev'));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'default_secret',
   resave: false,

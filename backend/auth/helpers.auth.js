@@ -6,16 +6,17 @@ import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.js
 
 const { User } = db;
 
-export const findUser = async (username, email) => {
+export const findUser = async (fullName, email) => {
   const user = await User.findOne({
-    where: { username, email },
+    where: { email },
   });
   
   return user?.toJSON();
 };
 
-export const handleExistingUser = async (user, password, res) => {
-  const isCorrectPassword = await comparePasswords(password, user.password);
+export const handleExistingUser = async (user, password, res) => {  
+  console.log(password,user.password);
+  const isCorrectPassword = await comparePasswords(password, user.password);  
   if (isCorrectPassword) {
     const accessToken = generateAccessToken({
       id: user.id,
@@ -46,11 +47,11 @@ export const handleExistingUser = async (user, password, res) => {
   }
 };
 
-export const handleNewUser = async (username, email, password, res) => {
+export const handleNewUser = async (fullName, email, password, res) => {
   const hashedPassword = await hashPassword(password);
 
   const newUser = await User.create({
-    username,
+    fullName,
     email,
     password: hashedPassword,
   });

@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
-import { Button } from '../components/Button';
-import { Input } from '../components/Input';
-import '../styles/signup.css';
-
+import { useAuth } from  '../providers/AuthProvider'
+import { toast } from 'react-toastify';
 
 export function Signup() {
   const navigate = useNavigate();
@@ -14,7 +12,7 @@ export function Signup() {
     password: '',
     confirmPassword: '',
   });
-
+  const { signup } = useAuth();
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,12 +58,13 @@ export function Signup() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      // Demo: Simulate successful signup
-      console.log('Signup successful:', formData);
-      navigate('/login');
+      await signup(formData.fullName, formData.email, formData.password);
+      setTimeout(() => {
+        navigate('/login', { replace: true });
+      }, 2000);
     }
   };
 
@@ -142,7 +141,7 @@ export function Signup() {
                 Full Name
               </label>
               <div className="relative">
-                <User className="user-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <User className="user-ic absolute left-2 top-3/4 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="text"
                   id="fullName"
@@ -168,7 +167,7 @@ export function Signup() {
                 Email
               </label>
               <div className="relative">
-                <Mail className="email-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Mail className="absolute left-2 top-3/4 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="email"
                   id="email"
@@ -194,7 +193,7 @@ export function Signup() {
                 Password
               </label>
               <div className="relative">
-                <Lock className="pass-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Lock className="pass-ic absolute left-2 top-3/4 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="password"
                   id="password"
@@ -220,7 +219,7 @@ export function Signup() {
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="pass-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Lock className="pass-ic absolute left-2 top-3/4 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="password"
                   id="confirmPassword"
