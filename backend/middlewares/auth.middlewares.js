@@ -18,6 +18,12 @@ export const validateCredentials = (req, res, next) => {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
+  const fullNameRegex = /^[A-Za-z]{3,50}$/;
+
+  if (!fullName || !fullNameRegex.test(fullName)) {
+    return res.status(400).json({ error: "Invalid full name format" });
+  }
+
   // Regular expression to validate username format:
   // - Only alphanumeric characters and underscores
   // - Between 3 and 20 characters

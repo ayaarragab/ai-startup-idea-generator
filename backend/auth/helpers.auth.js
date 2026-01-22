@@ -77,7 +77,7 @@ export const handleNewUser = async (fullName, email, password, res) => {
     sameSite: "Strict",
   });
 
-  return res.status(201).json({
+  return res.status(200).json({
     message: "User registered successfully",
     user: {
       id: newUser.id,

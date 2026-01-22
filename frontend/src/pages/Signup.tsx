@@ -32,20 +32,20 @@ export function Signup() {
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
+    const emailRegex = /\S+@\S+\.\S+/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const fullNameRegex = /^[A-Za-z]{3,50}$/;
+
+    if (!formData.fullName.trim() || !fullNameRegex.test(formData.fullName)) {
+      newErrors.fullName = 'Full name is required and must be 3-50 characters long';
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+    if (!formData.email.trim() || !emailRegex.test(formData.email)) {
+      newErrors.email = 'Email is required and must be valid';
     }
 
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    if (!formData.password || !passwordRegex.test(formData.password)) {
+      newErrors.password = 'Password is required and must be at least 8 characters long, including uppercase, lowercase, digit, and special character';
     }
 
     if (!formData.confirmPassword) {
@@ -61,10 +61,12 @@ export function Signup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      await signup(formData.fullName, formData.email, formData.password);
-      setTimeout(() => {
-        navigate('/login', { replace: true });
-      }, 2000);
+      const success = await signup(formData.fullName, formData.email, formData.password);
+      if (success) {
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 2000);
+      }
     }
   };
 

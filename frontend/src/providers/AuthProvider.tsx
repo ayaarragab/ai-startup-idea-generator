@@ -35,8 +35,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		setLoading(false);
 	  }
 	};
+
 	checkAuth();
   }, []);
+  
   const resetUser = () => {
     setUser({
       id: -1,
@@ -51,12 +53,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const res = await axios.post('/auth/signup', {
       email, password, fullName
     });
-    if (res.status == 201) {
+    if (res.status == 200) {
       toast.success("Signup successful! Redirecting to login...");
       setUser(res.data);
 		  setIsAuthenticated(true);
       return true;
-    } else if (res.status == 200) {
+    } else if (res.status == 409) {
       toast.info("User already exists. Please login.");
       return true;
     } else {
