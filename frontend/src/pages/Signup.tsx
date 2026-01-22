@@ -69,9 +69,7 @@ export function Signup() {
   };
 
   const handleGoogleSignup = () => {
-    // Demo: Simulate Google signup
-    console.log('Google signup initiated');
-    navigate('/');
+    window.location.href = "http://localhost:5000/auth/google";
   };
 
   return (
