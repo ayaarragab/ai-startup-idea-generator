@@ -34,20 +34,23 @@ export const getCurrentUser = async (req, res) => {
   }
 };
 
-export const handleOAuthTokens = (req, res, user) => {  
-  const { accessToken, refreshToken } = handleOAuthSignup({ email: user.email, username: user.username });
+export const handleOAuthTokens = (req, res, user, info) => {  
+  if (info === 'registered') {
+    const { accessToken, refreshToken } = handleOAuthSignup({ email: user.email, username: user.username });
 
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: false, // Set to true if using HTTPS
-    sameSite: "Strict",
-  });
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: false, // Set to true if using HTTPS
+      sameSite: "Strict",
+    });
 
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: false, // Set to true if using HTTPS
-    sameSite: "Strict",
-  });
-
-  return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/dashboard`)
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false, // Set to true if using HTTPS
+      sameSite: "Strict",
+    });
+    return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/login`)
+  } else if (info === 'loggedin') {
+      return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/dashboard`)
+  }
 }

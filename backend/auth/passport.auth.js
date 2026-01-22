@@ -6,9 +6,9 @@ import db from "../models/index.js";
 const { User } = db;
 dotenv.config();
 
-
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
 
 passport.use(new GoogleStrategy({
   clientID:     GOOGLE_CLIENT_ID,
@@ -19,21 +19,19 @@ passport.use(new GoogleStrategy({
   async function(request, accessToken, refreshToken, profile, done) {
   try {
     let user = await User.findOne({ where: { email: profile.email }})
-    if (user && user.provider !== 'google') {
-      await user.update({ provider: 'google and github', googleId: profile.id });
-    }
     if (!user) {
     user = await User.create({
       googleId: profile.id,
       email: profile.email,
       provider: 'Google',
-      username: profile.displayName,
-      firstName: profile.given_name,
-      lastName: profile.family_name,
-      avatar: profile.picture
+      fullName: profile.displayName,
+      // firstName: profile.given_name,
+      // lastName: profile.family_name,
+      // avatar: profile.picture
     });
+    return done(null, user, 'registered');
     }
-    return done(null, user);
+    return done(null, user, 'loggedin');
   } catch (error) {
     return done(error, null);
   }

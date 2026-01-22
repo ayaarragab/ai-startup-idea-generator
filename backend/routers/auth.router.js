@@ -18,7 +18,7 @@ router.get("/google/callback", (req, res, next) => {
     if (err) return next(err);
     if (!user) return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/`);
     
-    await handleOAuthTokens(req, res, user);
+    await handleOAuthTokens(req, res, user, info);
   })(req, res, next);
 });
 
