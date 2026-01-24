@@ -50,9 +50,6 @@ export function IdeaDetail() {
     problem: 'Rural Egyptian communities face severe healthcare access challenges, with limited medical facilities, long travel distances, and shortage of specialized doctors. Over 60% of rural residents must travel more than 50km to access quality healthcare.',
     solution: 'A telemedicine platform connecting rural patients with certified Egyptian doctors through mobile and web interfaces. Features include symptom checking, video consultations, prescription delivery, and health record management - all in Arabic with dialect support.',
     impact: 'Reaching 15+ million underserved Egyptians in rural governorates, reducing healthcare costs by 40%, and enabling preventive care through regular virtual checkups. Partnering with local pharmacies for prescription fulfillment.',
-    noveltyScore: 8.5,
-    feasibilityScore: 7.9,
-    usefulnessScore: 9.2,
     sectors: ['Healthcare', 'Technology', 'Rural Development'],
     targetUsers: ['Rural Communities', 'Doctors', 'Pharmacies'],
     bmc: {
@@ -132,11 +129,6 @@ export function IdeaDetail() {
         content: 'Video consultations with certified doctors • Arabic dialect support • Prescription delivery • Affordable pricing'
       },
       {
-        title: 'Market & Impact',
-        subtitle: '15M+ Underserved Egyptians',
-        content: '$400M telemedicine market • 40% cost reduction • Preventive care access • Rural economic boost'
-      },
-      {
         title: 'Next Steps',
         subtitle: 'Path to Launch',
         content: 'Pilot in 3 governorates • Doctor partnerships • Ministry approval • Seed funding ($500K)'
@@ -147,25 +139,21 @@ export function IdeaDetail() {
         title: 'Telemedicine adoption in developing countries: challenges and opportunities',
         source: 'Journal of Medical Internet Research',
         link: 'https://scholar.google.com',
-        relevance: 'Model 1 - Existing Solutions'
       },
       {
         title: 'Healthcare accessibility in rural Egypt: A systematic review',
         source: 'Egyptian Journal of Community Medicine',
         link: 'https://scholar.google.com',
-        relevance: 'Model 2 - Egyptian Needs'
       },
       {
         title: 'Mobile health interventions in Middle East: Success factors',
         source: 'BMC Health Services Research',
         link: 'https://scholar.google.com',
-        relevance: 'Model 3 - Solution Validation'
       },
       {
         title: 'Arabic NLP for healthcare applications',
         source: 'arXiv.org',
         link: 'https://arxiv.org',
-        relevance: 'Model 4 - Technical Implementation'
       }
     ]
   };
@@ -222,40 +210,6 @@ export function IdeaDetail() {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-                <div className="flex items-center gap-3 p-3 bg-primary-50 rounded-lg">
-                  <Lightbulb className="w-6 h-6 text-primary-600" />
-                  <div>
-                    <div className="text-neutral-600">Novelty Score</div>
-                    <div className="text-neutral-900">{idea.noveltyScore}/10</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-secondary-50 rounded-lg">
-                  <CheckCircle2 className="w-6 h-6 text-secondary-600" />
-                  <div>
-                    <div className="text-neutral-600">Feasibility</div>
-                    <div className="text-neutral-900">{idea.feasibilityScore}/10</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-accent-50 rounded-lg">
-                  <Target className="w-6 h-6 text-accent-600" />
-                  <div>
-                    <div className="text-neutral-600">Usefulness</div>
-                    <div className="text-neutral-900">{idea.usefulnessScore}/10</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-3 pt-4 border-t border-neutral-200">
-                <Button variant="primary" size="md">
-                  <Download className="w-5 h-5" />
-                  Download as PDF
-                </Button>
-                <Button variant="outlined" size="md">
-                  <Copy className="w-5 h-5" />
-                  Copy Pitch
-                </Button>
-              </div>
             </div>
           </Card>
 
@@ -293,11 +247,6 @@ export function IdeaDetail() {
                   <h4 className="text-neutral-900 mb-4">Solution</h4>
                   <p className="text-neutral-700">{idea.solution}</p>
                 </Card>
-
-                <Card variant="elevated" padding="lg">
-                  <h4 className="text-neutral-900 mb-4">Impact in Egypt</h4>
-                  <p className="text-neutral-700">{idea.impact}</p>
-                </Card>
               </div>
 
               <div className="space-y-6">
@@ -305,40 +254,10 @@ export function IdeaDetail() {
                   <h5 className="text-neutral-900 mb-4">Quick Stats</h5>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
-                      <span className="text-neutral-600">Novelty</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-24 h-2 bg-neutral-200 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary-600 rounded-full"
-                            style={{ width: `${idea.noveltyScore * 10}%` }}
-                          />
-                        </div>
-                        <span className="text-neutral-900 w-8">{idea.noveltyScore}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
                       <span className="text-neutral-600">Feasibility</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-24 h-2 bg-neutral-200 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-secondary-600 rounded-full"
-                            style={{ width: `${idea.feasibilityScore * 10}%` }}
-                          />
-                        </div>
-                        <span className="text-neutral-900 w-8">{idea.feasibilityScore}</span>
-                      </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-neutral-600">Usefulness</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-24 h-2 bg-neutral-200 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-accent-600 rounded-full"
-                            style={{ width: `${idea.usefulnessScore * 10}%` }}
-                          />
-                        </div>
-                        <span className="text-neutral-900 w-8">{idea.usefulnessScore}</span>
-                      </div>
                     </div>
                   </div>
                 </Card>
@@ -441,7 +360,6 @@ export function IdeaDetail() {
                         <h6 className="text-neutral-900 mb-2">{ref.title}</h6>
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <span className="text-neutral-600">{ref.source}</span>
-                          <Badge variant="info" size="sm">{ref.relevance}</Badge>
                         </div>
                       </div>
                       <Button variant="outlined" size="sm">
