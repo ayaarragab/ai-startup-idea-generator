@@ -17,7 +17,6 @@ export function Navigation() {
     { label: 'How It Works', value: '/how-it-works' },
     { label: 'Generate Idea', value: '/generate' },
     { label: 'Saved Ideas', value: '/dashboard' },
-    { label: 'Research & Metrics', value: '/research' },
     { label: 'About', value: '/about' },
   ];
   
