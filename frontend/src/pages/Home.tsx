@@ -94,14 +94,8 @@ export function Home() {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-white via-primary-50/30 to-accent-50/30 pt-12 md:pt-20 pb-16 md:pb-24">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left Content */}
-            <div className="space-y-6 md:space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full">
-                <Sparkles className="w-4 h-4" />
-                <span>NLP + Generative AI for Egypt</span>
-              </div>
-              
+          <div className="grid grid-cols-1 gap-12 items-center">
+            <div className="flex flex-col gap-6 max-w-3xl mx-auto text-center">        
               <h1 className="text-neutral-900">
                 AI Startup Idea Generator for the Egyptian Market
               </h1>
@@ -154,34 +148,6 @@ export function Home() {
                   See How It Works
                 </Button>
               </div>
-            </div>
-            
-            {/* Right Visual */}
-            <div className="hidden lg:block">
-              <Card variant="elevated" padding="lg">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between pb-4 border-b border-neutral-200">
-                    <h5 className="text-neutral-900">4-Model Pipeline</h5>
-                    <Tag variant="accent">AI-Powered</Tag>
-                  </div>
-                  {pipelineSteps.map((step, index) => (
-                    <div key={step.number} className="flex gap-4">
-                      <div className={`w-12 h-12 rounded-lg ${step.color} flex items-center justify-center flex-shrink-0`}>
-                        <step.icon className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-neutral-900">Model {step.number}</span>
-                        </div>
-                        <p className="text-neutral-600">{step.title}</p>
-                      </div>
-                      {index < pipelineSteps.length - 1 && (
-                        <div className="absolute left-6 mt-12 h-8 w-0.5 bg-neutral-200" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </Card>
             </div>
           </div>
         </div>
@@ -300,52 +266,6 @@ export function Home() {
                 </div>
               </Card>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Preview Section */}
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto">
-          <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-neutral-900 mb-4">How It Works</h2>
-            <p className="subtitle text-neutral-600 max-w-2xl mx-auto">
-              Our four-model AI pipeline transforms Egyptian market data into actionable startup ideas
-            </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto space-y-6">
-            {pipelineSteps.map((step, index) => (
-              <Card key={step.number} variant="bordered" padding="lg" className="hover:shadow-md transition-shadow">
-                <div className="flex flex-col md:flex-row gap-6 items-start">
-                  <div className={`w-16 h-16 rounded-xl ${step.color} flex items-center justify-center flex-shrink-0`}>
-                    <step.icon className="w-8 h-8" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-neutral-900">Model {step.number}</span>
-                      <span className="text-neutral-400">•</span>
-                      <h5 className="text-neutral-900">{step.title}</h5>
-                    </div>
-                    <p className="text-neutral-600">{step.description}</p>
-                  </div>
-                  <div className="hidden md:block text-neutral-300">
-                    {index < pipelineSteps.length - 1 && <ArrowRight className="w-6 h-6" />}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-          
-          <div className="text-center mt-12">
-            <Button 
-              variant="primary" 
-              size="lg"
-              onClick={() => navigate('/how-it-works')}
-            >
-              Learn More About Our Models
-              <ArrowRight className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </section>
