@@ -35,10 +35,7 @@ export function Dashboard() {
       name: 'MediConnect Egypt',
       description: 'Telemedicine platform for rural Egyptian communities',
       sector: 'Healthcare',
-      noveltyScore: 8.5,
-      feasibilityScore: 7.9,
       dateGenerated: '2025-12-01',
-      status: 'validated',
       tags: ['Healthcare', 'Rural Development'],
     },
     {
@@ -46,10 +43,7 @@ export function Dashboard() {
       name: 'EduBridge',
       description: 'AI-powered tutoring matching students with teachers',
       sector: 'Education',
-      noveltyScore: 7.8,
-      feasibilityScore: 8.5,
       dateGenerated: '2025-11-28',
-      status: 'draft',
       tags: ['Education', 'Technology'],
     },
     {
@@ -57,10 +51,7 @@ export function Dashboard() {
       name: 'FarmSmart Egypt',
       description: 'IoT-based precision agriculture for small Egyptian farms',
       sector: 'Agriculture',
-      noveltyScore: 8.2,
-      feasibilityScore: 6.9,
       dateGenerated: '2025-11-25',
-      status: 'draft',
       tags: ['Agriculture', 'IoT', 'Sustainability'],
     },
     {
@@ -68,10 +59,7 @@ export function Dashboard() {
       name: 'WasteWise',
       description: 'Waste collection optimization using AI routing',
       sector: 'Environment',
-      noveltyScore: 7.5,
-      feasibilityScore: 8.1,
       dateGenerated: '2025-11-20',
-      status: 'validated',
       tags: ['Environment', 'Smart Cities'],
     },
   ];
@@ -84,12 +72,6 @@ export function Dashboard() {
       value: savedIdeas.length.toString(),
       icon: Bookmark,
       color: 'bg-primary-100 text-primary-600',
-    },
-    {
-      label: 'Validated Ideas',
-      value: savedIdeas.filter(i => i.status === 'validated').length.toString(),
-      icon: TrendingUp,
-      color: 'bg-secondary-100 text-secondary-600',
     },
     {
       label: 'This Month',
@@ -128,7 +110,7 @@ export function Dashboard() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             {stats.map((stat) => (
               <Card key={stat.label} variant="bordered" padding="md">
                 <div className="flex items-center gap-4">
@@ -221,12 +203,6 @@ export function Dashboard() {
                       <h5 className="text-neutral-900 mb-1 truncate">{idea.name}</h5>
                       <p className="text-neutral-600 line-clamp-2">{idea.description}</p>
                     </div>
-                    <Badge 
-                      variant={idea.status === 'validated' ? 'success' : 'neutral'}
-                      size="sm"
-                    >
-                      {idea.status}
-                    </Badge>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
@@ -236,17 +212,6 @@ export function Dashboard() {
                     {idea.tags.length > 2 && (
                       <Tag variant="default" size="sm">+{idea.tags.length - 2}</Tag>
                     )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 py-3 border-t border-neutral-200">
-                    <div>
-                      <div className="text-neutral-600">Novelty</div>
-                      <div className="text-neutral-900">{idea.noveltyScore}/10</div>
-                    </div>
-                    <div>
-                      <div className="text-neutral-600">Feasibility</div>
-                      <div className="text-neutral-900">{idea.feasibilityScore}/10</div>
-                    </div>
                   </div>
 
                   <div className="text-neutral-500">
@@ -287,33 +252,11 @@ export function Dashboard() {
                         <h5 className="text-neutral-900 mb-1">{idea.name}</h5>
                         <p className="text-neutral-600">{idea.description}</p>
                       </div>
-                      <Badge 
-                        variant={idea.status === 'validated' ? 'success' : 'neutral'}
-                        size="sm"
-                      >
-                        {idea.status}
-                      </Badge>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
                       {idea.tags.map(tag => (
                         <Tag key={tag} variant="primary" size="sm">{tag}</Tag>
                       ))}
-                    </div>
-                  </div>
-                  <div className="flex md:flex-col items-center gap-4 md:gap-2">
-                    <div className="text-center">
-                      <div className="text-neutral-600">Novelty</div>
-                      <div className="text-neutral-900">{idea.noveltyScore}/10</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-neutral-600">Feasibility</div>
-                      <div className="text-neutral-900">{idea.feasibilityScore}/10</div>
-                    </div>
-                    <div className="text-neutral-500 whitespace-nowrap">
-                      {new Date(idea.dateGenerated).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric' 
-                      })}
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -333,23 +276,6 @@ export function Dashboard() {
               </Card>
             ))}
           </div>
-        )}
-
-        {/* Bulk Actions */}
-        {filteredIdeas.length > 0 && (
-          <Card variant="bordered" padding="md" className="mt-8">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-neutral-600">
-                Showing {filteredIdeas.length} of {savedIdeas.length} ideas
-              </p>
-              <div className="flex gap-3">
-                <Button variant="outlined" size="sm">
-                  <Download className="w-4 h-4" />
-                  Export All
-                </Button>
-              </div>
-            </div>
-          </Card>
         )}
       </div>
     </div>
