@@ -5,8 +5,11 @@ import {
   handleNewUser,
   handleOAuthSignup,
 } from "./helpers.auth.js";
+import { compareTexts } from "../utils/hashing.utils.js";
 import dotenv from "dotenv";
+import db from "../models/index.js";
 
+const { User } = db;
 dotenv.config();
 
 export const login = async (req, res) => {
@@ -96,8 +99,8 @@ export const verifyEmail = async (req, res) => {
     if (user.isVerified) {
       return res.status(400).json({ error: "Email is already verified" });
     }
-
-    if (user.emailOTP !== otp) {
+    const compareOTPs = await compareTexts(otp, user.otp);
+    if (!compareOTPs) {
       return res.status(400).json({ error: "Invalid OTP" });
     }
 
@@ -107,7 +110,16 @@ export const verifyEmail = async (req, res) => {
 
     user.isVerified = true;
     user.emailOTP = null; // Clear the OTP after successful verification
-    await user.save();
+    await User.update(
+    {
+      isVerified: true,
+      otp: null,
+      otpExpires: null,
+    },
+    {
+      where: { email },
+    }
+  );
 
     return res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {

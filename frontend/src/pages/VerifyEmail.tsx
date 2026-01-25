@@ -7,7 +7,9 @@ import {
   RefreshCw,
   ArrowLeft,
 } from "lucide-react";
+import axios from "../utils/axiosInstance";
 import { toast } from "react-toastify";
+
 
 export function VerifyEmail() {
   const navigate = useNavigate();
@@ -78,27 +80,37 @@ export function VerifyEmail() {
     lastInput?.focus();
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const enteredCode = code.join("");
 
     if (enteredCode.length !== 6) {
       setVerificationError("Please enter the complete 6-digit code");
       return;
     }
-
     setIsVerifying(true);
-
-    // Demo: Simulate API call
-    setTimeout(() => {
-      if (enteredCode === DEMO_CODE) {
+    try {
+      const response = await axios.post("/auth/verify-email", {
+        email: email,
+        otp: enteredCode,
+      });
+      if (response.status === 200) {
         setStatus("success");
+        setIsVerifying(false);
       } else {
         setVerificationError("Invalid verification code. Please try again.");
         setCode(["", "", "", "", "", ""]);
         document.getElementById("code-0")?.focus();
+        setIsVerifying(false);
       }
+    } catch (error: any) {
+      setVerificationError(
+        error.response?.data?.message ||
+          "An error occurred during verification. Please try again.",
+      );
+      setCode(["", "", "", "", "", ""]);
+      document.getElementById("code-0")?.focus();
       setIsVerifying(false);
-    }, 1000);
+    }
   };
 
   const handleResendCode = () => {
