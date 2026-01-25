@@ -217,7 +217,7 @@ export function ForgotPassword() {
                 <div className="w-16 h-16 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Mail className="w-8 h-8 text-white" />
                 </div>
-                <h1 className="text-neutral-900 mb-2">Check Your Email</h1>
+                <h3 className="text-neutral-900 mb-2">Check Your Email</h3>
                 <p className="text-neutral-600 text-sm">
                   We've sent a 6-digit code to
                 </p>
@@ -250,15 +250,15 @@ export function ForgotPassword() {
                   Demo code: 123456
                 </p>
               </div>
-
-              <button
-                onClick={handleCodeSubmit}
-                disabled={isSubmitting || code.join('').length !== 6}
-                className="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-neutral-400 disabled:cursor-not-allowed text-white py-3 rounded-lg transition-colors mb-4"
-              >
-                {isSubmitting ? 'Verifying...' : 'Verify Code'}
-              </button>
-
+                <div className='flex flex-col justify-center items-center'>
+                  <button
+                      onClick={handleCodeSubmit}
+                      disabled={isSubmitting || code.join('').length !== 6}
+                      className="w-3/4 bg-primary-600 hover:bg-primary-700 disabled:bg-neutral-400 disabled:cursor-not-allowed text-white py-3 rounded-lg transition-colors mb-4"
+                    >
+                      {isSubmitting ? 'Verifying...' : 'Verify Code'}
+                    </button>
+                </div>
               <div className="text-center">
                 <p className="text-sm text-neutral-600 mb-2">Didn't receive the code?</p>
                 <button
