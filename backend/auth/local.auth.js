@@ -83,3 +83,35 @@ export const handleOAuthTokens = (req, res, user, info) => {
     );
   }
 };
+
+export const verifyEmail = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await findUser(email);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ error: "Email is already verified" });
+    }
+
+    if (user.emailOTP !== otp) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    if (Date.now() > user.otpExpires) {
+      return res.status(400).json({ error: "OTP has expired" });
+    }
+
+    user.isVerified = true;
+    user.emailOTP = null; // Clear the OTP after successful verification
+    await user.save();
+
+    return res.status(200).json({ message: "Email verified successfully" });
+  } catch (error) {
+    console.error("Error during email verification:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

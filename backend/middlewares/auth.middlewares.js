@@ -103,3 +103,24 @@ export const authenticate = (req, res, next) => {
     });
   }
 };
+
+export const validateOTPAndEmail = (req, res, next) => {
+  const { email, otp } = req.body;
+
+  // Regular expression to validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Check if email is provided and matches the regex
+  if (!email || !emailRegex.test(email)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+
+  // Check if OTP is provided and is a 6-digit number
+  const otpRegex = /^\d{6}$/;
+  if (!otp || !otpRegex.test(otp)) {
+    return res.status(400).json({ error: "Invalid OTP format" });
+  }
+
+  // If both email and OTP are valid, proceed to the next middleware or route handler
+  next();
+}
