@@ -12,6 +12,7 @@ import { About } from './pages/About';
 import { Signup } from './pages/Signup';
 import { Login } from './pages/Login';
 import { VerifyEmail } from './pages/VerifyEmail';
+import { ForgotPassword } from './pages/ForgotPassword';
 import { ToastContainer } from 'react-toastify'
 
 type PageType = 'home' | 'generate' | 'idea-detail' | 'dashboard' | 'how-it-works' | 'research' | 'about';
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

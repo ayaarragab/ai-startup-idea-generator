@@ -187,6 +187,7 @@ export function Login() {
               </label>
               <button
                 type="button"
+                onClick={() => navigate('/forgot-password')}
                 className="text-primary-600 hover:text-primary-700 transition-colors"
               >
                 Forgot password?
