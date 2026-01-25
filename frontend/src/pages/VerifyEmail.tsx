@@ -113,14 +113,26 @@ export function VerifyEmail() {
     }
   };
 
-  const handleResendCode = () => {
-    // Demo: Simulate resending verification code
-    console.log("Resending verification code to:", email);
-    setResendDisabled(true);
-    setCountdown(60); // 60 second cooldown
-    setCode(["", "", "", "", "", ""]);
-    setVerificationError("");
-    document.getElementById("code-0")?.focus();
+  const handleResendCode = async () => {
+    try {
+      const res = await axios.post("/auth/resend-otp", { email });
+      if (res.status === 200) {
+        toast.success("Verification code resent. Please check your email.");
+        setResendDisabled(true);
+        setCountdown(60); // 60 second cooldown
+        setCode(["", "", "", "", "", ""]);
+        setVerificationError("");
+        document.getElementById("code-0")?.focus();
+      } else {
+        toast.error(res?.data?.error || "Failed to resend verification code. Please try again.");
+        setCode(["", "", "", "", "", ""]);
+        document.getElementById("code-0")?.focus();
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.error ||  "An error occurred while resending the code. Please try again.");
+      setCode(["", "", "", "", "", ""]);
+      document.getElementById("code-0")?.focus();
+    }
   };
 
   const handleBackToLogin = () => {

@@ -5,7 +5,8 @@ import {
   handleNewUser,
   handleOAuthSignup,
 } from "./helpers.auth.js";
-import { compareTexts } from "../utils/hashing.utils.js";
+import { sendVerificationEmail, generateOTP } from "../utils/email.utils.js";
+import { compareTexts, hashText } from "../utils/hashing.utils.js";
 import dotenv from "dotenv";
 import db from "../models/index.js";
 
@@ -127,3 +128,33 @@ export const verifyEmail = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const resendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await findUser(email);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ error: "Email is already verified" });
+    }
+
+    const otp = generateOTP();
+    const hashedOTP = await hashText(otp);
+
+    // Update user with new OTP and expiry
+    await User.update(
+      { otp: hashedOTP, otpExpires: Date.now() + 10 * 60 * 1000 },
+      { where: { email } }
+    );
+
+    await sendVerificationEmail(email, otp);
+    return res.status(200).json({ message: "OTP resent successfully" });
+  } catch (error) {
+    console.error("Error during OTP resend:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}

@@ -124,3 +124,17 @@ export const validateOTPAndEmail = (req, res, next) => {
   // If both email and OTP are valid, proceed to the next middleware or route handler
   next();
 }
+export const validateEmail = (req, res, next) => {
+  const { email } = req.body;
+
+  // Regular expression to validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Check if email is provided and matches the regex
+  if (!email || !emailRegex.test(email)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+
+  // If both email and OTP are valid, proceed to the next middleware or route handler
+  next();
+}
