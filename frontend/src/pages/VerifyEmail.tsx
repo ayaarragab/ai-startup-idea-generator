@@ -97,14 +97,14 @@ export function VerifyEmail() {
         setStatus("success");
         setIsVerifying(false);
       } else {
-        setVerificationError("Invalid verification code. Please try again.");
+        setVerificationError(response?.data?.error || "Invalid verification code. Please try again.");
         setCode(["", "", "", "", "", ""]);
         document.getElementById("code-0")?.focus();
         setIsVerifying(false);
       }
     } catch (error: any) {
       setVerificationError(
-        error.response?.data?.message ||
+        error.response?.data?.error ||
           "An error occurred during verification. Please try again.",
       );
       setCode(["", "", "", "", "", ""]);

@@ -62,9 +62,7 @@ export function Signup() {
     if (validateForm()) {
       const success = await signup(formData.fullName, formData.email, formData.password);
       if (success) {
-        setTimeout(() => {
-          navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`);
-        }, 2000);
+        navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`);
       }
     }
   };
