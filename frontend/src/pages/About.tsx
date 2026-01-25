@@ -18,46 +18,60 @@ export function About() {
   const projectInfo = {
     university: 'Helwan University',
     faculty: 'Faculty of Computer Science & Artificial Intelligence',
-    department: 'Department of Natural Language Processing & AI',
-    year: '2024-2025',
+    department: 'Computer Science',
+    year: '2025-2026',
     type: 'Graduation Project',
   };
 
   const supervisor = {
-    name: 'Dr. Ahmed Hassan',
+    name: 'Dr. Mohammed El-Said',
     title: 'Professor of Artificial Intelligence & NLP',
-    department: 'Computer Science & AI',
-    expertise: ['Natural Language Processing', 'Generative AI', 'Arabic NLP', 'Machine Learning'],
+    department: 'Computer Science',
+    expertise: ['Natural Language Processing', 'Machine Learning', 'Generative AI', 'Arabic Language Technologies'],
   };
 
   const teamMembers = [
     {
+      name: 'Aya Ragab',
+      role: 'Full Stack Developer',
+      specialization: 'Full Stack Development & Data Collection',
+      linkedin: 'https://www.linkedin.com/in/ayaragab/',
+      email: 'AyaRagabSaleh@outlook.com',
+    },
+    {
       name: 'Sarah Mohamed',
-      role: 'Team Lead & Backend Developer',
-      specialization: 'NLP & Model Development',
+      role: 'AI/ML Engineer',
+      specialization: 'Generative AI & Evaluation Metrics',
       linkedin: '#',
       email: 'sarah.mohamed@example.com',
     },
     {
-      name: 'Karim Ali',
-      role: 'AI/ML Engineer',
-      specialization: 'Generative AI & Evaluation Metrics',
+      name: 'Omnia Gamal',
+      role: 'AI/NLP Engineer',
+      specialization: 'Natural Language Processing & Model Integration',
       linkedin: '#',
-      email: 'karim.ali@example.com',
+      email: 'omnia.gamal@example.com',
     },
     {
-      name: 'Nour Hassan',
-      role: 'Frontend Developer',
-      specialization: 'Web Development & UI/UX',
+      name: 'Sagda Fathy',
+      role: 'GenAI Engineer',
+      specialization: 'Generative AI & Prompt Engineering',
       linkedin: '#',
-      email: 'nour.hassan@example.com',
+      email: 'sagda.fathy@example.com',
     },
     {
-      name: 'Omar Youssef',
-      role: 'Data Engineer',
-      specialization: 'Data Collection & Processing',
+      name: 'Alshimaa Ahmed',
+      role: 'GenAI Engineer',
+      specialization: 'Generative AI & Prompt Engineering',
       linkedin: '#',
-      email: 'omar.youssef@example.com',
+      email: 'alshimaa.ahmed@example.com',
+    },
+    {
+      name: 'Ahmed Amin',
+      role: 'GenAI Engineer',
+      specialization: 'Generative AI & Prompt Engineering',
+      linkedin: '#',
+      email: 'ahmed.amin@example.com',
     },
   ];
 
