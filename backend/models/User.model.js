@@ -22,6 +22,18 @@ const User = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      otp: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      otpExpires: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      isVerified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       tableName: 'users',

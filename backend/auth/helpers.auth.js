@@ -1,6 +1,6 @@
 import { hashText } from "../utils/hashing.utils.js";
 import { compareTexts } from "../utils/hashing.utils.js";
-
+import { generateOTP, sendVerificationEmail } from "../utils/email.utils.js";
 import db from "../models/index.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.js";
 
@@ -55,11 +55,17 @@ export const handleExistingUser = async (user, password, res) => {
 
 export const handleNewUser = async (fullName, email, password, res) => {
   const hashedPassword = await hashText(password);
+  
+  const otp = generateOTP();
+  const hashedOTP = await hashText(otp);
 
   const newUser = await User.create({
     fullName,
     email,
+    otp: hashedOTP,
     password: hashedPassword,
+    otpExpires: Date.now() + 10 * 60 * 1000,
+    isVerified: false,
   });
 
   const accessToken = generateAccessToken({
@@ -82,7 +88,7 @@ export const handleNewUser = async (fullName, email, password, res) => {
     secure: false, // Set to true if using HTTPS
     sameSite: "Strict",
   });
-
+  await sendVerificationEmail(email, otp);
   return res.status(200).json({
     message: "User registered successfully",
     user: {
