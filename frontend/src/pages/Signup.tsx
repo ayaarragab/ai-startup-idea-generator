@@ -86,7 +86,7 @@ export function Signup() {
         </button>
       <div className="flex items-center justify-center">
         {/* Signup Card */}
-        <div style={{width: '500px'}} className="bg-white rounded-xl shadow-lg border border-neutral-200 p-4">
+        <div className="bg-white w-[500px] rounded-xl shadow-lg border border-neutral-200 p-4">
           {/* Header */}
           <div className="text-center mb-4">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent-600 rounded-xl flex items-center justify-center mx-auto mb-2">
