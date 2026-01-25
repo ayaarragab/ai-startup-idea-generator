@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendVerificationEmail(email, otp) {
   await resend.emails.send({
-    from: "Verify <onboarding@resend.dev>",
+    from: "AIStartupIdeaGenerator <onboarding@resend.dev>",
     to: email,
     subject: "Email Verification Code",
     html: `

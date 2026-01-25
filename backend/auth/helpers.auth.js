@@ -93,7 +93,7 @@ export const handleNewUser = async (fullName, email, password, res) => {
     message: "User registered successfully",
     user: {
       id: newUser.id,
-      username: newUser.username,
+      fullName: newUser.fullName,
       email: newUser.email,
     },
   })
