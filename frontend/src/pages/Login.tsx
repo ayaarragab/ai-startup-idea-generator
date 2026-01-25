@@ -128,7 +128,7 @@ export function Login() {
                 Email
               </label>
               <div className="relative">
-                <Mail className="email-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Mail className="absolute left-2.5 top-3/4 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="email"
                   id="email"
@@ -154,7 +154,7 @@ export function Login() {
                 Password
               </label>
               <div className="relative">
-                <Lock className="pass-ic absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Lock className="pass-ic absolute left-2.5 top-3/4 -translate-y-1/2 w-4 h-4 text-neutral-400" />
                 <input
                   type="password"
                   id="password"
