@@ -1,5 +1,5 @@
-import { hashPassword } from "../utils/hashing.utils.js";
-import { comparePasswords } from "../utils/hashing.utils.js";
+import { hashText } from "../utils/hashing.utils.js";
+import { compareTexts } from "../utils/hashing.utils.js";
 
 import db from "../models/index.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.js";
@@ -22,7 +22,7 @@ export const findUserById = async (id) => {
 
 export const handleExistingUser = async (user, password, res) => {
   
-  const isCorrectPassword = await comparePasswords(password, user.password);  
+  const isCorrectPassword = await compareTexts(password, user.password);  
   if (isCorrectPassword) {
     const accessToken = generateAccessToken({
       id: user.id,
@@ -54,7 +54,7 @@ export const handleExistingUser = async (user, password, res) => {
 };
 
 export const handleNewUser = async (fullName, email, password, res) => {
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashText(password);
 
   const newUser = await User.create({
     fullName,
