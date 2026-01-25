@@ -54,7 +54,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       email, password, fullName
     });
     if (res.status == 200) {
-      toast.success("Signup successful! Redirecting to login...");
       return true;
     } else if (res.status == 409) {
       toast.info("User already exists. Please login.");

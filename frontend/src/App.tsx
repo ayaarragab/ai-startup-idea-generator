@@ -8,10 +8,10 @@ import { Generate } from './pages/Generate';
 import { IdeaDetail } from './pages/IdeaDetail';
 import { Dashboard } from './pages/Dashboard';
 import { HowItWorks } from './pages/HowItWorks';
-import { Research } from './pages/Research';
 import { About } from './pages/About';
 import { Signup } from './pages/Signup';
 import { Login } from './pages/Login';
+import { VerifyEmail } from './pages/VerifyEmail';
 import { ToastContainer } from 'react-toastify'
 
 type PageType = 'home' | 'generate' | 'idea-detail' | 'dashboard' | 'how-it-works' | 'research' | 'about';
@@ -42,10 +42,10 @@ export default function App() {
             <Route path="/idea/:id" element={<IdeaDetail />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/research" element={<Research />} />
             <Route path="/about" element={<About />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
