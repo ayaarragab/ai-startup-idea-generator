@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'motion/react';
 import { AuthProvider } from './providers/AuthProvider';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
+import { PageTransition } from './components/PageTransition';
 import { Home } from './pages/Home';
 import { Generate } from './pages/Generate';
 import { IdeaDetail } from './pages/IdeaDetail';
@@ -16,6 +18,28 @@ import { ForgotPassword } from './pages/ForgotPassword';
 import { ToastContainer } from 'react-toastify'
 
 type PageType = 'home' | 'generate' | 'idea-detail' | 'dashboard' | 'how-it-works' | 'research' | 'about';
+
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+        <Route path="/generate" element={<PageTransition><Generate /></PageTransition>} />
+        <Route path="/idea/:id" element={<PageTransition><IdeaDetail /></PageTransition>} />
+        <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+        <Route path="/how-it-works" element={<PageTransition><HowItWorks /></PageTransition>} />
+        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+        <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
+        <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+        <Route path="/verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
+        <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -37,19 +61,7 @@ export default function App() {
         <Navigation />
         
         <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/generate" element={<Generate />} />
-            <Route path="/idea/:id" element={<IdeaDetail />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <AnimatedRoutes />
         </main>
 
         <Footer />
