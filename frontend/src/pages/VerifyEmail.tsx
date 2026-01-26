@@ -243,7 +243,7 @@ export function VerifyEmail() {
                   <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="w-8 h-8 text-white" />
                   </div>
-                  <h1 className="text-neutral-900 mb-2">Email Verified!</h1>
+                  <h3 className="text-neutral-900 mb-2">Email Verified!</h3>
                   <p className="text-neutral-600 text-sm mb-6">
                     Your email has been successfully verified. You can now
                     access all features of the platform.
