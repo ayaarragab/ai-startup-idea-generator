@@ -1,7 +1,7 @@
 import Router from 'express';
 import passport from "../auth/passport.auth.js";
 import { validateCredentialsSignup, validateCredentialsLogin, validateOTPAndEmail, validateEmail, authenticate } from '../middlewares/auth.middlewares.js';
-import { signup, login, verifyEmail, resendOTP, getCurrentUser, handleOAuthTokens } from '../auth/local.auth.js';
+import { signup, login, verifyEmail, resendOTP, forgetPasswordOTP, verifyOTPForgetPassword, getCurrentUser, handleOAuthTokens } from '../auth/local.auth.js';
 import dotenv from "dotenv";
 
 const router = Router();
@@ -12,6 +12,10 @@ router.post('/signup', validateCredentialsSignup, signup);
 router.post('/verify-email', validateOTPAndEmail, verifyEmail);
 
 router.post('/resend-otp', validateEmail, resendOTP);
+
+router.post('/forget-password', validateEmail, forgetPasswordOTP);
+
+router.post('/verify-otp-forget-password', validateOTPAndEmail, verifyOTPForgetPassword);
 
 router.post('/login', validateCredentialsLogin, login);
 

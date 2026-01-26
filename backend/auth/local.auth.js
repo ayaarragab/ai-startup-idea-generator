@@ -158,3 +158,53 @@ export const resendOTP = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
+
+export const forgetPasswordOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await findUser(email);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const otp = generateOTP();
+    const hashedOTP = await hashText(otp);
+
+    // Update user with new OTP and expiry
+    await User.update(
+      { otp: hashedOTP, otpExpires: Date.now() + 10 * 60 * 1000 },
+      { where: { email } }
+    );
+
+    await sendVerificationEmail(email, otp);
+    return res.status(200).json({ message: "OTP resent successfully" });
+  } catch (error) {
+    console.error("Error during OTP resend:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export const verifyOTPForgetPassword = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await findUser(email);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const compareOTPs = await compareTexts(otp, user.otp);
+    if (!compareOTPs) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    if (Date.now() > user.otpExpires) {
+      return res.status(400).json({ error: "OTP has expired" });
+    }
+    return res.status(200).json({ message: "You can now reset your password" });
+  } catch (error) {
+    console.error("Error during OTP verification for forget password:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

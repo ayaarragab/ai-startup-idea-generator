@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle2, KeyRound } from 'lucide-react';
+import axios from '../utils/axiosInstance';
+import { toast } from 'react-toastify';
 
 export function ForgotPassword() {
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ export function ForgotPassword() {
     }
   }, [countdown]);
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email.trim()) {
@@ -42,12 +44,19 @@ export function ForgotPassword() {
     }
 
     setIsSubmitting(true);
-    // Demo: Simulate sending reset code
-    setTimeout(() => {
-      console.log('Password reset code sent to:', email);
-      setStep('code');
-      setIsSubmitting(false);
-    }, 1000);
+    try {
+      const res = await axios.post('/auth/forget-password', { email });
+      if (res.status === 200) {
+        setStep('code');
+        setIsSubmitting(false);   
+      } else {
+        toast.error(res?.data?.error || 'Failed to send reset code. Please try again later.');
+        setIsSubmitting(false); 
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.error || 'Failed to send reset code. Please try again later.');
+      setIsSubmitting(false); 
+    }
   };
 
   const handleCodeChange = (index: number, value: string) => {
@@ -85,7 +94,7 @@ export function ForgotPassword() {
     lastInput?.focus();
   };
 
-  const handleCodeSubmit = () => {
+  const handleCodeSubmit = async () => {
     const enteredCode = code.join('');
     
     if (enteredCode.length !== 6) {
@@ -95,16 +104,25 @@ export function ForgotPassword() {
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      if (enteredCode === DEMO_CODE) {
+    try {
+      const res = await axios.post('/auth/verify-otp-forget-password', { email, otp: enteredCode });
+      if (res.status === 200) {
+        toast.success('Verification successful');
         setStep('reset');
+        setIsSubmitting(false);   
       } else {
-        setCodeError('Invalid verification code. Please try again.');
+        toast.error(res.data?.error || 'Invalid verification code. Please try again.');
+        setCodeError(res.data?.error || 'Invalid verification code. Please try again.');
         setCode(['', '', '', '', '', '']);
         document.getElementById('reset-code-0')?.focus();
+        setIsSubmitting(false); 
       }
-      setIsSubmitting(false);
-    }, 1000);
+    } catch (error: any) {
+      setCodeError(error?.response?.data?.error || 'Invalid verification code. Please try again.');
+      setCode(['', '', '', '', '', '']);
+      document.getElementById('reset-code-0')?.focus();
+      setIsSubmitting(false); 
+    }
   };
 
   const handlePasswordReset = (e: React.FormEvent) => {
@@ -134,13 +152,30 @@ export function ForgotPassword() {
     }, 1000);
   };
 
-  const handleResendCode = () => {
-    console.log('Resending verification code to:', email);
-    setResendDisabled(true);
-    setCountdown(60);
-    setCode(['', '', '', '', '', '']);
-    setCodeError('');
-    document.getElementById('reset-code-0')?.focus();
+  const handleResendCode = async () => {
+    if (resendDisabled) return;
+    
+    try {
+      const res = await axios.post('/auth/forget-password', { email });
+      if (res.status === 200) {
+        toast.success('Verification code resent successfully');
+        setResendDisabled(true);
+        setCountdown(60);
+        setCode(['', '', '', '', '', '']);
+        setCodeError('');
+        document.getElementById('reset-code-0')?.focus();
+      } else {
+        toast.error(res?.data?.error || 'Failed to resend code. Please try again later.');
+        setCode(['', '', '', '', '', '']);
+        setCodeError('');
+        document.getElementById('reset-code-0')?.focus();
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.error || 'Failed to resend code. Please try again later.');
+      setCode(['', '', '', '', '', '']);
+      setCodeError('');
+      document.getElementById('reset-code-0')?.focus();
+    }
   };
 
   return (
