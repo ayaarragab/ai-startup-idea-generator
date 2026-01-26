@@ -280,7 +280,7 @@ export function ForgotPassword() {
                 <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <KeyRound className="w-8 h-8 text-white" />
                 </div>
-                <h1 className="text-neutral-900 mb-2">Set New Password</h1>
+                <h3 className="text-neutral-900 mb-2">Set New Password</h3>
                 <p className="text-neutral-600 text-sm">
                   Choose a strong password for your account
                 </p>
