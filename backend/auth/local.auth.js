@@ -208,3 +208,26 @@ export const verifyOTPForgetPassword = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await findUser(email);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const hashedPassword = await hashText(password);
+
+    await User.update(
+      { password: hashedPassword, otp: null, otpExpires: null },
+      { where: { email } }
+    );
+
+    return res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Error during password reset:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

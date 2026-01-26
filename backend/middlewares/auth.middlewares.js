@@ -124,6 +124,7 @@ export const validateOTPAndEmail = (req, res, next) => {
   // If both email and OTP are valid, proceed to the next middleware or route handler
   next();
 }
+
 export const validateEmail = (req, res, next) => {
   const { email } = req.body;
 
@@ -136,5 +137,25 @@ export const validateEmail = (req, res, next) => {
   }
 
   // If both email and OTP are valid, proceed to the next middleware or route handler
+  next();
+};
+
+export const validateResetPassword = (req, res, next) => {
+  const { password } = req.body;
+
+  // Regular expression to validate password format:
+  // - At least 8 characters
+  // - At least one lowercase letter
+  // - At least one uppercase letter
+  // - At least one digit
+  // - At least one special character (@, $, !, %, *, ?, &)
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+  // Check if password is provided and matches the regex
+  if (!password || !passwordRegex.test(password)) {
+    return res.status(400).json({ error: "Invalid password format" }); // Respond with error if password is invalid
+  }
+  // If password is valid, proceed to the next middleware or route handler
   next();
 }

@@ -125,7 +125,7 @@ export function ForgotPassword() {
     }
   };
 
-  const handlePasswordReset = (e: React.FormEvent) => {
+  const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     
     let hasError = false;
@@ -144,12 +144,20 @@ export function ForgotPassword() {
     if (hasError) return;
 
     setIsSubmitting(true);
-    // Demo: Simulate password reset
-    setTimeout(() => {
-      console.log('Password reset successful');
-      setStep('success');
-      setIsSubmitting(false);
-    }, 1000);
+    try {
+      const res = await axios.post('/auth/reset-password', { email, password });
+      if (res.status === 200) {
+        toast.success('Password reset successful');
+        setStep('success');
+        setIsSubmitting(false);   
+      } else {
+        toast.error(res?.data?.error || 'Failed to reset password. Please try again later.');
+        setIsSubmitting(false); 
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.error || 'Failed to reset password. Please try again later.');
+      setIsSubmitting(false); 
+    }
   };
 
   const handleResendCode = async () => {
