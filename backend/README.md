@@ -2,7 +2,7 @@
 
 ## Authentication Endpoints
 
-### POST /api/auth/signup
+### POST /auth/signup
 
 - Description: Register a new user.
 - Request Body: `{ "fullName": "string", "email": "string", "password": "string" }`
@@ -38,7 +38,7 @@
     }
     ```
 
-### POST /api/auth/login
+### POST /auth/login
 
 - Description: Log in an existing user.
 - Request Body: `{ "email": "string", "password": "string" }`
@@ -73,7 +73,7 @@
     }
     ```
 
-### POST /api/auth/verify-email
+### POST /auth/verify-email
 
 - Description: Verify user email with OTP.
 - Request Body: `{ "email": "string", "otp": "string" }`
@@ -103,7 +103,7 @@
     }
     ```
 
-### POST /api/auth/resend-otp
+### POST /auth/resend-otp
 
 - Description: Resend OTP for email verification.
 - Request Body: `{ "email": "string" }`
@@ -133,7 +133,7 @@
     }
     ```
 
-### POST /api/auth/forget-password
+### POST /auth/forget-password
 
 - Description: Request OTP for password reset.
 - Request Body: `{ "email": "string" }`
@@ -163,7 +163,7 @@
     }
     ```
 
-### POST /api/auth/verify-otp-forget-password
+### POST /auth/verify-otp-forget-password
 
 - Description: Verify OTP for password reset.
 - Request Body: `{ "email": "string", "otp": "string" }`
@@ -193,7 +193,7 @@
     }
     ```
 
-### POST /api/auth/reset-password
+### POST /auth/reset-password
 
 - Description: Reset user password.
 - Request Body: `{ "email": "string", "password": "string" }`
@@ -223,7 +223,7 @@
     }
     ```
 
-### GET /api/auth/me
+### GET /auth/me
 
 - Description: Get current logged-in user details.
 - Responses:
@@ -248,13 +248,13 @@
     }
     ```
 
-### GET /api/auth/google
+### GET /auth/google
 
 - Description: Authenticate user with Google.
 - Responses:
   - 302: Redirects to Google authentication.
 
-### GET /api/auth/google/callback
+### GET /auth/google/callback
 
 - Description: Callback for Google authentication.
 - Responses:
@@ -266,7 +266,7 @@
     }
     ```
 
-### GET /api/auth/logout
+### GET /auth/logout
 
 - Description: Log out the user.
 - Responses:
