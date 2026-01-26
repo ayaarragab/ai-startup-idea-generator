@@ -74,7 +74,7 @@ export const authenticate = (req, res, next) => {
       const { valid, decoded } = validateAccessToken(accessToken);
       if (valid) {
         req.user = decoded;
-        
+
         next();
       } else {
         return res.status(401).json({
@@ -123,7 +123,7 @@ export const validateOTPAndEmail = (req, res, next) => {
 
   // If both email and OTP are valid, proceed to the next middleware or route handler
   next();
-}
+};
 
 export const validateEmail = (req, res, next) => {
   const { email } = req.body;
@@ -158,4 +158,4 @@ export const validateResetPassword = (req, res, next) => {
   }
   // If password is valid, proceed to the next middleware or route handler
   next();
-}
+};

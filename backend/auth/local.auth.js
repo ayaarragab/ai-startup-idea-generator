@@ -22,7 +22,7 @@ export const login = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
     req.user = user;
-    
+
     return await handleExistingUser(user, password, res);
   } catch (error) {
     console.error("Error during login:", error);
@@ -112,15 +112,15 @@ export const verifyEmail = async (req, res) => {
     user.isVerified = true;
     user.emailOTP = null; // Clear the OTP after successful verification
     await User.update(
-    {
-      isVerified: true,
-      otp: null,
-      otpExpires: null,
-    },
-    {
-      where: { email },
-    }
-  );
+      {
+        isVerified: true,
+        otp: null,
+        otpExpires: null,
+      },
+      {
+        where: { email },
+      },
+    );
 
     return res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
@@ -148,7 +148,7 @@ export const resendOTP = async (req, res) => {
     // Update user with new OTP and expiry
     await User.update(
       { otp: hashedOTP, otpExpires: Date.now() + 10 * 60 * 1000 },
-      { where: { email } }
+      { where: { email } },
     );
 
     await sendVerificationEmail(email, otp);
@@ -157,7 +157,7 @@ export const resendOTP = async (req, res) => {
     console.error("Error during OTP resend:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const forgetPasswordOTP = async (req, res) => {
   try {
@@ -174,7 +174,7 @@ export const forgetPasswordOTP = async (req, res) => {
     // Update user with new OTP and expiry
     await User.update(
       { otp: hashedOTP, otpExpires: Date.now() + 10 * 60 * 1000 },
-      { where: { email } }
+      { where: { email } },
     );
 
     await sendVerificationEmail(email, otp);
@@ -183,7 +183,7 @@ export const forgetPasswordOTP = async (req, res) => {
     console.error("Error during OTP resend:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const verifyOTPForgetPassword = async (req, res) => {
   try {
@@ -222,7 +222,7 @@ export const resetPassword = async (req, res) => {
 
     await User.update(
       { password: hashedPassword, otp: null, otpExpires: null },
-      { where: { email } }
+      { where: { email } },
     );
 
     return res.status(200).json({ message: "Password reset successfully" });
