@@ -24,10 +24,8 @@ export function Navigation() {
   
   const navLinks = [
     { label: 'Home', value: '/' },
-    { label: 'How It Works', value: '/how-it-works' },
     { label: 'Generate Idea', value: '/generate' },
     { label: 'Saved Ideas', value: '/dashboard' },
-    { label: 'Research & Metrics', value: '/research' },
     { label: 'About', value: '/about' },
   ];
   
