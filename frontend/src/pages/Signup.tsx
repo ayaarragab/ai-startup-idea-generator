@@ -31,9 +31,10 @@ export function Signup() {
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
 
-    const emailRegex = /\S+@\S+\.\S+/;
+  const emailRegex =
+        /^[A-Za-z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|icloud\.com)$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    const fullNameRegex = /^[A-Za-z]{3,50}$/;
+    const fullNameRegex = /^[A-Za-z]{3,50}(?:\s+[A-Za-z]{3,50})*$/;
 
     if (!formData.fullName.trim() || !fullNameRegex.test(formData.fullName)) {
       newErrors.fullName = 'Full name is required and must be 3-50 characters long';
