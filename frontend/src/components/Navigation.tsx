@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sparkles, Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
+import { useAuth } from "../providers/AuthProvider";
 import { Button } from './Button';
 
 interface NavigationProps {
@@ -15,12 +16,7 @@ export function Navigation() {
   const navigate = useNavigate();
   
   // TODO: Replace with actual auth state management
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [userProfile] = useState({
-    name: 'Ahmed Hassan',
-    email: 'ahmed.hassan@example.com',
-    avatar: null, // Can add avatar URL here
-  });
+  const { user, isAuthenticated, logout } = useAuth();
   
   const navLinks = [
     { label: 'Home', value: '/' },
@@ -32,8 +28,8 @@ export function Navigation() {
   // Don't show navigation on auth pages
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/verify-email' || location.pathname === '/forgot-password';
   
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    await logout();
     setProfileMenuOpen(false);
     setMobileMenuOpen(false);
     navigate('/');
@@ -76,7 +72,7 @@ export function Navigation() {
           
           {/* Desktop Auth Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <div className="relative">
                 <button
                   className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-neutral-100 transition-colors"
@@ -85,14 +81,14 @@ export function Navigation() {
                   <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center">
                     <User className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-neutral-900">{userProfile.name}</span>
+                  <span className="text-sm font-medium text-neutral-900">{user?.fullName}</span>
                   <ChevronDown className="w-4 h-4 text-neutral-600" />
                 </button>
                 {profileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-50">
                     <div className="px-4 py-3 border-b border-neutral-200">
-                      <p className="text-sm font-medium text-neutral-900">{userProfile.name}</p>
-                      <p className="text-xs text-neutral-500 mt-0.5">{userProfile.email}</p>
+                      <p className="text-sm font-medium text-neutral-900">{user?.fullName}</p>
+                      <p className="text-xs text-neutral-500 mt-0.5">{user?.email}</p>
                     </div>
                     <Link 
                       to="/profile" 
@@ -159,11 +155,11 @@ export function Navigation() {
                   {link.label}
                 </Link>
               ))}
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <div className="flex flex-col gap-2 mt-4 px-4 border-t border-neutral-200 pt-4">
                   <div className="px-4 py-2 mb-2">
-                    <p className="text-sm font-medium text-neutral-900">{userProfile.name}</p>
-                    <p className="text-xs text-neutral-500 mt-0.5">{userProfile.email}</p>
+                    <p className="text-sm font-medium text-neutral-900">{user?.fullName}</p>
+                    <p className="text-xs text-neutral-500 mt-0.5">{user?.email}</p>
                   </div>
                   <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="w-full">
                     <Button variant="outlined" size="md" className="w-full justify-start gap-2">
