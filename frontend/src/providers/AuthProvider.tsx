@@ -95,7 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     resetUser()
     setIsAuthenticated(false)
     try {
-      await axios.post('/auth/logout')
+      await axios.get('/auth/logout')
     } catch (error) {
       console.log(error)
     }

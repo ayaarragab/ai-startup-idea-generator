@@ -35,7 +35,6 @@ router.get("/google/callback", (req, res, next) => {
 });
 
 router.get("/logout", (req, res) => {
-  req.logout();
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/`);
