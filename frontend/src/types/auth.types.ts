@@ -12,6 +12,7 @@ interface AuthContextType {
   login: (email?: string, password?: string) => Promise<boolean>;
   logout: () => Promise<void>;
   resetUser: () => void;
+  setUserFromOAuth: (user: any) => void;
 }
 interface AuthProviderProps {
   children: React.ReactNode;

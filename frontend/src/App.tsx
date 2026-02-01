@@ -15,6 +15,7 @@ import { Signup } from './pages/Signup';
 import { Login } from './pages/Login';
 import { VerifyEmail } from './pages/VerifyEmail';
 import { ForgotPassword } from './pages/ForgotPassword';
+import OAuthCallback from './pages/OAuthCallback';
 import { ToastContainer } from 'react-toastify'
 
 type PageType = 'home' | 'generate' | 'idea-detail' | 'dashboard' | 'how-it-works' | 'research' | 'about';
@@ -36,6 +37,7 @@ function AnimatedRoutes() {
         <Route path="/verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/auth/callback" element={<OAuthCallback></OAuthCallback>}/>
       </Routes>
     </AnimatePresence>
   );

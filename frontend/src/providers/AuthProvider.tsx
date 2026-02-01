@@ -100,6 +100,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log(error)
     }
   }
+
+  const setUserFromOAuth = (user: any) => {
+    setUser(user);
+    setIsAuthenticated(true);
+    setLoading(false);
+  }
   
   return (
     <AuthContext.Provider
@@ -111,6 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         logout,
         resetUser,
+        setUserFromOAuth
       }}
 	>{children}</AuthContext.Provider>
   );

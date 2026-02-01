@@ -47,10 +47,12 @@ export const signup = async (req, res) => {
 };
 
 export const getCurrentUser = async (req, res) => {
-  try {
+  try {    
+    console.log(req.user);
+    
     const { id } = req.user;
     const user = await findUserById(id);
-    if (!user) {
+    if (!user) {      
       return res.status(404).json({ error: "User not found" });
     }
     return res.status(200).json(user);
@@ -62,9 +64,11 @@ export const getCurrentUser = async (req, res) => {
 
 export const handleOAuthTokens = (req, res, user, info) => {
   req.user = user;
+  
   const { accessToken, refreshToken } = handleOAuthSignup({
     email: user.email,
     username: user.username,
+    id: user.id,
   });
 
   res.cookie("accessToken", accessToken, {
@@ -81,9 +85,8 @@ export const handleOAuthTokens = (req, res, user, info) => {
   if (info === "registered") {
     return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/login`);
   } else if (info === "loggedin") {
-    req.user = user;
     return res.redirect(
-      `http://localhost:${process.env.FRONTEND_PORT}/dashboard`,
+      `http://localhost:${process.env.FRONTEND_PORT}/auth/callback`,
     );
   }
 };

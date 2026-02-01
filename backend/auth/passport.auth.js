@@ -2,7 +2,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import passport from 'passport';
 import dotenv from 'dotenv';
 import db from "../models/index.js";
-
+import { findUser } from './helpers.auth.js';
 const { User } = db;
 dotenv.config();
 
@@ -18,7 +18,9 @@ passport.use(new GoogleStrategy({
   },
   async function(request, accessToken, refreshToken, profile, done) {
   try {
-    let user = await User.findOne({ where: { email: profile.email }})
+    let user = await findUser(profile.email);
+    console.log(user);
+    
     if (!user) {
     user = await User.create({
       googleId: profile.id,
@@ -29,7 +31,7 @@ passport.use(new GoogleStrategy({
       // lastName: profile.family_name,
       // avatar: profile.picture
     });
-    return done(null, user, 'registered');
+    return done(null, user?.toJSON(), 'registered');
     }
     return done(null, user, 'loggedin');
   } catch (error) {
