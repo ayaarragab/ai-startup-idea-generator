@@ -13,6 +13,7 @@ import { HowItWorks } from './pages/HowItWorks';
 import { About } from './pages/About';
 import { Signup } from './pages/Signup';
 import { Login } from './pages/Login';
+import { Profile } from './pages/Profile';
 import { VerifyEmail } from './pages/VerifyEmail';
 import { ForgotPassword } from './pages/ForgotPassword';
 import OAuthCallback from './pages/OAuthCallback';
@@ -36,6 +37,7 @@ function AnimatedRoutes() {
         <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
         <Route path="/verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+        <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
         <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/auth/callback" element={<OAuthCallback></OAuthCallback>}/>
       </Routes>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Sparkles, Menu, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Sparkles, Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from './Button';
 
 interface NavigationProps {
@@ -10,17 +10,36 @@ interface NavigationProps {
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  // TODO: Replace with actual auth state management
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [userProfile] = useState({
+    name: 'Ahmed Hassan',
+    email: 'ahmed.hassan@example.com',
+    avatar: null, // Can add avatar URL here
+  });
   
   const navLinks = [
     { label: 'Home', value: '/' },
+    { label: 'How It Works', value: '/how-it-works' },
     { label: 'Generate Idea', value: '/generate' },
     { label: 'Saved Ideas', value: '/dashboard' },
+    { label: 'Research & Metrics', value: '/research' },
     { label: 'About', value: '/about' },
   ];
   
   // Don't show navigation on auth pages
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/verify-email' || location.pathname === '/forgot-password';
+  
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setProfileMenuOpen(false);
+    setMobileMenuOpen(false);
+    navigate('/');
+  };
   
   if (isAuthPage) {
     return null;
@@ -59,16 +78,56 @@ export function Navigation() {
           
           {/* Desktop Auth Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="outlined" size="sm">
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="primary" size="sm">
-                Get Started
-              </Button>
-            </Link>
+            {isLoggedIn ? (
+              <div className="relative">
+                <button
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-neutral-100 transition-colors"
+                  onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-neutral-900">{userProfile.name}</span>
+                  <ChevronDown className="w-4 h-4 text-neutral-600" />
+                </button>
+                {profileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-50">
+                    <div className="px-4 py-3 border-b border-neutral-200">
+                      <p className="text-sm font-medium text-neutral-900">{userProfile.name}</p>
+                      <p className="text-xs text-neutral-500 mt-0.5">{userProfile.email}</p>
+                    </div>
+                    <Link 
+                      to="/profile" 
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
+                      onClick={() => setProfileMenuOpen(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      My Profile
+                    </Link>
+                    <button
+                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors border-t border-neutral-200"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outlined" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="primary" size="sm">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
           
           {/* Mobile Menu Button */}
@@ -102,18 +161,42 @@ export function Navigation() {
                   {link.label}
                 </Link>
               ))}
-              <div className="flex flex-col gap-2 mt-4 px-4">
-                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outlined" size="md" className="w-full">
-                    Sign In
+              {isLoggedIn ? (
+                <div className="flex flex-col gap-2 mt-4 px-4 border-t border-neutral-200 pt-4">
+                  <div className="px-4 py-2 mb-2">
+                    <p className="text-sm font-medium text-neutral-900">{userProfile.name}</p>
+                    <p className="text-xs text-neutral-500 mt-0.5">{userProfile.email}</p>
+                  </div>
+                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="w-full">
+                    <Button variant="outlined" size="md" className="w-full justify-start gap-2">
+                      <User className="w-4 h-4" />
+                      My Profile
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="outlined" 
+                    size="md" 
+                    className="w-full justify-start gap-2"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
                   </Button>
-                </Link>
-                <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="primary" size="md" className="w-full">
-                    Get Started
-                  </Button>
-                </Link>
-              </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 mt-4 px-4">
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outlined" size="md" className="w-full">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="primary" size="md" className="w-full">
+                      Get Started
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         )}

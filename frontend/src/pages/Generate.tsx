@@ -213,6 +213,57 @@ export function Generate() {
                         ))}
                       </div>
                     </div>
+
+                    <Card variant="bordered" padding="md" className="bg-accent-50 border-accent-200">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          id="focusImpact"
+                          checked={formData.focusImpact}
+                          onChange={(e) => setFormData({ ...formData, focusImpact: e.target.checked })}
+                          className="mt-1 w-5 h-5 text-primary-600 rounded"
+                        />
+                        <div className="flex-1">
+                          <label htmlFor="focusImpact" className="text-neutral-900 cursor-pointer">
+                            Focus on high-impact societal problems
+                          </label>
+                          <p className="text-neutral-600 mt-1">
+                            Prioritize startup ideas that address significant Egyptian societal challenges
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+
+                    <div>
+                      <label className="block text-neutral-700 mb-3">
+                        Idea maturity level
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button
+                          onClick={() => setFormData({ ...formData, maturityLevel: 'exploratory' })}
+                          className={`p-4 rounded-lg border-2 transition-colors text-left ${
+                            formData.maturityLevel === 'exploratory'
+                              ? 'border-primary-600 bg-primary-50'
+                              : 'border-neutral-200 hover:border-neutral-300'
+                          }`}
+                        >
+                          <h6 className="text-neutral-900 mb-1">Exploratory</h6>
+                          <p className="text-neutral-600">Early-stage concepts to explore and validate</p>
+                        </button>
+                        <button
+                          onClick={() => setFormData({ ...formData, maturityLevel: 'mvp-ready' })}
+                          className={`p-4 rounded-lg border-2 transition-colors text-left ${
+                            formData.maturityLevel === 'mvp-ready'
+                              ? 'border-primary-600 bg-primary-50'
+                              : 'border-neutral-200 hover:border-neutral-300'
+                          }`}
+                        >
+                          <h6 className="text-neutral-900 mb-1">MVP-Ready</h6>
+                          <p className="text-neutral-600">Ideas ready to develop into a minimum viable product</p>
+                        </button>
+                      </div>
+                    </div>
+
                     <Card variant="bordered" padding="md" className="bg-yellow-50 border-yellow-200">
                       <p className="text-neutral-700">
                         <strong>Note:</strong> This system is designed specifically for the Egyptian market using local data sources and cultural context.
@@ -235,62 +286,64 @@ export function Generate() {
                 {/* Step 2: Chat with AI */}
                 {currentStep === 2 && (
                   <div className="flex flex-col h-[600px]">
-                    <div className="mb-4">
-                      <h4 className="text-neutral-900 mb-2">Chat with AI</h4>
-                      <p className="text-neutral-600">
-                        Interact with our AI to refine your startup idea
+                    <div className="mb-6">
+                      <h4 className="text-neutral-900 mb-1">Refine Your Idea</h4>
+                      <p className="text-neutral-500 text-sm">
+                        Discuss your vision with our AI assistant
                       </p>
                     </div>
 
                     {/* Selected Preferences Summary */}
-                    <Card variant="bordered" padding="sm" className="bg-neutral-50 mb-4">
+                    <div className="mb-4 pb-4 border-b border-neutral-200">
                       <div className="flex flex-wrap gap-2 items-center">
-                        <span className="text-neutral-600">Selected sectors:</span>
+                        <span className="text-sm text-neutral-500">Selected:</span>
                         {selectedSectors.map(sector => (
-                          <Tag key={sector} variant="secondary" size="sm">{sector}</Tag>
+                          <span key={sector} className="px-2.5 py-1 bg-neutral-100 text-neutral-700 rounded-md text-sm">
+                            {sector}
+                          </span>
                         ))}
                       </div>
-                    </Card>
+                    </div>
 
                     {/* Chat Messages Container */}
-                    <div className="flex-1 overflow-y-auto space-y-4 mb-4 p-4 bg-neutral-50 rounded-lg border border-neutral-200">
+                    <div className="flex-1 overflow-y-auto space-y-4 mb-4 px-1">
                       {chatMessages.map((message) => (
                         <div 
                           key={message.id} 
                           className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                           {message.role === 'ai' && (
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-600 to-accent-600 flex items-center justify-center flex-shrink-0">
-                              <Bot className="w-5 h-5 text-white" />
+                            <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <Bot className="w-4 h-4 text-neutral-600" />
                             </div>
                           )}
                           <div 
-                            className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+                            className={`max-w-[75%] rounded-lg px-4 py-2.5 ${
                               message.role === 'user'
-                                ? 'bg-primary-600 text-white' 
-                                : 'bg-white border border-neutral-200 text-neutral-900'
+                                ? 'bg-neutral-900 text-white' 
+                                : 'bg-neutral-50 text-neutral-900'
                             }`}
                           >
-                            <p className={message.role === 'user' ? 'text-white' : 'text-neutral-900'}>
+                            <p className={`text-sm leading-relaxed ${message.role === 'user' ? 'text-white' : 'text-neutral-800'}`}>
                               {message.content}
                             </p>
-                            <span className={`text-xs mt-1 block ${message.role === 'user' ? 'text-primary-100' : 'text-neutral-400'}`}>
+                            <span className={`text-xs mt-1.5 block ${message.role === 'user' ? 'text-neutral-400' : 'text-neutral-400'}`}>
                               {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
                           {message.role === 'user' && (
-                            <div className="w-8 h-8 rounded-full bg-secondary-600 flex items-center justify-center flex-shrink-0">
-                              <User className="w-5 h-5 text-white" />
+                            <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <User className="w-4 h-4 text-white" />
                             </div>
                           )}
                         </div>
                       ))}
                       {isAITyping && (
                         <div className="flex gap-3 justify-start">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-600 to-accent-600 flex items-center justify-center flex-shrink-0">
-                            <Bot className="w-5 h-5 text-white" />
+                          <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Bot className="w-4 h-4 text-neutral-600" />
                           </div>
-                          <div className="max-w-[70%] rounded-2xl px-4 py-3 bg-white border border-neutral-200">
+                          <div className="max-w-[75%] rounded-lg px-4 py-3 bg-neutral-50">
                             <div className="flex gap-1">
                               <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                               <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -302,45 +355,48 @@ export function Generate() {
                     </div>
 
                     {/* Input Area */}
-                    <div className="flex items-center gap-3 pt-4 border-t border-neutral-200">
-                      <input
-                        type="text"
-                        value={userInput}
-                        onChange={(e) => setUserInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                        placeholder="Type your message here..."
-                        disabled={isGenerating || isAITyping}
-                        className="flex-1 px-4 py-3 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                      />
-                      <Button
-                        variant="primary"
-                        onClick={handleSendMessage}
-                        disabled={isGenerating || isAITyping || !userInput.trim()}
-                        className="px-6"
-                      >
-                        {isGenerating ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            Generating...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="w-5 h-5" />
-                            Send
-                          </>
-                        )}
-                      </Button>
-                    </div>
-
-                    {/* Back Button */}
-                    <div className="mt-4">
-                      <Button
-                        variant="outlined"
-                        onClick={() => setCurrentStep(1)}
-                        disabled={isGenerating || isAITyping}
-                      >
-                        Back to Preferences
-                      </Button>
+                    <div className="pt-4 border-t border-neutral-200">
+                      <div className="flex items-end gap-2">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={userInput}
+                            onChange={(e) => setUserInput(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                            placeholder="Type your message..."
+                            disabled={isGenerating || isAITyping}
+                            className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:bg-white focus:border-neutral-400 transition-all placeholder:text-neutral-400"
+                          />
+                        </div>
+                        <button
+                          onClick={handleSendMessage}
+                          disabled={isGenerating || isAITyping || !userInput.trim()}
+                          className="px-4 py-2.5 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 disabled:bg-neutral-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2 text-sm"
+                        >
+                          {isGenerating ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              Generating
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4" />
+                              Send
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      
+                      {/* Back Button */}
+                      <div className="mt-4">
+                        <button
+                          onClick={() => setCurrentStep(1)}
+                          disabled={isGenerating || isAITyping}
+                          className="text-sm text-neutral-600 hover:text-neutral-900 disabled:text-neutral-400 transition-colors"
+                        >
+                          ← Back to Preferences
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
