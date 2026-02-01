@@ -49,7 +49,7 @@ export const handleExistingUser = async (user, password, res) => {
       message: "User logged in successfully",
     });
   } else {
-    return res.status(401).json({ message: "Incorrect password" });
+    return res.status(401).json({ error: "Incorrect password" });
   }
 };
 

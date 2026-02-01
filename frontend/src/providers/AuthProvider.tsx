@@ -85,6 +85,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return false;
       }
     } catch (error: any) {    
+      console.log(error.response);
+      
       toast.error(error.response?.data?.error || "Login failed");
       setIsAuthenticated(false);
     }
