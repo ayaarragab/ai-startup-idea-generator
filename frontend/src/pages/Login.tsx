@@ -27,13 +27,13 @@ export function Login() {
       });
     }
   };
-
+  
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
 
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/^[A-Za-z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|icloud\.com)$/.test(formData.email)) {      
       newErrors.email = 'Email is invalid';
     }
 
@@ -47,12 +47,10 @@ export function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {      
+    if (validateForm()) {            
       const success = await login(formData.email, formData.password);
       if (success) {
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 2000);
+        navigate('/dashboard');
       }
     }
   };
@@ -121,7 +119,7 @@ export function Login() {
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form noValidate onSubmit={handleSubmit} className="space-y-3">
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-xs text-neutral-700 mb-1">
