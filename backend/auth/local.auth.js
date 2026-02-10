@@ -53,8 +53,6 @@ export const signup = async (req, res) => {
 
 export const getCurrentUser = async (req, res) => {
   try {
-    console.log(req.user);
-
     const { id } = req.user;
     const user = await findUserById(id);
     if (!user) {
@@ -243,6 +241,8 @@ export const resetPassword = async (req, res) => {
 export const generateNewAccessToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
+    console.log(refreshToken);
+    
     const { valid, decoded } = validateRefreshToken(refreshToken);
     if (!valid) {
       return res.status(401).json({
