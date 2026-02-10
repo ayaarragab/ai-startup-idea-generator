@@ -214,55 +214,6 @@ export function Generate() {
                       </div>
                     </div>
 
-                    <Card variant="bordered" padding="md" className="bg-accent-50 border-accent-200">
-                      <div className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          id="focusImpact"
-                          checked={formData.focusImpact}
-                          onChange={(e) => setFormData({ ...formData, focusImpact: e.target.checked })}
-                          className="mt-1 w-5 h-5 text-primary-600 rounded"
-                        />
-                        <div className="flex-1">
-                          <label htmlFor="focusImpact" className="text-neutral-900 cursor-pointer">
-                            Focus on high-impact societal problems
-                          </label>
-                          <p className="text-neutral-600 mt-1">
-                            Prioritize startup ideas that address significant Egyptian societal challenges
-                          </p>
-                        </div>
-                      </div>
-                    </Card>
-
-                    <div>
-                      <label className="block text-neutral-700 mb-3">
-                        Idea maturity level
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button
-                          onClick={() => setFormData({ ...formData, maturityLevel: 'exploratory' })}
-                          className={`p-4 rounded-lg border-2 transition-colors text-left ${
-                            formData.maturityLevel === 'exploratory'
-                              ? 'border-primary-600 bg-primary-50'
-                              : 'border-neutral-200 hover:border-neutral-300'
-                          }`}
-                        >
-                          <h6 className="text-neutral-900 mb-1">Exploratory</h6>
-                          <p className="text-neutral-600">Early-stage concepts to explore and validate</p>
-                        </button>
-                        <button
-                          onClick={() => setFormData({ ...formData, maturityLevel: 'mvp-ready' })}
-                          className={`p-4 rounded-lg border-2 transition-colors text-left ${
-                            formData.maturityLevel === 'mvp-ready'
-                              ? 'border-primary-600 bg-primary-50'
-                              : 'border-neutral-200 hover:border-neutral-300'
-                          }`}
-                        >
-                          <h6 className="text-neutral-900 mb-1">MVP-Ready</h6>
-                          <p className="text-neutral-600">Ideas ready to develop into a minimum viable product</p>
-                        </button>
-                      </div>
-                    </div>
 
                     <Card variant="bordered" padding="md" className="bg-yellow-50 border-yellow-200">
                       <p className="text-neutral-700">
