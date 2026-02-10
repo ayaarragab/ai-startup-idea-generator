@@ -1,7 +1,7 @@
 import Router from 'express';
 import passport from "../auth/passport.auth.js";
 import { validateCredentialsSignup, validateCredentialsLogin, validateOTPAndEmail, validateEmail, validateResetPassword, authenticate } from '../middlewares/auth.middlewares.js';
-import { signup, login, verifyEmail, resendOTP, forgetPasswordOTP, resetPassword, verifyOTPForgetPassword, getCurrentUser, handleOAuthTokens } from '../auth/local.auth.js';
+import { signup, login, generateNewAccessToken, verifyEmail, resendOTP, forgetPasswordOTP, resetPassword, verifyOTPForgetPassword, getCurrentUser, handleOAuthTokens } from '../auth/local.auth.js';
 import dotenv from "dotenv";
 
 const router = Router();
@@ -22,6 +22,8 @@ router.post('/reset-password', validateEmail, validateResetPassword, resetPasswo
 router.post('/login', validateCredentialsLogin, login);
 
 router.get('/me', authenticate, getCurrentUser)
+
+router.post("/refresh-token", generateNewAccessToken);
 
 router.get('/google', passport.authenticate("google", { scope: ['profile', 'email'] }))
 

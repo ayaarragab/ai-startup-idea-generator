@@ -7,6 +7,11 @@ import {
 } from "./helpers.auth.js";
 import { sendVerificationEmail, generateOTP } from "../utils/email.utils.js";
 import { compareTexts, hashText } from "../utils/hashing.utils.js";
+import {
+  validateRefreshToken,
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/jwt.utils.js";
 import dotenv from "dotenv";
 import db from "../models/index.js";
 
@@ -47,12 +52,12 @@ export const signup = async (req, res) => {
 };
 
 export const getCurrentUser = async (req, res) => {
-  try {    
+  try {
     console.log(req.user);
-    
+
     const { id } = req.user;
     const user = await findUserById(id);
-    if (!user) {      
+    if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
     return res.status(200).json(user);
@@ -64,7 +69,7 @@ export const getCurrentUser = async (req, res) => {
 
 export const handleOAuthTokens = (req, res, user, info) => {
   req.user = user;
-  
+
   const { accessToken, refreshToken } = handleOAuthSignup({
     email: user.email,
     username: user.username,
@@ -232,5 +237,50 @@ export const resetPassword = async (req, res) => {
   } catch (error) {
     console.error("Error during password reset:", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const generateNewAccessToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    const { valid, decoded } = validateRefreshToken(refreshToken);
+    if (!valid) {
+      return res.status(401).json({
+        error: "REFRESH_TOKEN_INVALID",
+        message: "Please login again",
+      });
+    }
+    const user = await findUserById(decoded.id);
+    if (!user) {
+      return res.status(404).json({
+        error: "NOT_FOUND",
+        message: "User not found",
+      });
+    };
+    const newAccessToken = generateAccessToken({
+      id: user.id
+    });
+    const newRefreshToken = generateRefreshToken({
+      id: user.id
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "Strict"
+    });
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "Strict"
+    });
+
+    res.status(201).json({ message: "Access token refreshed" })
+  } catch (error) {
+    return res.status(401).json({
+      error: "REFRESH_TOKEN_EXPIRED",
+      message: "Please login again",
+    });
   }
 };
