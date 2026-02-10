@@ -280,10 +280,10 @@ export function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button 
-                variant="secondary" 
+                variant="primary" 
                 size="lg"
                 onClick={() => navigate('/generate')}
-                className="bg-white text-primary-600 hover:bg-neutral-100"
+                className= text-primary-600"
               >
                 Generate My Idea
                 <ArrowRight className="w-5 h-5" />
