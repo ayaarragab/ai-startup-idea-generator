@@ -19,6 +19,8 @@ import {
   Loader2
 } from 'lucide-react';
 import { useAuth } from "../providers/AuthProvider";
+import axios from "../utils/axiosInstance";
+import { toast } from 'react-toastify';
 
 export function Profile() {
   const navigate = useNavigate();
@@ -55,11 +57,18 @@ export function Profile() {
     }
   }, [user])
 
-  const handleSaveProfile = () => {
-    // Simulate save
-    setSaveSuccess(true);
-    setIsEditing(false);
-    setTimeout(() => setSaveSuccess(false), 3000);
+  const handleSaveProfile = async () => {
+    try {
+      const res = await axios.patch(`/user/${user.id}`, profileData);
+      if (res.status === 200) {
+        setSaveSuccess(true);
+        setIsEditing(false);
+        setTimeout(() => setSaveSuccess(false), 3000);   
+      }
+    } catch (error: any) {
+      toast.error("Error while updating");
+      console.log(error.response.data.message || error.response.data.error);
+    }
   };
 
   const handleChangePassword = () => {
