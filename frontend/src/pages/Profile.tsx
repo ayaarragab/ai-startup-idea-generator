@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -15,22 +15,20 @@ import {
   Settings,
   Bell,
   Shield,
-  CheckCircle
+  CheckCircle,
+  Loader2
 } from 'lucide-react';
+import { useAuth } from "../providers/AuthProvider";
 
 export function Profile() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'profile' | 'settings' | 'password'>('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  
-  const [profileData, setProfileData] = useState({
-    name: 'Ahmed Hassan',
-    email: 'ahmed.hassan@example.com',
-    bio: 'Passionate entrepreneur interested in solving Egyptian market challenges',
-    phone: '+20 1234567890',
-    location: 'Cairo, Egypt',
-  });
+
+  const { user }: any = useAuth();
+
+  const [profileData, setProfileData] = useState<any>(null);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -44,12 +42,18 @@ export function Profile() {
     newFeatures: false,
   });
 
-  const stats = [
-    { label: 'Ideas Generated', value: '12', icon: Lightbulb, color: 'primary' },
-    { label: 'Saved Ideas', value: '8', icon: Save, color: 'secondary' },
-    { label: 'Hours Saved', value: '24', icon: Clock, color: 'accent' },
-    { label: 'Success Rate', value: '85%', icon: TrendingUp, color: 'secondary' },
-  ];
+  // const stats = [
+  //   { label: 'Ideas Generated', value: '12', icon: Lightbulb, color: 'primary' },
+  //   { label: 'Saved Ideas', value: '8', icon: Save, color: 'secondary' },
+  //   // { label: 'Hours Saved', value: '24', icon: Clock, color: 'accent' },
+  //   // { label: 'Success Rate', value: '85%', icon: TrendingUp, color: 'secondary' },
+  // ];
+
+  useEffect(() => {
+    if (user) {
+      setProfileData({ ...user, avatar: null });
+    }
+  }, [user])
 
   const handleSaveProfile = () => {
     // Simulate save
@@ -115,7 +119,7 @@ export function Profile() {
             </div>
 
             {/* Main Content */}
-            <div className="lg:col-span-9">
+            { profileData && <div className="lg:col-span-9">
               <Card variant="elevated" padding="lg">
                 {/* Profile Tab */}
                 {activeTab === 'profile' && (
@@ -142,8 +146,8 @@ export function Profile() {
                         )}
                       </div>
                       <div>
-                        <h5 className="text-neutral-900">{profileData.name}</h5>
-                        <p className="text-neutral-600 mt-1">{profileData.email}</p>
+                        <h5 className="text-neutral-900">{profileData?.fullName}</h5>
+                        <p className="text-neutral-600 mt-1">{profileData?.email}</p>
                       </div>
                     </div>
 
@@ -153,8 +157,8 @@ export function Profile() {
                         <label className="block text-neutral-700 mb-2">Full Name</label>
                         <Input
                           type="text"
-                          value={profileData.name}
-                          onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                          value={profileData?.fullName}
+                          onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
                           disabled={!isEditing}
                           className={!isEditing ? 'bg-neutral-50' : ''}
                         />
@@ -164,14 +168,14 @@ export function Profile() {
                         <label className="block text-neutral-700 mb-2">Email</label>
                         <Input
                           type="email"
-                          value={profileData.email}
+                          value={profileData?.email}
                           onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                           disabled={!isEditing}
                           className={!isEditing ? 'bg-neutral-50' : ''}
                         />
                       </div>
 
-                      <div>
+                      {/* <div>
                         <label className="block text-neutral-700 mb-2">Phone Number</label>
                         <Input
                           type="tel"
@@ -204,7 +208,7 @@ export function Profile() {
                             !isEditing ? 'bg-neutral-50 text-neutral-600' : ''
                           }`}
                         />
-                      </div>
+                      </div> */}
                     </div>
 
                     {isEditing && (
@@ -220,7 +224,7 @@ export function Profile() {
                     )}
 
                     {/* Stats */}
-                    <div className="pt-6 border-t border-neutral-200">
+                    {/* <div className="pt-6 border-t border-neutral-200">
                       <h5 className="text-neutral-900 mb-4">Your Statistics</h5>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {stats.map((stat) => (
@@ -233,7 +237,7 @@ export function Profile() {
                           </Card>
                         ))}
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 )}
 
@@ -400,7 +404,9 @@ export function Profile() {
                   </div>
                 )}
               </Card>
-            </div>
+            </div> }
+            { !profileData && 
+            <Loader2 className="animate-spin" /> }
           </div>
         </div>
       </div>
