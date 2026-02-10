@@ -1,6 +1,5 @@
 import {
   validateAccessToken,
-  validateRefreshToken,
 } from "../utils/jwt.utils.js";
 
 export const validateCredentialsSignup = (req, res, next) => {
