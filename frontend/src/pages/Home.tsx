@@ -283,7 +283,7 @@ export function Home() {
                 variant="primary" 
                 size="lg"
                 onClick={() => navigate('/generate')}
-                className= text-primary-600"
+                className=" text-primary-600 hover:bg-neutral-100"
               >
                 Generate My Idea
                 <ArrowRight className="w-5 h-5" />
