@@ -143,9 +143,9 @@ export function Home() {
                 <Button 
                   variant="outlined" 
                   size="lg"
-                  onClick={() => navigate('/how-it-works')}
+                  onClick={() => navigate('/about')}
                 >
-                  See How It Works
+                  About the project
                 </Button>
               </div>
             </div>
