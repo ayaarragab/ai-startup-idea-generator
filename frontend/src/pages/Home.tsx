@@ -283,7 +283,7 @@ export function Home() {
                 variant="primary" 
                 size="lg"
                 onClick={() => navigate('/generate')}
-                className=" text-primary-600 hover:bg-neutral-100"
+                className=" text-primary-600"
               >
                 Generate My Idea
                 <ArrowRight className="w-5 h-5" />
@@ -292,7 +292,7 @@ export function Home() {
                 variant="outlined" 
                 size="lg"
                 onClick={() => navigate('/dashboard')}
-                className="border-white text-white hover:bg-white/10"
+                className="border-white text-white"
               >
                 View Saved Ideas
               </Button>

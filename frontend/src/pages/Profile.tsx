@@ -67,7 +67,7 @@ export function Profile() {
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    // { id: 'settings', label: 'Settings', icon: Settings },
     { id: 'password', label: 'Security', icon: Shield },
   ];
 
@@ -383,7 +383,7 @@ export function Profile() {
                       </Button>
                     </div>
 
-                    <div className="pt-6 border-t border-neutral-200">
+                    {/* <div className="pt-6 border-t border-neutral-200">
                       <h5 className="text-neutral-900 mb-3">Account Security</h5>
                       <Card variant="bordered" padding="md" className="bg-secondary-50 border-secondary-200">
                         <div className="flex items-start gap-3">
@@ -396,7 +396,7 @@ export function Profile() {
                           </div>
                         </div>
                       </Card>
-                    </div>
+                    </div> */}
                   </div>
                 )}
               </Card>
