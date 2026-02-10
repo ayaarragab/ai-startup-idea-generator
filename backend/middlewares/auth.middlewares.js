@@ -61,7 +61,6 @@ export const validateCredentialsLogin = (req, res, next) => {
 
 export const authenticate = (req, res, next) => {
   try {
-    // Extract token from the "Authorization" header
     const accessToken = req.cookies.accessToken;
 
     if (!accessToken) {
