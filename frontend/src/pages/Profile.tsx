@@ -71,11 +71,18 @@ export function Profile() {
     }
   };
 
-  const handleChangePassword = () => {
-    // Simulate password change
-    setSaveSuccess(true);
-    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    setTimeout(() => setSaveSuccess(false), 3000);
+  const handleChangePassword = async () => {
+    try {
+      const res = await axios.patch(`/user/password/${user.id}`, passwordData);
+      if (res.status === 200) {
+        setSaveSuccess(true);
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setTimeout(() => setSaveSuccess(false), 3000);  
+      }
+    } catch (error: any) {
+      toast.error("Error while updating");
+      console.log(error.response.data.message || error.response.data.error);
+    }
   };
 
   const tabs = [
