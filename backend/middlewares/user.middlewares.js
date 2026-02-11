@@ -38,20 +38,21 @@ export const validateCurrentPassword = async (req, res, next) => {
     const { id } = req.params;
     const user = await findUserById(id);
     if (!user) {
-      return res.status(404).json({ error: 'NOT_FOUND', message: 'User not found' })
+      return res.status(404).json({ error: 'NOT_FOUND', message: 'User not found' });
     }
     if (user.provider === 'google') {
-      next()
+      return next();
     }
-    const isIdentical = await compareTexts(currentPassword, user.pasword);
+    
+    const isIdentical = await compareTexts(currentPassword, user.password);
     if (!isIdentical) {
-      return res.status(400).json({ error: 'BAD_REQUEST', message: 'Password is not correct' })
+      return res.status(400).json({ error: 'BAD_REQUEST', message: 'Password is not correct' });
     }
-    next()
+    next();
   } catch (error) {
     return res.status(500).json({
       error: "INTERNAL_SERVER_ERROR"
-    })    
+    });    
   }
 }
 
@@ -63,13 +64,13 @@ export const validateNewPassword = (req, res, next) => {
     }
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!newPassword || !passwordRegex.test(newPassword)) {
+    if (!passwordRegex.test(newPassword)) {
       return res.status(400).json({ error: "Invalid password format" });
     }
-  next()
+    next();
   } catch (error) {
     return res.status(500).json({
       error: "INTERNAL_SERVER_ERROR"
-    })
+    });
   }
 }

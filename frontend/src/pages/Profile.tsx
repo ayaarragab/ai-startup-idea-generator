@@ -75,9 +75,12 @@ export function Profile() {
     try {
       const res = await axios.patch(`/user/password/${user.id}`, passwordData);
       if (res.status === 200) {
+        toast.success("Password updated successfully")
         setSaveSuccess(true);
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-        setTimeout(() => setSaveSuccess(false), 3000);  
+        setTimeout(() => setSaveSuccess(false), 2000);  
+      } else {
+        toast.error(res.data.error)
       }
     } catch (error: any) {
       toast.error("Error while updating");
