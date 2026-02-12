@@ -37,12 +37,14 @@ export const handleExistingUser = async (user, password, res) => {
       httpOnly: true,
       secure: false, // Set to true if using HTTPS
       sameSite: "Strict",
+      maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false, // Set to true if using HTTPS
       sameSite: "Strict",
+      maxAge: 7 * 60 * 60 * 24 * 1000
     });
 
     return res.status(200).json({
@@ -81,12 +83,14 @@ export const handleNewUser = async (fullName, email, password, res) => {
     httpOnly: true,
     secure: false, // Set to true if using HTTPS
     sameSite: "Strict",
+    maxAge: 60 * 15 * 1000
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: false, // Set to true if using HTTPS
     sameSite: "Strict",
+    maxAge: 7 * 60 * 60 * 24 * 1000
   });
   await sendVerificationEmail(email, otp);
   return res.status(200).json({

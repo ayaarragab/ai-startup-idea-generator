@@ -78,12 +78,14 @@ export const handleOAuthTokens = (req, res, user, info) => {
     httpOnly: true,
     secure: false, // Set to true if using HTTPS
     sameSite: "Strict",
+    maxAge: 15 * 60 * 1000,
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: false, // Set to true if using HTTPS
     sameSite: "Strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   if (info === "registered") {
     return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/login`);
@@ -267,13 +269,15 @@ export const generateNewAccessToken = async (req, res) => {
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "Strict"
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "Strict"
+      sameSite: "Strict",
+      maxAge: 15 * 60 * 1000,
     });
 
     res.status(201).json({ message: "Access token refreshed" })
