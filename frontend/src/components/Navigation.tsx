@@ -21,7 +21,7 @@ export function Navigation() {
   const navLinks = [
     { label: 'Home', value: '/' },
     { label: 'Generate Idea', value: '/generate' },
-    { label: 'Saved Ideas', value: '/dashboard' },
+    isAuthenticated ? { label: 'Saved Ideas', value: '/dashboard' } : null,
     { label: 'About', value: '/about' },
   ];
   
@@ -56,7 +56,7 @@ export function Navigation() {
           {/* Desktop Nav Links */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
-              <Link
+              link &&               <Link
                 key={link.value}
                 to={link.value}
                 className={`px-4 py-2 rounded-lg transition-colors ${
@@ -142,7 +142,7 @@ export function Navigation() {
           <div className="lg:hidden border-t border-neutral-200 py-4">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
-                <Link
+                link &&                 <Link
                   key={link.value}
                   to={link.value}
                   onClick={() => setMobileMenuOpen(false)}

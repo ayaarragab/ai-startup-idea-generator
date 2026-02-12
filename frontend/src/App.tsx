@@ -16,6 +16,7 @@ import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
 import { VerifyEmail } from './pages/VerifyEmail';
 import { ForgotPassword } from './pages/ForgotPassword';
+import PrivateRoute from './components/guards/PrivateRoute';
 import OAuthCallback from './pages/OAuthCallback';
 import { ToastContainer } from 'react-toastify'
 
@@ -29,15 +30,15 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/generate" element={<PageTransition><Generate /></PageTransition>} />
-        <Route path="/idea/:id" element={<PageTransition><IdeaDetail /></PageTransition>} />
-        <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+        <Route path="/idea/:id" element={<PrivateRoute><PageTransition><IdeaDetail /></PageTransition></PrivateRoute>} />
+        <Route path="/dashboard" element={<PrivateRoute><PageTransition><Dashboard /></PageTransition></PrivateRoute>} />
         <Route path="/how-it-works" element={<PageTransition><HowItWorks /></PageTransition>} />
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />
         <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
         <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
         <Route path="/verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
-        <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+        <Route path="/profile" element={<PrivateRoute><PageTransition><Profile /></PageTransition></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/auth/callback" element={<OAuthCallback></OAuthCallback>}/>
       </Routes>
