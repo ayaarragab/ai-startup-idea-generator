@@ -311,7 +311,7 @@ export function About() {
           <Card variant="bordered" padding="md" className="mt-8">
             <div className="text-center">
               <p className="text-neutral-600">
-                Special thanks to Helwan University, our supervisor Dr. Ahmed Hassan, and all the data sources and 
+                Special thanks to Helwan University, our supervisor Dr. Mohammed El-Said, and all the data sources and 
                 communities that made this research possible. This project is dedicated to advancing AI research 
                 and empowering Egyptian entrepreneurship.
               </p>
