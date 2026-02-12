@@ -35,4 +35,29 @@ Object.keys(db).forEach(modelName => {
 db.connection = connection;
 db.Sequelize = Sequelize;
 
+db.Idea.belongsToMany(db.Sector, {
+  through: "ideasSectors",
+  foreignKey: "ideaId",
+  otherKey: "sectorId",
+})
+
+db.Sector.belongsToMany(db.Idea, {
+  through: "ideasSectors",
+  foreignKey: "sectorId",
+  otherKey: "ideaId",
+});
+
+
+db.Idea.belongsToMany(db.TargetUsers, {
+  through: "ideasTargetUsers",
+  foreignKey: "ideaId",
+  otherKey: "TargetUsersId",
+})
+
+db.TargetUsers.belongsToMany(db.Idea, {
+  through: "ideasTargetUsers",
+  foreignKey: "TargetUsersId",
+  otherKey: "ideaId",
+});
+
 export default db;
