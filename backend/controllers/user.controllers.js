@@ -27,6 +27,7 @@ export const updateUser = async (req, res) => {
 export const updateUserPassword = async (req, res) => {
   const { id } = req.params;
   const { newPassword } = req.body;
+  
   try {
     const isChanged = await updatePassword(id, newPassword);
     if (isChanged) {
