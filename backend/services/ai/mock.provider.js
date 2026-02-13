@@ -18,3 +18,14 @@ export const generateIdea = async (prompt) => {
     academicReferences: [],
   };
 }
+
+const sendChat = async ({ message, conversationId, userId }) => {
+  return {
+    reply: `Mock reply to: "${message}"`,
+    meta: {
+      provider: "mock"
+    }
+  };
+};
+
+export default sendChat;
