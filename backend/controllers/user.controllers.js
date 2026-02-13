@@ -4,19 +4,19 @@ export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const isUpdated = await updateUserData(id);
+    const isUpdated = await updateUserData(id, req.body);
 
     if (isUpdated) {
       return res.status(200).json({
         message: "User updated successdully",
       });
-    } else {
+    } else {      
       return res.status(500).json({
         error: "INTERNAL_SERVER_ERROR",
         message: "Error while updating user",
       });
     }
-  } catch (error) {
+  } catch (error) {    
     return res.status(500).json({
       error: "INTERNAL_SERVER_ERROR",
       message: "Error while updating user",

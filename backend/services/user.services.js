@@ -3,10 +3,10 @@ import { hashText } from "../utils/hashing.utils.js";
 
 const { User } = db;
 
-export const updateUserData = async (id) => {
+export const updateUserData = async (id, updateValues) => {
   try {
     await User.update(
-      { ...req.body },
+      { ...updateValues },
       {
         where: {
           id
@@ -15,6 +15,8 @@ export const updateUserData = async (id) => {
     )
     return true;
   } catch (error) {
+    console.log(error);
+    
     return false;
   }
 }
