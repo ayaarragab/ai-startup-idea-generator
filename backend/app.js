@@ -8,6 +8,7 @@ import morgan from 'morgan';
 
 import authRouter from './routers/auth.router.js';
 import userRouter from './routers/user.router.js';
+import chatRouter from './routers/chat.router.js';
 
 dotenv.config();
 
@@ -33,4 +34,5 @@ app.use(passport.session());
 
 app.use('/auth', authRouter);
 app.use('/user', userRouter);
+app.use('/chat', chatRouter);
 export default app;
