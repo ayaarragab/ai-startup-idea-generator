@@ -16,7 +16,11 @@ const Message = (sequelize, DataTypes) => {
       content: {
         type: DataTypes.TEXT,
         allowNull: false
-      }
+      },
+    },
+    {
+      tableName: 'messages',
+      timestamps: true
     }
   )
   return messageModel;

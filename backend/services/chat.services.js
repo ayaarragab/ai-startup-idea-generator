@@ -1,4 +1,4 @@
-import aiClient from "./ai/index.js";
+import sendChat from "./ai/index.js";
 import { createConversation } from "./conversation.services.js";
 import { createMessage } from "./message.services.js";
 
@@ -11,7 +11,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
 
   await createMessage(content, conversationId, userId, 'user')
 
-  const aiResponse = await aiClient.sendChat({
+  const aiResponse = await sendChat({
     content,
     conversationId,
     userId
