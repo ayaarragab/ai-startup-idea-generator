@@ -9,7 +9,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
     conversationId = conversation.id;
   }
 
-  await createMessage(content, conversationId, userId, 'user')
+  await createMessage(content, conversationId, 'user')
 
   const aiResponse = await sendChat({
     content,
@@ -17,7 +17,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
     userId
   });
 
-  await createMessage(content, conversationId, userId, 'ai')
+  await createMessage(aiResponse.content, aiResponse.conversationId, 'ai')
   
   return aiResponse;
 }
