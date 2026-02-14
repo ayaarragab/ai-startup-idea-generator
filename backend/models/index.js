@@ -25,7 +25,6 @@ for (const file of modelFiles) {
 }
 
 
-
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {
       db[modelName].associate(db);
@@ -59,5 +58,29 @@ db.TargetUsers.belongsToMany(db.Idea, {
   foreignKey: "TargetUsersId",
   otherKey: "ideaId",
 });
+
+db.User.hasMany(db.Conversation, {
+  foreignKey: "userId",
+  as: "coversations",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE"
+})
+
+db.Conversation.belongsTo(db.User, {
+  foreignKey: "userId",
+  as: "user"
+})
+
+db.Conversation.hasMany(db.Message, {
+  foreignKey: "conversationId",
+  as: "messages",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",  
+})
+
+db.Message.belongsTo(db.Conversation, {
+  foreignKey: "conversationId",
+  as: "conversation"
+})
 
 export default db;
