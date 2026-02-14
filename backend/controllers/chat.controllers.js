@@ -1,6 +1,13 @@
-import { handleChat } from "../services/chat.services";
+import { handleChat } from "../services/chat.services.js";
 
 
-const handleAIChat = async (req, res) => {
-
+export const handleAIChat = async (req, res) => {
+  try {
+    const aiResponse = await handleChat({ ...req.body });
+    if (aiResponse) {
+      return res.status(201).json(aiResponse);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'INTERNAL_SERVER_ERROR' });
+  }
 }

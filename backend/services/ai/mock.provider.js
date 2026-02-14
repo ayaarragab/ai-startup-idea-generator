@@ -19,12 +19,11 @@ export const generateIdea = async (prompt) => {
   };
 }
 
-const sendChat = async ({ message, conversationId, userId }) => {
+const sendChat = async ({ content, conversationId, userId }) => {
   return {
-    reply: `Mock reply to: "${message}"`,
-    meta: {
-      provider: "mock"
-    }
+    content: `Mock reply to: "${content}"`,
+    conversationId,
+    role: 'ai'
   };
 };
 

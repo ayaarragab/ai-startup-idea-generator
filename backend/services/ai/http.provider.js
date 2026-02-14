@@ -28,6 +28,4 @@ const sendChat = async ({ message, conversationId, userId }) => {
   };
 };
 
-export default {
-  sendChat
-};
+export default sendChat;

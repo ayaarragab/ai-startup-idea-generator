@@ -4,7 +4,7 @@ import {
   handleExistingUser,
   handleNewUser,
   handleOAuthSignup,
-} from "./helpers.auth.js";
+} from "../services/auth.services.js";
 import { sendVerificationEmail, generateOTP } from "../utils/email.utils.js";
 import { compareTexts, hashText } from "../utils/hashing.utils.js";
 import {
