@@ -1,37 +1,68 @@
-import Router from 'express';
+import Router from "express";
 import passport from "../auth/passport.auth.js";
-import { validateCredentialsSignup, validateCredentialsLogin, validateOTPAndEmail, validateEmail, validateResetPassword, authenticate } from '../middlewares/auth.middlewares.js';
-import { signup, login, generateNewAccessToken, verifyEmail, resendOTP, forgetPasswordOTP, resetPassword, verifyOTPForgetPassword, getCurrentUser, handleOAuthTokens } from '../auth/local.auth.js';
+import {
+  validateCredentialsSignup,
+  validateCredentialsLogin,
+  validateOTPAndEmail,
+  validateEmail,
+  validateResetPassword,
+  authenticate,
+} from "../middlewares/auth.middlewares.js";
+import {
+  signup,
+  login,
+  generateNewAccessToken,
+  verifyEmail,
+  resendOTP,
+  forgetPasswordOTP,
+  resetPassword,
+  verifyOTPForgetPassword,
+  getCurrentUser,
+  handleOAuthTokens,
+} from "../controllers/auth.controllers.js";
 import dotenv from "dotenv";
 
 const router = Router();
-dotenv.config()
+dotenv.config();
 
-router.post('/signup', validateCredentialsSignup, signup);
+router.post("/signup", validateCredentialsSignup, signup);
 
-router.post('/verify-email', validateOTPAndEmail, verifyEmail);
+router.post("/verify-email", validateOTPAndEmail, verifyEmail);
 
-router.post('/resend-otp', validateEmail, resendOTP);
+router.post("/resend-otp", validateEmail, resendOTP);
 
-router.post('/forget-password', validateEmail, forgetPasswordOTP);
+router.post("/forget-password", validateEmail, forgetPasswordOTP);
 
-router.post('/verify-otp-forget-password', validateOTPAndEmail, verifyOTPForgetPassword);
+router.post(
+  "/verify-otp-forget-password",
+  validateOTPAndEmail,
+  verifyOTPForgetPassword,
+);
 
-router.post('/reset-password', validateEmail, validateResetPassword, resetPassword);
+router.post(
+  "/reset-password",
+  validateEmail,
+  validateResetPassword,
+  resetPassword,
+);
 
-router.post('/login', validateCredentialsLogin, login);
+router.post("/login", validateCredentialsLogin, login);
 
-router.get('/me', authenticate, getCurrentUser)
+router.get("/me", authenticate, getCurrentUser);
 
 router.post("/refresh-token", generateNewAccessToken);
 
-router.get('/google', passport.authenticate("google", { scope: ['profile', 'email'] }))
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
+);
 
 router.get("/google/callback", (req, res, next) => {
   passport.authenticate("google", async (err, user, info) => {
     if (err) return next(err);
-    if (!user) return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/`);
-    
+    if (!user)
+      return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/`);
+
     await handleOAuthTokens(req, res, user, info);
   })(req, res, next);
 });

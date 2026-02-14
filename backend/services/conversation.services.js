@@ -1,6 +1,6 @@
 import db from "../models/index.js";
 
-const { Conversation } = db();
+const { Conversation } = db;
 
 export const findConversation = async (id) => {
   try {

@@ -1,4 +1,4 @@
-import { findUserById } from '../auth/helpers.auth.js';
+import { findUserById } from '../services/auth.services.js';
 import { compareTexts } from '../utils/hashing.utils.js';
 
 export const validateUpdateData = (req, res, next) => {

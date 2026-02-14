@@ -1,6 +1,6 @@
 import db from "../models/index.js";
 
-const { Message } = db();
+const { Message } = db;
 
 export const createMessage = async (content, conversationId, userId, role) => {
   try {

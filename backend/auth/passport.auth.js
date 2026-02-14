@@ -2,7 +2,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import passport from 'passport';
 import dotenv from 'dotenv';
 import db from "../models/index.js";
-import { findUser } from './helpers.auth.js';
+import { findUser } from '../services/auth.services.js';
 const { User } = db;
 dotenv.config();
 
