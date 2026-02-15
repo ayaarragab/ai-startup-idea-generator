@@ -68,8 +68,6 @@ export const validatePrompt = async (req, res, next) => {
   }
 };
 
-
-
 export const validateMessageLength = (req, res, next) => {
   const { content } = req.body;
   if (!content) {
