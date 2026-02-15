@@ -32,3 +32,12 @@ export const validatePrompt = async (req, res, next) => {
     return res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
   }
 };
+export const validateMessageLength = (req, res, next) => {
+  const { content } = req.body;
+  const MAX_MESSAGE_LENGTH = 1000; // Set your desired maximum length
+
+  if (content.length > MAX_MESSAGE_LENGTH) {
+    return res.status(400).json({ error: `Message must be less than ${MAX_MESSAGE_LENGTH} characters` });
+  }
+  next();
+};
