@@ -5,6 +5,7 @@ import session from 'express-session';
 import passport from './auth/passport.auth.js';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
+import { requestId } from "./middlewares/requestId.js";
 
 import authRouter from './routers/auth.router.js';
 import userRouter from './routers/user.router.js';
@@ -20,6 +21,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(requestId);
 app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(session({
