@@ -5,6 +5,6 @@ import { handleAIChat } from "../controllers/chat.controllers.js";
 
 const router = Router()
 
-router.post('/', authenticate, validatePrompt, validateMessageLength, handleAIChat);
+router.post('/', authenticate, validateMessageLength, validatePrompt, handleAIChat);
 
 export default router;

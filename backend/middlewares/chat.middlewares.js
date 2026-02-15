@@ -2,12 +2,8 @@ import { findConversation } from "../services/conversation.services.js";
 import { findMessage } from "../services/message.services.js";
 
 const validateFieldsExistence = (req, res) => {
-  const { content, clientMessageId } = req.body;
+  const { clientMessageId } = req.body;
 
-  if (!content) {
-    res.status(400).json({ error: "Message is required" });
-    return true; // responded
-  }
   if (!clientMessageId) {
     res.status(400).json({ error: "Client message ID is required" });
     return true; // responded
@@ -76,6 +72,9 @@ export const validatePrompt = async (req, res, next) => {
 
 export const validateMessageLength = (req, res, next) => {
   const { content } = req.body;
+  if (!content) {
+    return res.status(400).json({ error: "Message is required" });
+  }
   const MAX_MESSAGE_LENGTH = 1000; // Set your desired maximum length
 
   if (content.length > MAX_MESSAGE_LENGTH) {
