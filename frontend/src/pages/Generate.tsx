@@ -14,22 +14,102 @@ import {
   Bot,
   User,
   Loader2,
-  MessageSquare
-} from 'lucide-react'; 
-import axios from "../utils/axiosInstance";
+  MessageSquare,
+  Plus,
+  Trash2,
+  Clock,
+  Edit2
+} from 'lucide-react';
 
 interface ChatMessage {
+  id: number;
   role: 'user' | 'ai';
   content: string;
-  conversationId: number | null;
-  clientMessageId: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  id?: string;
+  timestamp: Date;
+}
+
+interface Conversation {
+  id: string;
+  userId: string;
+  title?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  messages: ChatMessage[];
+  selectedSectors: string[];
+  formData: {
+    focusImpact: boolean;
+    maturityLevel: string;
+  };
 }
 
 export function Generate() {
   const navigate = useNavigate();
+  const userId = 'user-123'; // TODO: Replace with actual user ID from auth
+
+  // Conversations State
+  const [conversations, setConversations] = useState<Conversation[]>([
+    {
+      id: 'conv-1',
+      userId: userId,
+      title: 'HealthTech Solution for Cairo',
+      createdAt: new Date('2024-02-10'),
+      updatedAt: new Date('2024-02-10'),
+      messages: [
+        {
+          id: 1,
+          role: 'ai',
+          content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market.",
+          timestamp: new Date('2024-02-10'),
+        }
+      ],
+      selectedSectors: ['Healthcare', 'FinTech'],
+      formData: {
+        focusImpact: true,
+        maturityLevel: 'mvp-ready',
+      }
+    },
+    {
+      id: 'conv-2',
+      userId: userId,
+      title: 'E-commerce Platform',
+      createdAt: new Date('2024-02-12'),
+      updatedAt: new Date('2024-02-12'),
+      messages: [
+        {
+          id: 1,
+          role: 'ai',
+          content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market.",
+          timestamp: new Date('2024-02-12'),
+        }
+      ],
+      selectedSectors: ['E-commerce', 'Tourism'],
+      formData: {
+        focusImpact: false,
+        maturityLevel: 'exploratory',
+      }
+    },
+    {
+      id: 'conv-3',
+      userId: userId,
+      createdAt: new Date('2024-02-14'),
+      updatedAt: new Date('2024-02-14'),
+      messages: [
+        {
+          id: 1,
+          role: 'ai',
+          content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market.",
+          timestamp: new Date('2024-02-14'),
+        }
+      ],
+      selectedSectors: ['Education'],
+      formData: {
+        focusImpact: true,
+        maturityLevel: 'mvp-ready',
+      }
+    }
+  ]);
+
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
@@ -37,9 +117,17 @@ export function Generate() {
     focusImpact: true,
     maturityLevel: 'mvp-ready',
   });
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    {
+      id: 1,
+      role: 'ai',
+      content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market. What problem or opportunity would you like to explore?",
+      timestamp: new Date(),
+    }
+  ]);
   const [userInput, setUserInput] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
+  const [showConversations, setShowConversations] = useState(false);
 
   const steps = [
     { number: 1, title: 'Preferences', icon: Settings },
@@ -66,94 +154,251 @@ export function Generate() {
     }, 3000);
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (userInput.trim() === '') return;
     const newMessage: ChatMessage = {
+      id: chatMessages.length + 1,
       role: 'user',
       content: userInput,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      conversationId: 1,
-      clientMessageId: crypto.randomUUID()
+      timestamp: new Date(),
     };
     setChatMessages([...chatMessages, newMessage]);
     setUserInput('');
 
-    // Simulate AI response
-    setIsAITyping(true)
-    try {
-      setTimeout(async () => {
-        const aiResponse = await axios.post('/chat/', newMessage);
-        console.log(aiResponse);
-        
-        setChatMessages([...chatMessages, newMessage, aiResponse.data]);
-        setIsAITyping(false)
-      }, 1500);
-    } catch (error) {
-      console.log(error);
+    // Update current conversation if exists
+    if (currentConversationId) {
+      setConversations(prev => prev.map(conv => 
+        conv.id === currentConversationId 
+          ? { ...conv, messages: [...chatMessages, newMessage], updatedAt: new Date() }
+          : conv
+      ));
     }
+
+    // Simulate AI response
+    setIsAITyping(true);
+    setTimeout(() => {
+      let aiResponseContent = '';
+      
+      // Intelligent AI responses based on conversation context
+      if (chatMessages.length === 1) {
+        aiResponseContent = `Interesting! I can see you're interested in ${selectedSectors.join(', ')}. Let me help you explore this further. What specific challenges or pain points have you noticed in ${selectedSectors[0]} that could be addressed with a startup solution?`;
+      } else if (chatMessages.length === 3) {
+        aiResponseContent = `That's a great observation! Based on your preferences for ${formData.maturityLevel === 'mvp-ready' ? 'MVP-ready' : 'exploratory'} ideas${formData.focusImpact ? ' with high societal impact' : ''}, I'm analyzing the Egyptian market data to find the best match. Would you like me to generate a complete startup idea now, or would you like to discuss more details?`;
+      } else if (chatMessages.length >= 5 || userInput.toLowerCase().includes('generate') || userInput.toLowerCase().includes('yes')) {
+        aiResponseContent = `Perfect! I have gathered enough information. I'll now process your inputs through our 4-model AI pipeline to generate a comprehensive startup idea tailored for the Egyptian market. This will include a Business Model Canvas, pitch summary, and relevant academic references. Please wait a moment...`;
+        
+        const aiResponse: ChatMessage = {
+          id: chatMessages.length + 2,
+          role: 'ai',
+          content: aiResponseContent,
+          timestamp: new Date(),
+        };
+        setChatMessages([...chatMessages, newMessage, aiResponse]);
+        setIsAITyping(false);
+        
+        // Trigger generation after showing the message
+        setTimeout(() => {
+          handleGenerate();
+        }, 1500);
+        return;
+      } else {
+        aiResponseContent = `I understand. Tell me more about your vision for this startup. What makes you passionate about solving this problem in the Egyptian market?`;
+      }
+
+      const aiResponse: ChatMessage = {
+        id: chatMessages.length + 2,
+        role: 'ai',
+        content: aiResponseContent,
+        timestamp: new Date(),
+      };
+      setChatMessages([...chatMessages, newMessage, aiResponse]);
+      setIsAITyping(false);
+
+      // Update conversation with AI response
+      if (currentConversationId) {
+        setConversations(prev => prev.map(conv => 
+          conv.id === currentConversationId 
+            ? { ...conv, messages: [...chatMessages, newMessage, aiResponse], updatedAt: new Date() }
+            : conv
+        ));
+      }
+    }, 1500);
+  };
+
+  const handleNewConversation = () => {
+    const newConv: Conversation = {
+      id: `conv-${Date.now()}`,
+      userId: userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      messages: [
+        {
+          id: 1,
+          role: 'ai',
+          content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market. What problem or opportunity would you like to explore?",
+          timestamp: new Date(),
+        }
+      ],
+      selectedSectors: [],
+      formData: {
+        focusImpact: true,
+        maturityLevel: 'mvp-ready',
+      }
+    };
+    setConversations(prev => [newConv, ...prev]);
+    setCurrentConversationId(newConv.id);
+    setSelectedSectors([]);
+    setFormData({ focusImpact: true, maturityLevel: 'mvp-ready' });
+    setChatMessages(newConv.messages);
+    setCurrentStep(1);
+    setShowConversations(false);
+  };
+
+  const handleSelectConversation = (convId: string) => {
+    const conv = conversations.find(c => c.id === convId);
+    if (conv) {
+      setCurrentConversationId(convId);
+      setSelectedSectors(conv.selectedSectors);
+      setFormData(conv.formData);
+      setChatMessages(conv.messages);
+      setCurrentStep(2); // Always open to chat view
+      setShowConversations(false);
+    }
+  };
+
+  const handleDeleteConversation = (convId: string) => {
+    setConversations(prev => prev.filter(c => c.id !== convId));
+    if (currentConversationId === convId) {
+      setCurrentConversationId(null);
+      handleNewConversation();
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
   };
 
   return (
     <div className="min-h-screen bg-neutral-50 py-8 md:py-12">
       <div className="container mx-auto">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8 md:mb-12">
-            <h2 className="text-neutral-900 mb-2">Generate Your Startup Idea</h2>
-            <p className="text-neutral-600">
-              Answer a few questions to help our AI create the perfect startup idea for you
-            </p>
+          <div className="mb-8 md:mb-12 flex items-center justify-between">
+            <div>
+              <h2 className="text-neutral-900 mb-2">Generate Your Startup Idea</h2>
+              <p className="text-neutral-600">
+                Answer a few questions to help our AI create the perfect startup idea for you
+              </p>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleNewConversation}
+              className="hidden md:flex"
+            >
+              <Plus className="w-5 h-5" />
+              New Chat
+            </Button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Progress Sidebar */}
-            <div className="lg:col-span-3">
-              <Card variant="bordered" padding="md" className="sticky top-24">
-                <div className="space-y-1">
-                  {steps.map((step, index) => (
-                    <div key={step.number}>
-                      <button
-                        onClick={() => !isGenerating && setCurrentStep(step.number)}
-                        disabled={isGenerating}
-                        className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
-                          currentStep === step.number
-                            ? 'bg-primary-50 text-primary-700'
-                            : currentStep > step.number
-                            ? 'text-neutral-700 hover:bg-neutral-50'
-                            : 'text-neutral-400'
-                        }`}
-                      >
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            currentStep === step.number
-                              ? 'bg-primary-600 text-white'
-                              : currentStep > step.number
-                              ? 'bg-secondary-600 text-white'
-                              : 'bg-neutral-200 text-neutral-400'
-                          }`}
-                        >
-                          {currentStep > step.number ? (
-                            <Check className="w-5 h-5" />
-                          ) : (
-                            <step.icon className="w-5 h-5" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="truncate">{step.title}</div>
-                        </div>
-                      </button>
-                      {index < steps.length - 1 && (
-                        <div className="h-8 ml-7 w-0.5 bg-neutral-200" />
-                      )}
+          {/* Mobile: Conversations Toggle Button */}
+          <div className="mb-4 md:hidden">
+            <Button
+              variant="outlined"
+              size="sm"
+              onClick={() => setShowConversations(!showConversations)}
+              className="w-full justify-center"
+            >
+              <MessageSquare className="w-4 h-4" />
+              {showConversations ? 'Hide' : 'Show'} Conversations ({conversations.length})
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Conversations Sidebar */}
+            <div className={`lg:col-span-3 ${showConversations ? 'block' : 'hidden md:block'}`}>
+              <Card variant="bordered" padding="sm" className="sticky top-24 max-h-[600px] overflow-y-auto">
+                <div className="space-y-2">
+                  <div className="px-2 py-1">
+                    <h6 className="text-neutral-900 text-sm font-medium">Previous Conversations</h6>
+                  </div>
+                  
+                  {conversations.length === 0 ? (
+                    <div className="px-2 py-8 text-center">
+                      <p className="text-neutral-500 text-sm">No conversations yet</p>
+                      <Button variant="primary" size="sm" onClick={handleNewConversation} className="mt-4">
+                        <Plus className="w-4 h-4" />
+                        Start New Chat
+                      </Button>
                     </div>
-                  ))}
+                  ) : (
+                    <>
+                      {conversations.map((conv) => (
+                        <div
+                          key={conv.id}
+                          className={`group relative p-3 rounded-lg transition-colors cursor-pointer ${
+                            currentConversationId === conv.id
+                              ? 'bg-primary-50 border border-primary-200'
+                              : 'hover:bg-neutral-50 border border-transparent'
+                          }`}
+                          onClick={() => handleSelectConversation(conv.id)}
+                        >
+                          <div className="flex items-start gap-2">
+                            <MessageSquare className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
+                              currentConversationId === conv.id ? 'text-primary-600' : 'text-neutral-500'
+                            }`} />
+                            <div className="flex-1 min-w-0">
+                              <h6 className={`text-sm font-medium truncate ${
+                                currentConversationId === conv.id ? 'text-primary-900' : 'text-neutral-900'
+                              }`}>
+                                {conv.title || 'Untitled Conversation'}
+                              </h6>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Clock className="w-3 h-3 text-neutral-400" />
+                                <span className="text-xs text-neutral-500">{formatDate(conv.updatedAt)}</span>
+                              </div>
+                              {conv.selectedSectors.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {conv.selectedSectors.slice(0, 2).map(sector => (
+                                    <span key={sector} className="px-1.5 py-0.5 bg-neutral-100 text-neutral-600 rounded text-xs">
+                                      {sector}
+                                    </span>
+                                  ))}
+                                  {conv.selectedSectors.length > 2 && (
+                                    <span className="px-1.5 py-0.5 bg-neutral-100 text-neutral-600 rounded text-xs">
+                                      +{conv.selectedSectors.length - 2}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteConversation(conv.id);
+                            }}
+                            className="absolute top-2 right-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-neutral-200 transition-opacity"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-neutral-600" />
+                          </button>
+                        </div>
+                      ))}
+                    </>
+                  )}
                 </div>
               </Card>
             </div>
 
-            {/* Main Content */}
-            <div className="lg:col-span-9">
+            {/* Main Content Area */}
+            <div className="lg:col-span-6">
               <Card variant="elevated" padding="lg">
                 {/* Step 1: Preferences */}
                 {currentStep === 1 && (
@@ -186,6 +431,55 @@ export function Generate() {
                       </div>
                     </div>
 
+                    <Card variant="bordered" padding="md" className="bg-accent-50 border-accent-200">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          id="focusImpact"
+                          checked={formData.focusImpact}
+                          onChange={(e) => setFormData({ ...formData, focusImpact: e.target.checked })}
+                          className="mt-1 w-5 h-5 text-primary-600 rounded"
+                        />
+                        <div className="flex-1">
+                          <label htmlFor="focusImpact" className="text-neutral-900 cursor-pointer">
+                            Focus on high-impact societal problems
+                          </label>
+                          <p className="text-neutral-600 mt-1">
+                            Prioritize startup ideas that address significant Egyptian societal challenges
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+
+                    <div>
+                      <label className="block text-neutral-700 mb-3">
+                        Idea maturity level
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button
+                          onClick={() => setFormData({ ...formData, maturityLevel: 'exploratory' })}
+                          className={`p-4 rounded-lg border-2 transition-colors text-left ${
+                            formData.maturityLevel === 'exploratory'
+                              ? 'border-primary-600 bg-primary-50'
+                              : 'border-neutral-200 hover:border-neutral-300'
+                          }`}
+                        >
+                          <h6 className="text-neutral-900 mb-1">Exploratory</h6>
+                          <p className="text-neutral-600">Early-stage concepts to explore and validate</p>
+                        </button>
+                        <button
+                          onClick={() => setFormData({ ...formData, maturityLevel: 'mvp-ready' })}
+                          className={`p-4 rounded-lg border-2 transition-colors text-left ${
+                            formData.maturityLevel === 'mvp-ready'
+                              ? 'border-primary-600 bg-primary-50'
+                              : 'border-neutral-200 hover:border-neutral-300'
+                          }`}
+                        >
+                          <h6 className="text-neutral-900 mb-1">MVP-Ready</h6>
+                          <p className="text-neutral-600">Ideas ready to develop into a minimum viable product</p>
+                        </button>
+                      </div>
+                    </div>
 
                     <Card variant="bordered" padding="md" className="bg-yellow-50 border-yellow-200">
                       <p className="text-neutral-700">
@@ -251,7 +545,7 @@ export function Generate() {
                               {message.content}
                             </p>
                             <span className={`text-xs mt-1.5 block ${message.role === 'user' ? 'text-neutral-400' : 'text-neutral-400'}`}>
-                              {message.createdAt?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
                           {message.role === 'user' && (
