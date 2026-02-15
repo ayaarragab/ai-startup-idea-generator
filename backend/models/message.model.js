@@ -22,12 +22,18 @@ const Message = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         allowNull: true
       }
-    },
-    {
-      tableName: 'messages',
-      timestamps: true
-    }
-  )
+    },   
+  {
+    tableName: 'messages',
+    timestamps: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ["conversationId", "clientMessageId", "role"],
+      },
+    ]
+  });
+
   return messageModel;
 }
 

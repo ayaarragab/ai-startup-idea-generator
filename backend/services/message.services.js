@@ -2,7 +2,7 @@ import db from "../models/index.js";
 
 const { Message } = db;
 
-export const createMessage = async (content, conversationId, role, clientMessageId='') => {
+export const createMessage = async (content, conversationId, role, clientMessageId) => {
   try {
     const message = await Message.create({
       content,
@@ -12,14 +12,22 @@ export const createMessage = async (content, conversationId, role, clientMessage
     })
     return message;
   } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      const existing = await Message.findOne({
+        where: { conversationId, role, clientMessageId },
+      });
+      return existing;            
+    }
     return false;
   }
 }
 
-export const findMessageByUUID = async (clientMessageId) => {
+export const findMessage = async (clientMessageId, role, conversationId) => {
   try {
     const message = await Message.findOne({
       where: {
+        role,
+        conversationId,
         clientMessageId
       }
     })
