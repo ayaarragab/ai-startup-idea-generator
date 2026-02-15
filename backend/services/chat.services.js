@@ -19,5 +19,5 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
 
   const message = await createMessage(aiResponse.content, aiResponse.conversationId, 'ai', clientMessageId)
   
-  return { ...aiResponse, messageId: message.id };
+  return { ...aiResponse, messageId: message.id, clientMessageId };
 }

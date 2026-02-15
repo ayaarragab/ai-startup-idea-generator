@@ -15,13 +15,17 @@ import {
   User,
   Loader2,
   MessageSquare
-} from 'lucide-react';
+} from 'lucide-react'; 
+import axios from "../utils/axiosInstance";
 
 interface ChatMessage {
-  id: number;
   role: 'user' | 'ai';
   content: string;
-  timestamp: Date;
+  conversationId: number | null;
+  clientMessageId: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  id?: string;
 }
 
 export function Generate() {
@@ -33,14 +37,7 @@ export function Generate() {
     focusImpact: true,
     maturityLevel: 'mvp-ready',
   });
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      role: 'ai',
-      content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market. What problem or opportunity would you like to explore?",
-      timestamp: new Date(),
-    }
-  ]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [userInput, setUserInput] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
 
@@ -69,57 +66,32 @@ export function Generate() {
     }, 3000);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (userInput.trim() === '') return;
     const newMessage: ChatMessage = {
-      id: chatMessages.length + 1,
       role: 'user',
       content: userInput,
-      timestamp: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      conversationId: 1,
+      clientMessageId: crypto.randomUUID()
     };
     setChatMessages([...chatMessages, newMessage]);
     setUserInput('');
 
     // Simulate AI response
-    setIsAITyping(true);
-    setTimeout(() => {
-      let aiResponseContent = '';
-      
-      // Intelligent AI responses based on conversation context
-      if (chatMessages.length === 1) {
-        aiResponseContent = `Interesting! I can see you're interested in ${selectedSectors.join(', ')}. Let me help you explore this further. What specific challenges or pain points have you noticed in ${selectedSectors[0]} that could be addressed with a startup solution?`;
-      } else if (chatMessages.length === 3) {
-        aiResponseContent = `That's a great observation! Based on your preferences for ${formData.maturityLevel === 'mvp-ready' ? 'MVP-ready' : 'exploratory'} ideas${formData.focusImpact ? ' with high societal impact' : ''}, I'm analyzing the Egyptian market data to find the best match. Would you like me to generate a complete startup idea now, or would you like to discuss more details?`;
-      } else if (chatMessages.length >= 5 || userInput.toLowerCase().includes('generate') || userInput.toLowerCase().includes('yes')) {
-        aiResponseContent = `Perfect! I have gathered enough information. I'll now process your inputs through our 4-model AI pipeline to generate a comprehensive startup idea tailored for the Egyptian market. This will include a Business Model Canvas, pitch summary, and relevant academic references. Please wait a moment...`;
+    setIsAITyping(true)
+    try {
+      setTimeout(async () => {
+        const aiResponse = await axios.post('/chat/', newMessage);
+        console.log(aiResponse);
         
-        const aiResponse: ChatMessage = {
-          id: chatMessages.length + 2,
-          role: 'ai',
-          content: aiResponseContent,
-          timestamp: new Date(),
-        };
-        setChatMessages([...chatMessages, newMessage, aiResponse]);
-        setIsAITyping(false);
-        
-        // Trigger generation after showing the message
-        setTimeout(() => {
-          handleGenerate();
-        }, 1500);
-        return;
-      } else {
-        aiResponseContent = `I understand. Tell me more about your vision for this startup. What makes you passionate about solving this problem in the Egyptian market?`;
-      }
-
-      const aiResponse: ChatMessage = {
-        id: chatMessages.length + 2,
-        role: 'ai',
-        content: aiResponseContent,
-        timestamp: new Date(),
-      };
-      setChatMessages([...chatMessages, newMessage, aiResponse]);
-      setIsAITyping(false);
-    }, 1500);
+        setChatMessages([...chatMessages, newMessage, aiResponse.data]);
+        setIsAITyping(false)
+      }, 1500);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -279,7 +251,7 @@ export function Generate() {
                               {message.content}
                             </p>
                             <span className={`text-xs mt-1.5 block ${message.role === 'user' ? 'text-neutral-400' : 'text-neutral-400'}`}>
-                              {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {message.createdAt?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
                           {message.role === 'user' && (
