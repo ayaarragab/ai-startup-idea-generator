@@ -32,7 +32,7 @@ export const findMessage = async (clientMessageId, role, conversationId) => {
       }
     })
     if (message) {
-      return true;
+      return message;
     }
     return false;
   } catch (error) {

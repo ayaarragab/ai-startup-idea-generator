@@ -42,7 +42,7 @@ const validateMessage = async (req, res) => {
   const aiResponseExists = await findMessage(clientMessageId, "ai", conversationId);
 
   if (aiResponseExists) {
-    res.status(200).json({ aiResponse: aiResponseExists });
+    res.status(200).json({ ...aiResponseExists.dataValues });
     return true;
   }
 
