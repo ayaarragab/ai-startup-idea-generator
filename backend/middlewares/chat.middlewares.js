@@ -1,9 +1,9 @@
 import { findConversation } from "../services/conversation.services.js";
-import { findUserById } from "../services/auth.services.js";
+import { findMessageByUUID } from "../services/message.services.js";
 
 export const validatePrompt = async (req, res, next) => {
   try {
-    const { content, conversationId, userId } = req.body;
+    const { content, conversationId, clientMessageId } = req.body;
     let isNewConversation = false;
     if (!content) {
       return res.status(400).json({ error: "Message is required" });
@@ -18,13 +18,12 @@ export const validatePrompt = async (req, res, next) => {
           .json({ error: "This conversation doesn't exist" });
       }
     }
-    if (!userId) {
-      return res.status(404).json({ error: "userId is required" });
-    } else {
-      const user = await findUserById(userId);
-      if (!user) {
-        return res.status(404).json({ error: "This user doesn't exist" });
-      }
+    if (!clientMessageId) {
+      return res.status(400).json({ error: "Client message ID is required" });
+    }
+    const alreadyExists = await findMessageByUUID(clientMessageId);
+    if (alreadyExists) {
+      return res.status(409).json({ error: "Message with this ID already sent" });
     }
     req.body.isNewConversation = isNewConversation;
     next();
@@ -32,6 +31,7 @@ export const validatePrompt = async (req, res, next) => {
     return res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
   }
 };
+
 export const validateMessageLength = (req, res, next) => {
   const { content } = req.body;
   const MAX_MESSAGE_LENGTH = 1000; // Set your desired maximum length

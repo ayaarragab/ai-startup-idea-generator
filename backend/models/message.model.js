@@ -17,6 +17,11 @@ const Message = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false
       },
+      clientMessageId: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: true
+      }
     },
     {
       tableName: 'messages',

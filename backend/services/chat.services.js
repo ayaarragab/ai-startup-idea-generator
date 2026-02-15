@@ -2,14 +2,14 @@ import sendChat from "./ai/index.js";
 import { createConversation } from "./conversation.services.js";
 import { createMessage } from "./message.services.js";
 
-export const handleChat = async ({ content, conversationId, userId, isNewConversation }) => {
+export const handleChat = async ({ content, conversationId, userId, isNewConversation, clientMessageId }) => {
   
   if (isNewConversation) {
     const conversation = await createConversation(userId);
     conversationId = conversation.id;
   }
 
-  await createMessage(content, conversationId, 'user')
+  await createMessage(content, conversationId, 'user', clientMessageId)
 
   const aiResponse = await sendChat({
     content,
@@ -17,7 +17,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
     userId
   });
 
-  await createMessage(aiResponse.content, aiResponse.conversationId, 'ai')
+  const message = await createMessage(aiResponse.content, aiResponse.conversationId, 'ai')
   
-  return aiResponse;
+  return { ...aiResponse, messageId: message.id };
 }
