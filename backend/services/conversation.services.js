@@ -14,11 +14,13 @@ export const findConversation = async (id) => {
   }
 }
 
-export const createConversation = async (userId) => {
+export const createConversation = async (userId, sectorIds = []) => {
   try {
-    const conversation = await Conversation.create({
-    userId
-    })
+    const conversation = await Conversation.create({ userId })
+    
+    if (sectorIds.length > 0) {
+      await conversation.setSectors(sectorIds);
+    }
     return conversation;
   } catch (error) {
     return false;
