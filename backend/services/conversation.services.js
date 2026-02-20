@@ -10,14 +10,14 @@ export const findConversation = async (id) => {
     }
     return null;
   } catch (error) {
-    return null;    
+    return null;
   }
-}
+};
 
 export const createConversation = async (userId, sectorIds = []) => {
   try {
-    const conversation = await Conversation.create({ userId })
-    
+    const conversation = await Conversation.create({ userId });
+
     if (sectorIds.length > 0) {
       await conversation.setSectors(sectorIds);
     }
@@ -25,55 +25,56 @@ export const createConversation = async (userId, sectorIds = []) => {
   } catch (error) {
     return false;
   }
-}
+};
 
 export const fetchConversations = async (userId) => {
   try {
     const conversations = await Conversation.findAll({
-      where: { 
-        userId
+      where: {
+        userId,
       },
       include: [
         {
           model: Message,
-          as: 'messages'
+          as: "messages",
         },
         {
           model: Sector,
-          as: 'sectors'
-        }
-      ]
+          as: "sectors",
+        },
+      ],
     });
     console.log(conversations);
-    
+
     return conversations;
   } catch (error) {
     console.log(error);
     return [];
   }
-}
+};
 
 export const fetchConversation = async (userId, id) => {
   try {
     const conversation = await Conversation.findOne({
       where: {
-      id,
-      userId
+        id,
+        userId,
       },
       include: [
-      {
-        model: Message,
-        as: 'messages'
-      },
-      {
-        model: Sector,
-        as: 'sectors'
-      }
-      ]
+        {
+          model: Message,
+          as: "messages",
+        },
+        {
+          model: Sector,
+          as: "sectors",
+        },
+      ],
+      order: [[{ model: Message, as: "messages" }, "id", "ASC"]],
     });
     return conversation || null;
-    } catch (error) {
+  } catch (error) {
     console.log(error);
     return null;
-    }
-}
+  }
+};
