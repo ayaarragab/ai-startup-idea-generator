@@ -1,6 +1,6 @@
 import db from "../models/index.js";
 
-const { Conversation } = db;
+const { Conversation, Message, Sector } = db;
 
 export const findConversation = async (id) => {
   try {
@@ -22,5 +22,31 @@ export const createConversation = async (userId) => {
     return conversation;
   } catch (error) {
     return false;
+  }
+}
+
+export const fetchConversations = async (userId) => {
+  try {
+    const conversations = await Conversation.findAll({
+      where: { 
+        userId
+      },
+      include: [
+        {
+          model: Message,
+          as: 'messages'
+        },
+        {
+          model: Sector,
+          as: 'sectors'
+        }
+      ]
+    });
+    console.log(conversations);
+    
+    return conversations;
+  } catch (error) {
+    console.log(error);
+    return [];
   }
 }
