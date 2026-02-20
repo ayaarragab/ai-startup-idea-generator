@@ -50,3 +50,28 @@ export const fetchConversations = async (userId) => {
     return [];
   }
 }
+
+export const fetchConversation = async (userId, id) => {
+  try {
+    const conversation = await Conversation.findOne({
+      where: {
+      id,
+      userId
+      },
+      include: [
+      {
+        model: Message,
+        as: 'messages'
+      },
+      {
+        model: Sector,
+        as: 'sectors'
+      }
+      ]
+    });
+    return conversation || null;
+    } catch (error) {
+    console.log(error);
+    return null;
+    }
+}

@@ -1,4 +1,4 @@
-import { fetchConversations } from "../services/conversation.services.js"
+import { fetchConversations, fetchConversation } from "../services/conversation.services.js"
 
 export const getConversations = async (req, res) => {
   try {
@@ -11,5 +11,24 @@ export const getConversations = async (req, res) => {
     res.status(200).json(conversations);
   } catch (error) {
     res.status(500).json({ message: "Error fetching conversations", error });
+  }
+}
+
+export const getConversation = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const userId = req.user.id;
+    if (!id) {
+      return res.status(400).json({ message: "Conversation ID is required" });
+    }
+    
+    const conversation = await fetchConversation(userId, id);
+    if (!conversation) {
+      return res.status(404).json({ message: "Conversation not found" });
+    }
+    
+    res.status(200).json(conversation);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching conversation", error });
   }
 }
