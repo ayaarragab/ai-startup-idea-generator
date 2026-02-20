@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../utils/axiosInstance'; // <-- تم استيراد الـ axios instance
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { Input, TextArea } from '../components/Input';
-import { Tag } from '../components/Tag';
-import { Badge } from '../components/Badge';
 import { 
   Settings, 
-  Sparkles, 
-  Check,
   ChevronRight,
   Send,
   Bot,
@@ -17,270 +13,207 @@ import {
   MessageSquare,
   Plus,
   Trash2,
-  Clock,
-  Edit2
+  Clock
 } from 'lucide-react';
 
+// تحديث الواجهات لتتطابق مع الـ Backend (Sequelize Models)
 interface ChatMessage {
-  id: number;
+  id: number | string;
   role: 'user' | 'ai';
   content: string;
-  timestamp: Date;
+  createdAt: string; 
+  clientMessageId?: string;
+}
+
+interface Sector {
+  id: number;
+  name: string;
 }
 
 interface Conversation {
   id: string;
   userId: string;
   title?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   messages: ChatMessage[];
-  selectedSectors: string[];
-  formData: {
-    focusImpact: boolean;
-    maturityLevel: string;
-  };
+  sectors?: Sector[]; // بناءً على الـ include في الـ backend
 }
 
 export function Generate() {
   const navigate = useNavigate();
-  const userId = 'user-123'; // TODO: Replace with actual user ID from auth
 
-  // Conversations State
-  const [conversations, setConversations] = useState<Conversation[]>([
-    {
-      id: 'conv-1',
-      userId: userId,
-      title: 'HealthTech Solution for Cairo',
-      createdAt: new Date('2024-02-10'),
-      updatedAt: new Date('2024-02-10'),
-      messages: [
-        {
-          id: 1,
-          role: 'ai',
-          content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market.",
-          timestamp: new Date('2024-02-10'),
-        }
-      ],
-      selectedSectors: ['Healthcare', 'FinTech'],
-      formData: {
-        focusImpact: true,
-        maturityLevel: 'mvp-ready',
-      }
-    },
-    {
-      id: 'conv-2',
-      userId: userId,
-      title: 'E-commerce Platform',
-      createdAt: new Date('2024-02-12'),
-      updatedAt: new Date('2024-02-12'),
-      messages: [
-        {
-          id: 1,
-          role: 'ai',
-          content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market.",
-          timestamp: new Date('2024-02-12'),
-        }
-      ],
-      selectedSectors: ['E-commerce', 'Tourism'],
-      formData: {
-        focusImpact: false,
-        maturityLevel: 'exploratory',
-      }
-    },
-    {
-      id: 'conv-3',
-      userId: userId,
-      createdAt: new Date('2024-02-14'),
-      updatedAt: new Date('2024-02-14'),
-      messages: [
-        {
-          id: 1,
-          role: 'ai',
-          content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market.",
-          timestamp: new Date('2024-02-14'),
-        }
-      ],
-      selectedSectors: ['Education'],
-      formData: {
-        focusImpact: true,
-        maturityLevel: 'mvp-ready',
-      }
-    }
-  ]);
-
+  // الحالة (State)
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
-  const [formData, setFormData] = useState({
-    focusImpact: true,
-    maturityLevel: 'mvp-ready',
-  });
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      role: 'ai',
-      content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market. What problem or opportunity would you like to explore?",
-      timestamp: new Date(),
-    }
-  ]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  
+  // تحويل الـ Sectors لـ Objects لتتوافق مع الـ IDs في الداتا بيز
+  const sectorOptions = [
+    { id: 1, name: 'Healthcare' }, { id: 2, name: 'Education' }, 
+    { id: 3, name: 'Agriculture' }, { id: 4, name: 'Transportation' }, 
+    { id: 5, name: 'Environment' }, { id: 6, name: 'FinTech' }, 
+    { id: 7, name: 'E-commerce' }, { id: 8, name: 'Tourism' }, 
+    { id: 9, name: 'Manufacturing' }, { id: 10, name: 'Energy' }, 
+    { id: 11, name: 'Real Estate' }, { id: 12, name: 'Food Tech' }
+  ];
+  
+  const [selectedSectorIds, setSelectedSectorIds] = useState<number[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [userInput, setUserInput] = useState('');
   const [isAITyping, setIsAITyping] = useState(false);
   const [showConversations, setShowConversations] = useState(false);
 
-  const steps = [
-    { number: 1, title: 'Preferences', icon: Settings },
-    { number: 2, title: 'Chat with AI', icon: MessageSquare },
-  ];
+  // 1. جلب المحادثات السابقة عند تحميل الصفحة
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await axiosInstance.get('/conversation/');
+        setConversations(response.data);
+      } catch (error) {
+        console.error("Error fetching conversations:", error);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+    fetchHistory();
+  }, []);
 
-  const sectorOptions = [
-    'Healthcare', 'Education', 'Agriculture', 'Transportation', 'Environment',
-    'FinTech', 'E-commerce', 'Tourism', 'Manufacturing', 'Energy', 'Real Estate', 'Food Tech'
-  ];
-
-  const toggleSector = (sector: string) => {
-    setSelectedSectors(prev =>
-      prev.includes(sector) ? prev.filter(s => s !== sector) : [...prev, sector]
+  const toggleSector = (sectorId: number) => {
+    setSelectedSectorIds(prev =>
+      prev.includes(sectorId) ? prev.filter(id => id !== sectorId) : [...prev, sectorId]
     );
   };
 
-  const handleGenerate = () => {
+  // 2. الانتقال لخطوة الشات وإنشاء المحادثة في الـ DB
+  const handleNextStep = async () => {
+    if (selectedSectorIds.length === 0) return;
+    
     setIsGenerating(true);
-    // Simulate generation process
-    setTimeout(() => {
+    try {
+      // نرسل مصفوفة الـ IDs كما يتوقعها الـ service: createConversation(userId, sectorIds = [])
+      const response = await axiosInstance.post('/conversation/', selectedSectorIds);
+      const newConv = response.data;
+      
+      setCurrentConversationId(newConv.id);
+      
+      // رسالة ترحيبية مبدئية في الواجهة فقط (لا تحفظ في الداتابيز إلا إذا أرسلها الـ AI)
+      const welcomeMsg: ChatMessage = {
+        id: 'welcome',
+        role: 'ai',
+        content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea. What problem would you like to explore?",
+        createdAt: new Date().toISOString()
+      };
+      setChatMessages([welcomeMsg]);
+      setCurrentStep(2);
+      
+      // تحديث قائمة المحادثات في القائمة الجانبية
+      setConversations(prev => [newConv, ...prev]);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+    } finally {
       setIsGenerating(false);
-      navigate('/idea/sample-idea-1');
-    }, 3000);
+    }
   };
 
-  const handleSendMessage = () => {
+  // 3. إرسال الرسالة للـ Backend AI
+  const handleSendMessage = async () => {
     if (userInput.trim() === '') return;
+    
+    const clientMessageId = Date.now().toString();
     const newMessage: ChatMessage = {
-      id: chatMessages.length + 1,
+      id: clientMessageId,
       role: 'user',
       content: userInput,
-      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      clientMessageId
     };
-    setChatMessages([...chatMessages, newMessage]);
-    setUserInput('');
 
-    // Update current conversation if exists
-    if (currentConversationId) {
+    // Optimistic UI Update (عرض رسالة المستخدم فوراً)
+    setChatMessages(prev => [...prev, newMessage]);
+    setUserInput('');
+    setIsAITyping(true);
+
+    try {
+      // استدعاء endpoint الشات المربوط بـ AI
+      const response = await axiosInstance.post('/chat/', {
+        content: newMessage.content,
+        conversationId: currentConversationId,
+        isNewConversation: !currentConversationId, 
+        clientMessageId
+      });
+
+      const aiResponseData = response.data;
+      
+      const aiMessage: ChatMessage = {
+        id: aiResponseData.messageId || Date.now(),
+        role: 'ai',
+        content: aiResponseData.content,
+        createdAt: new Date().toISOString()
+      };
+
+      setChatMessages(prev => [...prev, aiMessage]);
+
+      // تحديث تاريخ المحادثة في القائمة الجانبية
       setConversations(prev => prev.map(conv => 
         conv.id === currentConversationId 
-          ? { ...conv, messages: [...chatMessages, newMessage], updatedAt: new Date() }
+          ? { ...conv, updatedAt: new Date().toISOString() }
           : conv
       ));
-    }
 
-    // Simulate AI response
-    setIsAITyping(true);
-    setTimeout(() => {
-      let aiResponseContent = '';
-      
-      // Intelligent AI responses based on conversation context
-      if (chatMessages.length === 1) {
-        aiResponseContent = `Interesting! I can see you're interested in ${selectedSectors.join(', ')}. Let me help you explore this further. What specific challenges or pain points have you noticed in ${selectedSectors[0]} that could be addressed with a startup solution?`;
-      } else if (chatMessages.length === 3) {
-        aiResponseContent = `That's a great observation! Based on your preferences for ${formData.maturityLevel === 'mvp-ready' ? 'MVP-ready' : 'exploratory'} ideas${formData.focusImpact ? ' with high societal impact' : ''}, I'm analyzing the Egyptian market data to find the best match. Would you like me to generate a complete startup idea now, or would you like to discuss more details?`;
-      } else if (chatMessages.length >= 5 || userInput.toLowerCase().includes('generate') || userInput.toLowerCase().includes('yes')) {
-        aiResponseContent = `Perfect! I have gathered enough information. I'll now process your inputs through our 4-model AI pipeline to generate a comprehensive startup idea tailored for the Egyptian market. This will include a Business Model Canvas, pitch summary, and relevant academic references. Please wait a moment...`;
-        
-        const aiResponse: ChatMessage = {
-          id: chatMessages.length + 2,
-          role: 'ai',
-          content: aiResponseContent,
-          timestamp: new Date(),
-        };
-        setChatMessages([...chatMessages, newMessage, aiResponse]);
-        setIsAITyping(false);
-        
-        // Trigger generation after showing the message
-        setTimeout(() => {
-          handleGenerate();
-        }, 1500);
-        return;
-      } else {
-        aiResponseContent = `I understand. Tell me more about your vision for this startup. What makes you passionate about solving this problem in the Egyptian market?`;
-      }
-
-      const aiResponse: ChatMessage = {
-        id: chatMessages.length + 2,
-        role: 'ai',
-        content: aiResponseContent,
-        timestamp: new Date(),
-      };
-      setChatMessages([...chatMessages, newMessage, aiResponse]);
+    } catch (error) {
+      console.error("Error in chat:", error);
+      // يمكن إضافة تنبيه للمستخدم هنا بحدوث خطأ
+    } finally {
       setIsAITyping(false);
+    }
+  };
 
-      // Update conversation with AI response
-      if (currentConversationId) {
-        setConversations(prev => prev.map(conv => 
-          conv.id === currentConversationId 
-            ? { ...conv, messages: [...chatMessages, newMessage, aiResponse], updatedAt: new Date() }
-            : conv
-        ));
-      }
-    }, 1500);
+  // 4. اختيار محادثة سابقة من القائمة
+  const handleSelectConversation = async (convId: string) => {
+    try {
+      const response = await axiosInstance.get(`/conversation/${convId}`);
+      const convData = response.data;
+      
+      setCurrentConversationId(convData.id);
+      setSelectedSectorIds(convData.sectors?.map((s: Sector) => s.id) || []);
+      setChatMessages(convData.messages || []);
+      setCurrentStep(2);
+      setShowConversations(false);
+    } catch (error) {
+      console.error("Error fetching conversation details:", error);
+    }
   };
 
   const handleNewConversation = () => {
-    const newConv: Conversation = {
-      id: `conv-${Date.now()}`,
-      userId: userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      messages: [
-        {
-          id: 1,
-          role: 'ai',
-          content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea tailored for the Egyptian market. What problem or opportunity would you like to explore?",
-          timestamp: new Date(),
-        }
-      ],
-      selectedSectors: [],
-      formData: {
-        focusImpact: true,
-        maturityLevel: 'mvp-ready',
-      }
-    };
-    setConversations(prev => [newConv, ...prev]);
-    setCurrentConversationId(newConv.id);
-    setSelectedSectors([]);
-    setFormData({ focusImpact: true, maturityLevel: 'mvp-ready' });
-    setChatMessages(newConv.messages);
+    setCurrentConversationId(null);
+    setSelectedSectorIds([]);
+    setChatMessages([]);
     setCurrentStep(1);
     setShowConversations(false);
   };
 
-  const handleSelectConversation = (convId: string) => {
-    const conv = conversations.find(c => c.id === convId);
-    if (conv) {
-      setCurrentConversationId(convId);
-      setSelectedSectors(conv.selectedSectors);
-      setFormData(conv.formData);
-      setChatMessages(conv.messages);
-      setCurrentStep(2); // Always open to chat view
-      setShowConversations(false);
-    }
-  };
-
-  const handleDeleteConversation = (convId: string) => {
+  const handleDeleteConversation = async (convId: string) => {
+    // إذا كان لديك API للحذف، يمكنك إضافته هنا
+    // await axiosInstance.delete(`/conversations/${convId}`);
     setConversations(prev => prev.filter(c => c.id !== convId));
     if (currentConversationId === convId) {
-      setCurrentConversationId(null);
       handleNewConversation();
     }
   };
 
-  const formatDate = (date: Date) => {
+  // دالة مساعدة لتنسيق التاريخ
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
+    if (diffDays === 0 || diffDays === 1) return 'Today';
+    if (diffDays === 2) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
     return date.toLocaleDateString();
   };
@@ -308,7 +241,6 @@ export function Generate() {
             </Button>
           </div>
 
-          {/* Mobile: Conversations Toggle Button */}
           <div className="mb-4 md:hidden">
             <Button
               variant="outlined"
@@ -317,7 +249,7 @@ export function Generate() {
               className="w-full justify-center"
             >
               <MessageSquare className="w-4 h-4" />
-              {showConversations ? 'Hide' : 'Show'} Conversations ({conversations.length})
+              {showConversations ? 'Hide' : 'Show'} Conversations
             </Button>
           </div>
 
@@ -330,7 +262,11 @@ export function Generate() {
                     <h6 className="text-neutral-900 text-sm font-medium">Previous Conversations</h6>
                   </div>
                   
-                  {conversations.length === 0 ? (
+                  {isLoadingHistory ? (
+                    <div className="flex justify-center p-4">
+                      <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
+                    </div>
+                  ) : conversations.length === 0 ? (
                     <div className="px-2 py-8 text-center">
                       <p className="text-neutral-500 text-sm">No conversations yet</p>
                       <Button variant="primary" size="sm" onClick={handleNewConversation} className="mt-4">
@@ -364,20 +300,6 @@ export function Generate() {
                                 <Clock className="w-3 h-3 text-neutral-400" />
                                 <span className="text-xs text-neutral-500">{formatDate(conv.updatedAt)}</span>
                               </div>
-                              {conv.selectedSectors.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                  {conv.selectedSectors.slice(0, 2).map(sector => (
-                                    <span key={sector} className="px-1.5 py-0.5 bg-neutral-100 text-neutral-600 rounded text-xs">
-                                      {sector}
-                                    </span>
-                                  ))}
-                                  {conv.selectedSectors.length > 2 && (
-                                    <span className="px-1.5 py-0.5 bg-neutral-100 text-neutral-600 rounded text-xs">
-                                      +{conv.selectedSectors.length - 2}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
                             </div>
                           </div>
                           <button
@@ -417,33 +339,29 @@ export function Generate() {
                       <div className="flex flex-wrap gap-2">
                         {sectorOptions.map((sector) => (
                           <button
-                            key={sector}
-                            onClick={() => toggleSector(sector)}
+                            key={sector.id}
+                            onClick={() => toggleSector(sector.id)}
                             className={`px-4 py-2 rounded-full border-2 transition-colors ${
-                              selectedSectors.includes(sector)
+                              selectedSectorIds.includes(sector.id)
                                 ? 'border-secondary-600 bg-secondary-50 text-secondary-700'
                                 : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                             }`}
                           >
-                            {sector}
+                            {sector.name}
                           </button>
                         ))}
                       </div>
                     </div>
-                    <Card variant="bordered" padding="md" className="bg-yellow-50 border-yellow-200">
-                      <p className="text-neutral-700">
-                        <strong>Note:</strong> This system is designed specifically for the Egyptian market using local data sources and cultural context.
-                      </p>
-                    </Card>
 
                     <div className="flex justify-between pt-4">
                       <Button
                         variant="primary"
-                        onClick={() => setCurrentStep(2)}
-                        disabled={selectedSectors.length === 0}
+                        onClick={handleNextStep}
+                        disabled={selectedSectorIds.length === 0 || isGenerating}
                       >
+                        {isGenerating ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                         Next: Chat with AI
-                        <ChevronRight className="w-5 h-5" />
+                        <ChevronRight className="w-5 h-5 ml-1" />
                       </Button>
                     </div>
                   </div>
@@ -457,18 +375,6 @@ export function Generate() {
                       <p className="text-neutral-500 text-sm">
                         Discuss your vision with our AI assistant
                       </p>
-                    </div>
-
-                    {/* Selected Preferences Summary */}
-                    <div className="mb-4 pb-4 border-b border-neutral-200">
-                      <div className="flex flex-wrap gap-2 items-center">
-                        <span className="text-sm text-neutral-500">Selected:</span>
-                        {selectedSectors.map(sector => (
-                          <span key={sector} className="px-2.5 py-1 bg-neutral-100 text-neutral-700 rounded-md text-sm">
-                            {sector}
-                          </span>
-                        ))}
-                      </div>
                     </div>
 
                     {/* Chat Messages Container */}
@@ -487,14 +393,14 @@ export function Generate() {
                             className={`max-w-[75%] rounded-lg px-4 py-2.5 ${
                               message.role === 'user'
                                 ? 'bg-neutral-900 text-white' 
-                                : 'bg-neutral-50 text-neutral-900'
+                                : 'bg-neutral-50 text-neutral-900 border border-neutral-100'
                             }`}
                           >
-                            <p className={`text-sm leading-relaxed ${message.role === 'user' ? 'text-white' : 'text-neutral-800'}`}>
+                            <p className={`text-sm leading-relaxed whitespace-pre-wrap ${message.role === 'user' ? 'text-white' : 'text-neutral-800'}`}>
                               {message.content}
                             </p>
                             <span className={`text-xs mt-1.5 block ${message.role === 'user' ? 'text-neutral-400' : 'text-neutral-400'}`}>
-                              {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
                           {message.role === 'user' && (
@@ -504,12 +410,14 @@ export function Generate() {
                           )}
                         </div>
                       ))}
+                      
+                      {/* Typing Indicator */}
                       {isAITyping && (
                         <div className="flex gap-3 justify-start">
                           <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <Bot className="w-4 h-4 text-neutral-600" />
                           </div>
-                          <div className="max-w-[75%] rounded-lg px-4 py-3 bg-neutral-50">
+                          <div className="max-w-[75%] rounded-lg px-4 py-3 bg-neutral-50 border border-neutral-100">
                             <div className="flex gap-1">
                               <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                               <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -530,37 +438,27 @@ export function Generate() {
                             onChange={(e) => setUserInput(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
                             placeholder="Type your message..."
-                            disabled={isGenerating || isAITyping}
+                            disabled={isAITyping}
                             className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:bg-white focus:border-neutral-400 transition-all placeholder:text-neutral-400"
                           />
                         </div>
                         <button
                           onClick={handleSendMessage}
-                          disabled={isGenerating || isAITyping || !userInput.trim()}
+                          disabled={isAITyping || !userInput.trim()}
                           className="px-4 py-2.5 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 disabled:bg-neutral-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2 text-sm"
                         >
-                          {isGenerating ? (
-                            <>
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              Generating
-                            </>
-                          ) : (
-                            <>
-                              <Send className="w-4 h-4" />
-                              Send
-                            </>
-                          )}
+                          <Send className="w-4 h-4" />
+                          <span className="hidden sm:inline">Send</span>
                         </button>
                       </div>
                       
-                      {/* Back Button */}
                       <div className="mt-4">
                         <button
-                          onClick={() => setCurrentStep(1)}
-                          disabled={isGenerating || isAITyping}
+                          onClick={handleNewConversation}
+                          disabled={isAITyping}
                           className="text-sm text-neutral-600 hover:text-neutral-900 disabled:text-neutral-400 transition-colors"
                         >
-                          ← Back to Preferences
+                          ← Start New Idea
                         </button>
                       </div>
                     </div>
