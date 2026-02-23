@@ -1,4 +1,4 @@
-import { fetchConversations, fetchConversation, createConversation } from "../services/conversation.services.js"
+import { fetchConversations, fetchConversation, createConversation, deleteConversation } from "../services/conversation.services.js"
 
 export const getConversations = async (req, res) => {
   try {
@@ -46,5 +46,23 @@ export const createOneConversation = async (req, res) => {
     res.status(201).json(newConversation);
   } catch (error) {
     res.status(500).json({ message: "Error creating conversation", error });
+  }
+}
+
+export const deleteOneConversation = async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ message: "Conversation ID is required" });
+    }
+
+    const success = await deleteConversation(id);
+    if (!success) {
+      return res.status(404).json({ message: "Conversation not found or could not be deleted" });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting conversation", error });
   }
 }

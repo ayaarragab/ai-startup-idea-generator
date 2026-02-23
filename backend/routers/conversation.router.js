@@ -10,4 +10,6 @@ router.get('/:id', authenticate, getConversation);
 
 router.post('/', authenticate, createOneConversation)
 
+router.delete('/:id', authenticate)
+
 export default router;
