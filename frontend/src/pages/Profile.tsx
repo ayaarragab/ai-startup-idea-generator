@@ -119,20 +119,20 @@ export function Profile() {
             <div className="lg:col-span-3">
               <Card variant="bordered" padding="sm">
                 <div className="flex flex-col gap-1">
-                  {tabs.map((tab) => (
+                    {tabs.filter(tab => !(tab.id === 'password' && user?.provider === 'Google')).map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${
-                        activeTab === tab.id
-                          ? 'bg-primary-50 text-primary-700'
-                          : 'text-neutral-700 hover:bg-neutral-50'
+                      activeTab === tab.id
+                        ? 'bg-primary-50 text-primary-700'
+                        : 'text-neutral-700 hover:bg-neutral-50'
                       }`}
                     >
                       <tab.icon className="w-5 h-5" />
                       <span className="font-medium">{tab.label}</span>
                     </button>
-                  ))}
+                    ))}
                 </div>
               </Card>
             </div>
