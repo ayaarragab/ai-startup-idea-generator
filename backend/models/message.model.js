@@ -25,7 +25,11 @@ const Message = (sequelize, DataTypes) => {
       },
       is_idea: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true,
+        defaultValue: false,
+      },
+      is_idea_saved: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
       is_deleted: {
         type: DataTypes.BOOLEAN,

@@ -14,7 +14,7 @@ import {
   Plus,
   Trash2,
   Clock,
-  Save // <-- تم إضافة أيقونة الحفظ
+  Save
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -24,7 +24,8 @@ interface ChatMessage {
   createdAt: string; 
   clientMessageId?: string;
   is_idea?: boolean; 
-  ideaId?: string | number; // إضافة اختيارية لو الباك إند بيبعت ID للفكرة
+  is_idea_saved?: boolean;
+  ideaId?: string | number;
 }
 
 interface Sector {
@@ -145,6 +146,7 @@ export function Generate() {
         content: aiResponseData.content,
         createdAt: new Date().toISOString(),
         is_idea: aiResponseData.is_idea || false,
+        is_idea_saved: aiResponseData.is_idea_saved || false,
         ideaId: aiResponseData.ideaId 
       };
 
@@ -211,11 +213,40 @@ export function Generate() {
     return date.toLocaleDateString();
   };
 
+  const toggleIdeaSave = async (messageId: string | number) => {
+      // 1. بندور على الرسالة اللي اليوزر داس عليها عشان نعرف حالتها الحالية
+      const targetMessage = chatMessages.find(msg => msg.id === messageId);
+      if (!targetMessage) return;
+
+      const isCurrentlySaved = targetMessage.is_idea_saved;
+      const newSavedState = !isCurrentlySaved;
+
+      setChatMessages(prev => prev.map(msg => 
+        msg.id === messageId ? { ...msg, is_idea_saved: newSavedState } : msg
+      ));
+
+      try {
+        if (!isCurrentlySaved) {
+          await axiosInstance.post('/saved-ideas/', { 
+            messageId: messageId,
+            ideaId: targetMessage.ideaId
+          });
+        } else {
+          await axiosInstance.delete(`/saved-ideas/${targetMessage.ideaId || messageId}`);
+        }
+      } catch (error) {
+        console.error("Error saving/unsaving idea:", error);
+
+        setChatMessages(prev => prev.map(msg => 
+          msg.id === messageId ? { ...msg, is_idea_saved: isCurrentlySaved } : msg
+        ));
+      }
+  };
+
   return (
     <div className="min-h-screen bg-neutral-50 py-8 md:py-12">
       <div className="container mx-auto">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
           <div className="mb-8 md:mb-12 flex items-center justify-between">
             <div>
               <h2 className="text-neutral-900 mb-2">Generate Your Startup Idea</h2>
@@ -247,7 +278,6 @@ export function Generate() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Conversations Sidebar */}
             <div className={`lg:col-span-3 ${showConversations ? 'block' : 'hidden md:block'}`}>
               <Card variant="bordered" padding="sm" className="sticky top-24 max-h-[600px] overflow-y-auto">
                 <div className="space-y-2">
@@ -312,10 +342,8 @@ export function Generate() {
               </Card>
             </div>
 
-            {/* Main Content Area */}
             <div className="lg:col-span-6">
               <Card variant="elevated" padding="lg">
-                {/* Step 1: Preferences */}
                 {currentStep === 1 && (
                   <div className="space-y-6">
                     <div>
@@ -360,7 +388,6 @@ export function Generate() {
                   </div>
                 )}
 
-                {/* Step 2: Chat with AI */}
                 {currentStep === 2 && (
                   <div className="flex flex-col h-[600px]">
                     <div className="mb-6">
@@ -370,10 +397,8 @@ export function Generate() {
                       </p>
                     </div>
 
-                    {/* Chat Messages Container */}
                     <div className="flex-1 overflow-y-auto space-y-4 mb-4 px-1">
                       {chatMessages.map((message) => (
-                        // <-- هنا خلينا الاتجاه عمودي (flex-col) عشان الزرار يظهر تحت الرسالة
                         <div 
                           key={message.id} 
                           className={`flex flex-col gap-2 ${message.role === 'user' ? 'items-end' : 'items-start'}`}
@@ -395,7 +420,7 @@ export function Generate() {
                                 {message.content}
                               </p>
                               <span className={`text-xs mt-1.5 block ${message.role === 'user' ? 'text-neutral-400' : 'text-neutral-400'}`}>
-                                {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
                               </span>
                             </div>
                             {message.role === 'user' && (
@@ -405,24 +430,22 @@ export function Generate() {
                             )}
                           </div>
                           
-                          {/* <-- زرار الـ Save Idea بيظهر لو الرسالة من الـ AI وفيها الفلاج is_idea --> */}
                           {message.role === 'ai' && message.is_idea && (
                             <button
-                              onClick={() => {
-                                // تقدري تعدلي المسار ده على حسب الـ Router عندك
-                                // وممكن تبعتي الـ ID بتاع الفكرة لو متاح: navigate(`/idea/${message.ideaId}`)
-                                navigate('/idea/sample-idea-1'); 
-                              }}
-                              className="ml-11 flex items-center gap-2 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-md transition-colors text-sm"
+                              onClick={() => toggleIdeaSave(message.id)}
+                              className={`ml-11 flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors text-sm border ${
+                                message.is_idea_saved
+                                  ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border-neutral-200'
+                                  : 'bg-green-50 hover:bg-green-100 text-green-700 border-green-200'
+                              }`}
                             >
                               <Save className="w-3.5 h-3.5" />
-                              Save Idea
+                              {message.is_idea_saved ? 'Unsave Idea' : 'Save Idea'}
                             </button>
                           )}
                         </div>
                       ))}
                       
-                      {/* Typing Indicator */}
                       {isAITyping && (
                         <div className="flex gap-3 justify-start">
                           <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -439,7 +462,6 @@ export function Generate() {
                       )}
                     </div>
 
-                    {/* Input Area */}
                     <div className="pt-4 border-t border-neutral-200">
                       <div className="flex items-end gap-2">
                         <div className="flex-1">
