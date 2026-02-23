@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../utils/axiosInstance'; // <-- تم استيراد الـ axios instance
+import axiosInstance from '../utils/axiosInstance';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { 
@@ -13,16 +13,18 @@ import {
   MessageSquare,
   Plus,
   Trash2,
-  Clock
+  Clock,
+  Save // <-- تم إضافة أيقونة الحفظ
 } from 'lucide-react';
 
-// تحديث الواجهات لتتطابق مع الـ Backend (Sequelize Models)
 interface ChatMessage {
   id: number | string;
   role: 'user' | 'ai';
   content: string;
   createdAt: string; 
   clientMessageId?: string;
+  is_idea?: boolean; 
+  ideaId?: string | number; // إضافة اختيارية لو الباك إند بيبعت ID للفكرة
 }
 
 interface Sector {
@@ -37,20 +39,18 @@ interface Conversation {
   createdAt: string;
   updatedAt: string;
   messages: ChatMessage[];
-  sectors?: Sector[]; // بناءً على الـ include في الـ backend
+  sectors?: Sector[];
 }
 
 export function Generate() {
   const navigate = useNavigate();
 
-  // الحالة (State)
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   
-  // تحويل الـ Sectors لـ Objects لتتوافق مع الـ IDs في الداتا بيز
   const sectorOptions = [
     { id: 1, name: 'Healthcare' }, { id: 2, name: 'Education' }, 
     { id: 3, name: 'Agriculture' }, { id: 4, name: 'Transportation' }, 
@@ -66,7 +66,6 @@ export function Generate() {
   const [isAITyping, setIsAITyping] = useState(false);
   const [showConversations, setShowConversations] = useState(false);
 
-  // 1. جلب المحادثات السابقة عند تحميل الصفحة
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -87,19 +86,16 @@ export function Generate() {
     );
   };
 
-  // 2. الانتقال لخطوة الشات وإنشاء المحادثة في الـ DB
   const handleNextStep = async () => {
     if (selectedSectorIds.length === 0) return;
     
     setIsGenerating(true);
     try {
-      // نرسل مصفوفة الـ IDs كما يتوقعها الـ service: createConversation(userId, sectorIds = [])
       const response = await axiosInstance.post('/conversation/', selectedSectorIds);
       const newConv = response.data;
       
       setCurrentConversationId(newConv.id);
       
-      // رسالة ترحيبية مبدئية في الواجهة فقط (لا تحفظ في الداتابيز إلا إذا أرسلها الـ AI)
       const welcomeMsg: ChatMessage = {
         id: 'welcome',
         role: 'ai',
@@ -109,7 +105,6 @@ export function Generate() {
       setChatMessages([welcomeMsg]);
       setCurrentStep(2);
       
-      // تحديث قائمة المحادثات في القائمة الجانبية
       setConversations(prev => [newConv, ...prev]);
     } catch (error) {
       console.error("Error creating conversation:", error);
@@ -118,7 +113,6 @@ export function Generate() {
     }
   };
 
-  // 3. إرسال الرسالة للـ Backend AI
   const handleSendMessage = async () => {
     if (userInput.trim() === '') return;
     
@@ -131,13 +125,11 @@ export function Generate() {
       clientMessageId
     };
 
-    // Optimistic UI Update (عرض رسالة المستخدم فوراً)
     setChatMessages(prev => [...prev, newMessage]);
     setUserInput('');
     setIsAITyping(true);
 
     try {
-      // استدعاء endpoint الشات المربوط بـ AI
       const response = await axiosInstance.post('/chat/', {
         content: newMessage.content,
         conversationId: currentConversationId,
@@ -151,12 +143,13 @@ export function Generate() {
         id: aiResponseData.messageId || Date.now(),
         role: 'ai',
         content: aiResponseData.content,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        is_idea: aiResponseData.is_idea || false,
+        ideaId: aiResponseData.ideaId 
       };
 
       setChatMessages(prev => [...prev, aiMessage]);
 
-      // تحديث تاريخ المحادثة في القائمة الجانبية
       setConversations(prev => prev.map(conv => 
         conv.id === currentConversationId 
           ? { ...conv, updatedAt: new Date().toISOString() }
@@ -165,13 +158,11 @@ export function Generate() {
 
     } catch (error) {
       console.error("Error in chat:", error);
-      // يمكن إضافة تنبيه للمستخدم هنا بحدوث خطأ
     } finally {
       setIsAITyping(false);
     }
   };
 
-  // 4. اختيار محادثة سابقة من القائمة
   const handleSelectConversation = async (convId: string) => {
     try {
       const response = await axiosInstance.get(`/conversation/${convId}`);
@@ -196,15 +187,12 @@ export function Generate() {
   };
 
   const handleDeleteConversation = async (convId: string) => {
-    // إذا كان لديك API للحذف، يمكنك إضافته هنا
-    // await axiosInstance.delete(`/conversations/${convId}`);
     setConversations(prev => prev.filter(c => c.id !== convId));
     if (currentConversationId === convId) {
       handleNewConversation();
     }
   };
 
-  // دالة مساعدة لتنسيق التاريخ
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -380,33 +368,51 @@ export function Generate() {
                     {/* Chat Messages Container */}
                     <div className="flex-1 overflow-y-auto space-y-4 mb-4 px-1">
                       {chatMessages.map((message) => (
+                        // <-- هنا خلينا الاتجاه عمودي (flex-col) عشان الزرار يظهر تحت الرسالة
                         <div 
                           key={message.id} 
-                          className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                          className={`flex flex-col gap-2 ${message.role === 'user' ? 'items-end' : 'items-start'}`}
                         >
-                          {message.role === 'ai' && (
-                            <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Bot className="w-4 h-4 text-neutral-600" />
+                          <div className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                            {message.role === 'ai' && (
+                              <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <Bot className="w-4 h-4 text-neutral-600" />
+                              </div>
+                            )}
+                            <div 
+                              className={`max-w-[75%] rounded-lg px-4 py-2.5 ${
+                                message.role === 'user'
+                                  ? 'bg-neutral-900 text-white' 
+                                  : 'bg-neutral-50 text-neutral-900 border border-neutral-100'
+                              }`}
+                            >
+                              <p className={`text-sm leading-relaxed whitespace-pre-wrap ${message.role === 'user' ? 'text-white' : 'text-neutral-800'}`}>
+                                {message.content}
+                              </p>
+                              <span className={`text-xs mt-1.5 block ${message.role === 'user' ? 'text-neutral-400' : 'text-neutral-400'}`}>
+                                {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
                             </div>
-                          )}
-                          <div 
-                            className={`max-w-[75%] rounded-lg px-4 py-2.5 ${
-                              message.role === 'user'
-                                ? 'bg-neutral-900 text-white' 
-                                : 'bg-neutral-50 text-neutral-900 border border-neutral-100'
-                            }`}
-                          >
-                            <p className={`text-sm leading-relaxed whitespace-pre-wrap ${message.role === 'user' ? 'text-white' : 'text-neutral-800'}`}>
-                              {message.content}
-                            </p>
-                            <span className={`text-xs mt-1.5 block ${message.role === 'user' ? 'text-neutral-400' : 'text-neutral-400'}`}>
-                              {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
+                            {message.role === 'user' && (
+                              <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <User className="w-4 h-4 text-white" />
+                              </div>
+                            )}
                           </div>
-                          {message.role === 'user' && (
-                            <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <User className="w-4 h-4 text-white" />
-                            </div>
+                          
+                          {/* <-- زرار الـ Save Idea بيظهر لو الرسالة من الـ AI وفيها الفلاج is_idea --> */}
+                          {message.role === 'ai' && message.is_idea && (
+                            <button
+                              onClick={() => {
+                                // تقدري تعدلي المسار ده على حسب الـ Router عندك
+                                // وممكن تبعتي الـ ID بتاع الفكرة لو متاح: navigate(`/idea/${message.ideaId}`)
+                                navigate('/idea/sample-idea-1'); 
+                              }}
+                              className="ml-11 flex items-center gap-2 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-md transition-colors text-sm"
+                            >
+                              <Save className="w-3.5 h-3.5" />
+                              Save Idea
+                            </button>
                           )}
                         </div>
                       ))}

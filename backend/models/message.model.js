@@ -23,6 +23,10 @@ const Message = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         allowNull: true,
       },
+      is_idea: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
       is_deleted: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

@@ -23,7 +23,8 @@ const sendChat = async ({ content, conversationId, userId }) => {
   return {
     content: `Mock reply to: "${content}"`,
     conversationId,
-    role: 'ai'
+    role: 'ai',
+    is_idea: true
   };
 };
 
