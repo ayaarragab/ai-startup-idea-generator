@@ -1,6 +1,6 @@
 const User = (sequelize, DataTypes) => {
   const UserModel = sequelize.define(
-    'User',
+    "User",
     {
       fullName: {
         type: DataTypes.STRING,
@@ -24,21 +24,25 @@ const User = (sequelize, DataTypes) => {
       },
       otp: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
       },
       otpExpires: {
         type: DataTypes.DATE,
-        allowNull: true
+        allowNull: true,
       },
       isVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      is_deleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
-      tableName: 'users',
+      tableName: "users",
       timestamps: true,
-    }
+    },
   );
 
   return UserModel;

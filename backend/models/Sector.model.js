@@ -1,18 +1,22 @@
-const Sector = (sequelize,DataTypes) => {
+const Sector = (sequelize, DataTypes) => {
   const SectorModel = sequelize.define(
-    'Sector',
+    "Sector",
     {
       name: {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      is_deleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
-      tableName: 'sectors',
+      tableName: "sectors",
       timestamps: true,
-    }
-  )
+    },
+  );
   return SectorModel;
-}
+};
 
 export default Sector;
