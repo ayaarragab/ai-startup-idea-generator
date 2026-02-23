@@ -75,9 +75,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email, password
       });
       if (res.status == 200) {
-        toast.success("Login successful!");
-        setUser(res.data);
+        const me = await axios.get("/auth/me");
+
+        setUser(me.data);
         setIsAuthenticated(true);
+
+        toast.success("Login successful!");
         return true;
       } else {
         toast.error(res.data.error);      

@@ -50,7 +50,7 @@ export function Login() {
     if (validateForm()) {            
       const success = await login(formData.email, formData.password);
       if (success) {
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }
     }
   };
