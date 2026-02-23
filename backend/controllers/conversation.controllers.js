@@ -57,7 +57,7 @@ export const deleteOneConversation = async (req, res) => {
     }
 
     const success = await deleteConversation(id);
-    if (!success) {
+    if (!success) {      
       return res.status(404).json({ message: "Conversation not found or could not be deleted" });
     }
 

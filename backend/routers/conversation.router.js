@@ -1,6 +1,6 @@
 import Router from "express";
 import { authenticate } from "../middlewares/auth.middlewares.js"
-import { getConversations, getConversation, createOneConversation } from "../controllers/conversation.controllers.js";
+import { getConversations, getConversation, createOneConversation, deleteOneConversation} from "../controllers/conversation.controllers.js";
 
 const router = Router();
 
@@ -10,6 +10,6 @@ router.get('/:id', authenticate, getConversation);
 
 router.post('/', authenticate, createOneConversation)
 
-router.delete('/:id', authenticate)
+router.delete('/:id', authenticate, deleteOneConversation)
 
 export default router;

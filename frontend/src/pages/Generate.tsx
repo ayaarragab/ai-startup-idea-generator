@@ -187,6 +187,11 @@ export function Generate() {
   };
 
   const handleDeleteConversation = async (convId: string) => {
+    try {
+      await axiosInstance.delete(`/conversation/${convId}`);
+    } catch (error) {
+      console.log(error);
+    }
     setConversations(prev => prev.filter(c => c.id !== convId));
     if (currentConversationId === convId) {
       handleNewConversation();

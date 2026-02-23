@@ -45,7 +45,7 @@ export const fetchConversations = async (userId) => {
       ],
     });
 
-    return conversations.filter((c) => !(c.is_deleted));
+    return conversations.filter((c) => !c.is_deleted);
   } catch (error) {
     console.log(error);
     return [];
@@ -80,12 +80,20 @@ export const fetchConversation = async (userId, id) => {
 
 export const deleteConversation = async (id) => {
   try {
-    await Conversation.update({
-      is_deleted: true,
-      where: { id },
-    });
+    await Conversation.update(
+      {
+        is_deleted: true,
+      },
+      {
+        where: {
+          id,
+        },
+      },
+    );
     return true;
   } catch (error) {
+    console.log(error);
+
     return false;
   }
 };
