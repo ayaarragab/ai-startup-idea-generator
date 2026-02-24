@@ -1,7 +1,6 @@
 import db from "../models/index.js";
-import { findUserById } from "../services/auth.services.js";
 
-const { Idea, usersSavedIdeas, User } = db;
+const { Idea, User } = db;
 
 export const createIdea = async (ideaDetails) => {
   try {
@@ -28,18 +27,14 @@ export const saveIdea = async (ideaId, userId) => {
   return { ok: true };
 };
 
-
-export const unsaveIdea = async (ideaId, userId) => {
+export const findIdea = async (id) => {
   try {
-    const result = await usersSavedIdeas.destroy({
-      where: {
-      ideaId,
-      userId
-      }
-    });
-    return result > 0;
-    } catch (error) {
-    console.error("Error unsaving idea:", error);
-    throw error;
+    const idea = await Idea.findByPk(id);
+    if (!idea) {
+      return false; 
     }
+    return true;
+  } catch (error) {
+    return true;
+  }
 }

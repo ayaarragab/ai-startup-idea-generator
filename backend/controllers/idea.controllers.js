@@ -1,18 +1,23 @@
-import { createIdea, saveIdea } from "../services/idea.services.js";
+import { findIdea, saveIdea } from "../services/idea.services.js";
 
 export const saveUserIdea = async (req, res) => {
   try {
-    const ideaDetails = req.body;
     const userId = req.user.id;
-    const idea = await createIdea(ideaDetails);
+    const { ideaId } = req.body;
+
+    const idea = await findIdea(ideaId);
+    
     if (!idea) {
-      return res.status(400).json({ message: "Failed to create idea." });
+      return res.status(404).json({ message: "Idea not found" });
     }
+
     const ideaSaved = await saveIdea(idea.id, userId);
+    
     if (!ideaSaved) {
       return res.status(400).json({ message: "Failed to save idea." });      
     }
-    return res.status(201).json({ message: 'Idea saved successflly' });
+    
+    return res.status(200).json({ message: 'Idea saved successflly' });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: 'Internal server error' });
