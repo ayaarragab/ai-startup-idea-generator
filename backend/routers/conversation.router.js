@@ -8,6 +8,7 @@ router.get('/', authenticate, getConversations);
 
 router.get('/:id', authenticate, getConversation);
 
+// validation of input missing
 router.post('/', authenticate, createOneConversation)
 
 router.delete('/:id', authenticate, deleteOneConversation)
