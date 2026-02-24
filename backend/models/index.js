@@ -73,16 +73,16 @@ db.Sector.belongsToMany(db.Idea, {
   otherKey: "ideaId"
 });
 
-// Idea <-> TargetUsers associations (many-to-many)
-db.Idea.belongsToMany(db.TargetUsers, {
-  through: "ideasTargetUsers",
+// Idea <-> Users associations (many-to-many)
+db.Idea.belongsToMany(db.User, {
+  through: "usersSavedIdeas",
   foreignKey: "ideaId",
-  otherKey: "TargetUsersId"
+  otherKey: "userId"
 });
 
-db.TargetUsers.belongsToMany(db.Idea, {
-  through: "ideasTargetUsers",
-  foreignKey: "TargetUsersId",
+db.User.belongsToMany(db.Idea, {
+  through: "usersSavedIdeas",
+  foreignKey: "userId",
   otherKey: "ideaId"
 });
 
