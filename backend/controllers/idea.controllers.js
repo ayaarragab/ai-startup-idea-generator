@@ -3,15 +3,15 @@ import { findIdea, saveIdea } from "../services/idea.services.js";
 export const saveUserIdea = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { ideaId } = req.body;
-        
+    const { ideaId, messageId } = req.body;
+
     const idea = await findIdea(ideaId);
     
     if (!idea) {
       return res.status(404).json({ message: "Idea not found" });
     }
 
-    const ideaSaved = await saveIdea(ideaId, userId);
+    const ideaSaved = await saveIdea(ideaId, userId, messageId);
     
     if (!ideaSaved) {
       return res.status(400).json({ message: "Failed to save idea." });      

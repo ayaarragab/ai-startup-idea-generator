@@ -249,7 +249,8 @@ export function Generate() {
       try {
         if (!isCurrentlySaved) {
           await axiosInstance.post('idea/saved-ideas', { 
-            ideaId: currentIdea?.id
+            ideaId: currentIdea?.id,
+            messageId
           });
           
         } else {
@@ -273,7 +274,7 @@ export function Generate() {
               <h2 className="text-neutral-900 mb-2">Generate Your Startup Idea</h2>
               <p className="text-neutral-600">
                 Answer a few questions to help our AI create the perfect startup idea for you
-              </p>
+              </p>id
             </div>
             <Button
               variant="primary"

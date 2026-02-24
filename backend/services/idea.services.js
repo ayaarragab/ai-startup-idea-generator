@@ -1,6 +1,6 @@
 import db from "../models/index.js";
 
-const { Idea, User } = db;
+const { Idea, User, Message } = db;
 
 export const createIdea = async (ideaDetails) => {
   try {    
@@ -12,14 +12,19 @@ export const createIdea = async (ideaDetails) => {
   }
 }
 
-export const saveIdea = async (ideaId, userId) => {
+export const saveIdea = async (ideaId, userId, messageId) => {
 
   const user = await User.findByPk(userId);
   if (!user) throw new Error("User not found");
 
   const idea = await Idea.findByPk(ideaId);
   if (!idea) throw new Error("Idea not found");
+  
+  const message = await Message.findByPk(messageId);
+  if (!message) throw new Error("Message not found");
 
+  message.is_idea_saved = true;
+  await message.save();
   await user.addIdea(ideaId);
 
   return { ok: true };
