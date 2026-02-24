@@ -25,6 +25,7 @@ interface ChatMessage {
   clientMessageId?: string;
   is_idea?: boolean; 
   is_idea_saved?: boolean;
+  is_full_idea?: boolean;
   ideaId?: string | number;
 }
 
@@ -160,6 +161,7 @@ export function Generate() {
       });
 
       const aiResponseData = response.data;
+      
       if (aiResponseData.is_idea) {
         setCurrentIdea(aiResponseData.idea);
       }
@@ -170,6 +172,7 @@ export function Generate() {
         createdAt: new Date().toISOString(),
         is_idea: aiResponseData.is_idea || false,
         is_idea_saved: aiResponseData.is_idea_saved || false,
+        is_full_idea: aiResponseData.is_full_idea || false,
       };
 
       setChatMessages(prev => [...prev, aiMessage]);
@@ -420,7 +423,7 @@ export function Generate() {
                     </div>
 
                     <div className="flex-1 overflow-y-auto space-y-4 mb-4 px-1">
-                      {chatMessages.map((message) => (
+                      {chatMessages.map((message) => (                        
                         <div 
                           key={message.id} 
                           className={`flex flex-col gap-2 ${message.role === 'user' ? 'items-end' : 'items-start'}`}
@@ -451,8 +454,9 @@ export function Generate() {
                               </div>
                             )}
                           </div>
+                         
                           
-                          {message.role === 'ai' && message.is_idea && (
+                          {message.role === 'ai' && message.is_idea && message.is_full_idea && (
                             <button
                               onClick={() => toggleIdeaSave(message.id)}
                               className={`ml-11 flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors text-sm border ${
