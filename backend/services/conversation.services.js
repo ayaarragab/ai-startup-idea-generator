@@ -1,4 +1,5 @@
 import db from "../models/index.js";
+import { findIdeaWithMessageId } from "./idea.services.js";
 
 const { Conversation, Message, Sector } = db;
 
@@ -71,7 +72,22 @@ export const fetchConversation = async (userId, id) => {
       ],
       order: [[{ model: Message, as: "messages" }, "id", "ASC"]],
     });
-    return conversation || null;
+
+    const convMessages = conversation.messages;
+    
+    let messagesWithIdeas = []
+
+    convMessages.map(async (m) => {
+      const idea = await findIdeaWithMessageId(m.id);
+      if (idea) {
+        messagesWithIdeas.push({ message: m, idea });
+      }
+    })
+    const updatedConversation = { id: conversation.dataValues.id, userId: conversation.dataValues.userId, is_deleted: conversation.dataValues.is_deleted, createdAt: conversation.dataValues.createdAt, updatedAt: conversation.dataValues.updatedAt, messages: messagesWithIdeas, sectors: conversation.sectors };
+    console.log(updatedConversation);
+    
+    return updatedConversation;
+  
   } catch (error) {
     console.log(error);
     return null;

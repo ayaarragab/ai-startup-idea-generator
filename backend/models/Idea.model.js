@@ -6,6 +6,10 @@ const Idea = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false
       },
+      messageId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       subtitle: {
         type: DataTypes.STRING,
         allowNull: false

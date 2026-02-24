@@ -41,3 +41,12 @@ export const findIdea = async (id) => {
     return true;
   }
 }
+
+export const findIdeaWithMessageId = async (messageId) => {
+  try {
+    const idea = await Idea.findOne({ where: { messageId } });
+    return idea;
+  } catch (error) {
+    throw error;
+  }
+};
