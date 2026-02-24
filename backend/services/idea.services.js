@@ -3,10 +3,8 @@ import db from "../models/index.js";
 const { Idea, User } = db;
 
 export const createIdea = async (ideaDetails) => {
-  try {
-    console.log(ideaDetails);
-    
-    const idea = await Idea.create({ ...ideaDetails.currentIdea });
+  try {    
+    const idea = await Idea.create({ ...ideaDetails });
     return idea ? idea.toJSON() : null;
   } catch (error) {
     console.error("Error creating idea:", error);

@@ -1,6 +1,7 @@
 import sendChat from "./ai/index.js";
 import { createConversation } from "./conversation.services.js";
 import { createMessage } from "./message.services.js";
+import { createIdea } from "./idea.services.js";
 
 export const handleChat = async ({ content, conversationId, userId, isNewConversation, clientMessageId }) => {
   
@@ -16,8 +17,16 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
     conversationId,
     userId
   });
-
-  const message = await createMessage(aiResponse.content, aiResponse.conversationId, 'ai', clientMessageId)
+  const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
   
-  return { ...aiResponse, messageId: message.id, clientMessageId };
+  const message = await createMessage(aiResponse.content, aiResponse.conversationId, 'ai', clientMessageId)
+
+  let idea__ = null;
+
+  if (aiResponse.is_idea && aiResponse.is_full_idea) {
+    idea__ = await createIdea(aiResponse.idea);
+  }
+  
+  
+  return { ...aiResponseWithoutIdea, messageId: message.id, clientMessageId, idea: idea__ };
 }
