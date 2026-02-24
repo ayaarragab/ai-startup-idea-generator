@@ -28,6 +28,26 @@ interface ChatMessage {
   ideaId?: string | number;
 }
 
+interface Idea {
+  id: number;
+  name: string;
+  subtitle: string;
+  description: string;
+  problem: string;
+  solution: string;
+  keyPartners: string[];
+  keyActivities: string[];
+  keyResources: string[];
+  valueProposition: string[];
+  customerRelationships: string[];
+  channels: string[];
+  customerSegments: string[];
+  costStructure: string[];
+  revenueStreams: string[];
+  nextSteps: string[];
+  academicReferences: string[];
+}
+
 interface Sector {
   id: number;
   name: string;
@@ -48,6 +68,7 @@ export function Generate() {
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [currentIdea, setCurrentIdea] = useState<Idea | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
@@ -139,7 +160,9 @@ export function Generate() {
       });
 
       const aiResponseData = response.data;
-      
+      if (aiResponseData.is_idea) {
+        setCurrentIdea(aiResponseData.idea);
+      }
       const aiMessage: ChatMessage = {
         id: aiResponseData.messageId || Date.now(),
         role: 'ai',
@@ -147,7 +170,6 @@ export function Generate() {
         createdAt: new Date().toISOString(),
         is_idea: aiResponseData.is_idea || false,
         is_idea_saved: aiResponseData.is_idea_saved || false,
-        ideaId: aiResponseData.ideaId 
       };
 
       setChatMessages(prev => [...prev, aiMessage]);
@@ -214,7 +236,6 @@ export function Generate() {
   };
 
   const toggleIdeaSave = async (messageId: string | number) => {
-      // 1. بندور على الرسالة اللي اليوزر داس عليها عشان نعرف حالتها الحالية
       const targetMessage = chatMessages.find(msg => msg.id === messageId);
       if (!targetMessage) return;
 
@@ -227,12 +248,13 @@ export function Generate() {
 
       try {
         if (!isCurrentlySaved) {
-          await axiosInstance.post('/saved-ideas/', { 
-            messageId: messageId,
-            ideaId: targetMessage.ideaId
+          await axiosInstance.post('idea/saved-ideas', { 
+            currentIdea
           });
+          console.log(currentIdea);
+          
         } else {
-          await axiosInstance.delete(`/saved-ideas/${targetMessage.ideaId || messageId}`);
+          await axiosInstance.delete(`/saved-ideas/${ currentIdea?.id }`);
         }
       } catch (error) {
         console.error("Error saving/unsaving idea:", error);

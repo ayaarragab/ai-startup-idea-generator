@@ -5,4 +5,6 @@ import { saveUserIdea } from '../controllers/idea.controllers.js';
 
 const router = Router();
 
-router.post('/saved-idea', authenticate, validateIdeaFields, saveUserIdea);
+router.post('/saved-ideas', authenticate, saveUserIdea);
+
+export default router;

@@ -1,6 +1,5 @@
 const generateIdea = async (prompt='') => {
   return {
-    id: Math.random().toString(36).substr(2, 9),
     name: "AI-Powered Personalized Learning Platform",
     subtitle: "Adaptive education tailored to individual learning styles",
     description: "A platform that uses machine learning to adapt educational content in real-time based on student performance and learning preferences.",
