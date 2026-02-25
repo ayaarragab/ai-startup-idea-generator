@@ -102,8 +102,7 @@ db.Sector.belongsToMany(db.Conversation, {
 });
 
 
-db.Idea.belongsTo(db.Message, { foreignKey: 'messageId', as: 'message' });
-db.Message.hasMany(db.Idea, { foreignKey: 'messageId', as: 'ideas' });
-
+db.Idea.belongsTo(db.Message, { foreignKey: "messageId", as: "message" });
+db.Message.hasOne(db.Idea, { foreignKey: "messageId", as: "idea" });
 
 export default db;

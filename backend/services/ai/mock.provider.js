@@ -27,7 +27,6 @@ const sendChat = async ({ content, conversationId, userId }) => {
     role: 'ai',
     is_idea: true,
     is_idea_saved: false,
-    is_full_idea: true,
     idea
   };
 };

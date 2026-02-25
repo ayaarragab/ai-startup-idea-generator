@@ -1,7 +1,7 @@
 import db from "../models/index.js";
 import { findIdeaWithMessageId } from "./idea.services.js";
 
-const { Conversation, Message, Sector } = db;
+const { Conversation, Message, Sector, Idea } = db;
 
 export const findConversation = async (id) => {
   try {
@@ -56,37 +56,20 @@ export const fetchConversations = async (userId) => {
 export const fetchConversation = async (userId, id) => {
   try {
     const conversation = await Conversation.findOne({
-      where: {
-        id,
-        userId,
-      },
+      where: { id, userId },
       include: [
         {
           model: Message,
           as: "messages",
+          include: [{ model: Idea, as: "idea" }],
         },
-        {
-          model: Sector,
-          as: "sectors",
-        },
+        { model: Sector, as: "sectors" },
       ],
       order: [[{ model: Message, as: "messages" }, "id", "ASC"]],
     });
 
-    const convMessages = conversation.messages;
-    
-    let messagesWithIdeas = []
-
-    convMessages.map(async (m) => {
-      const idea = await findIdeaWithMessageId(m.id);
-      if (idea) {
-        messagesWithIdeas.push({ message: m, idea });
-      }
-    })
-    const updatedConversation = { id: conversation.dataValues.id, userId: conversation.dataValues.userId, is_deleted: conversation.dataValues.is_deleted, createdAt: conversation.dataValues.createdAt, updatedAt: conversation.dataValues.updatedAt, messages: messagesWithIdeas, sectors: conversation.sectors };
-    console.log(updatedConversation);
-    
-    return updatedConversation;
+    console.log(conversation.toJSON());
+    return conversation.toJSON();
   
   } catch (error) {
     console.log(error);

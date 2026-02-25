@@ -3,7 +3,7 @@ import db from "../models/index.js";
 const { Idea, User, Message } = db;
 
 export const createIdea = async (ideaDetails) => {
-  try {    
+  try {
     const idea = await Idea.create({ ...ideaDetails });
     return idea ? idea.toJSON() : null;
   } catch (error) {
