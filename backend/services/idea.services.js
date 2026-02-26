@@ -59,10 +59,11 @@ export const unsaveIdea = async (ideaId, userId, messageId) => {
   if (!idea) throw new Error("Idea not found");
   
   const message = await Message.findByPk(messageId);
-  if (!message) throw new Error("Message not found");
+  if (message) {
+    message.is_idea_saved = false;
+    await message.save();
+  };
 
-  message.is_idea_saved = false;
-  await message.save();
   await user.removeIdea(ideaId);
 
   return { ok: true };

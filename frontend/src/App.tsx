@@ -30,7 +30,7 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/generate" element={<PageTransition><Generate /></PageTransition>} />
-        <Route path="/idea/:id" element={<PrivateRoute><PageTransition><IdeaDetail /></PageTransition></PrivateRoute>} />
+        <Route path="/idea/:id/:messageid" element={<PrivateRoute><PageTransition><IdeaDetail /></PageTransition></PrivateRoute>} />
         <Route path="/dashboard" element={<PrivateRoute><PageTransition><Dashboard /></PageTransition></PrivateRoute>} />
         <Route path="/how-it-works" element={<PageTransition><HowItWorks /></PageTransition>} />
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />

@@ -254,7 +254,7 @@ export function Dashboard() {
                       variant="primary" 
                       size="sm" 
                       className="flex-1"
-                      onClick={() => navigate(`/idea/${idea.id}`)}
+                      onClick={() => navigate(`/idea/${idea.id}/${idea.messageId}`)}
                     >
                       <Eye className="w-4 h-4" />
                       View

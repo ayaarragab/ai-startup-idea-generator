@@ -46,7 +46,7 @@ interface IdeaData {
 
 export function IdeaDetail() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id, messageid } = useParams();
   
   const [activeTab, setActiveTab] = useState('overview');
   const [rating, setRating] = useState(0);
@@ -126,6 +126,23 @@ export function IdeaDetail() {
     ];
   };
 
+  const toggleIdeaSave = async (messageId: string | undefined, ideaId: string | number | undefined) => {
+      try {
+        if (!saved) {
+          await axiosInstance.post('idea/saved-ideas', { 
+            ideaId,
+            messageId
+          });
+          
+        } else {
+          await axiosInstance.delete(`idea/saved-ideas/${ ideaId }/${messageId}`);
+        }
+        setSaved(!saved)
+      } catch (error) {
+        console.error("Error saving/unsaving idea:", error);
+      }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
@@ -177,7 +194,9 @@ export function IdeaDetail() {
                   <Button
                     variant={saved ? 'primary' : 'outlined'}
                     size="md"
-                    onClick={() => setSaved(!saved)}
+                    onClick={async () => {
+                      toggleIdeaSave(messageid, id);
+                    }}
                   >
                     <Bookmark className={`w-5 h-5 ${saved ? 'fill-current' : ''}`} />
                     {saved ? 'Saved' : 'Save'}
