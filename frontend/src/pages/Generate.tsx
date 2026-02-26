@@ -17,17 +17,6 @@ import {
   Save
 } from 'lucide-react';
 
-interface ChatMessage {
-  id: number | string;
-  role: 'user' | 'ai';
-  content: string;
-  createdAt: string; 
-  clientMessageId?: string;
-  is_idea?: boolean; 
-  is_idea_saved?: boolean;
-  is_full_idea?: boolean;
-  ideaId?: string | number;
-}
 
 interface Idea {
   id: number;
@@ -47,6 +36,19 @@ interface Idea {
   revenueStreams: string[];
   nextSteps: string[];
   academicReferences: string[];
+}
+
+
+interface ChatMessage {
+  id: number | string;
+  role: 'user' | 'ai';
+  content: string;
+  createdAt: string; 
+  clientMessageId?: string;
+  is_idea?: boolean; 
+  is_idea_saved?: boolean;
+  is_full_idea?: boolean;
+  idea?: Idea | null;
 }
 
 interface Sector {
@@ -198,6 +200,8 @@ export function Generate() {
       setCurrentConversationId(convData.id);
       setSelectedSectorIds(convData.sectors?.map((s: Sector) => s.id) || []);
       setChatMessages(convData.messages || []);
+      console.log(chatMessages);
+      
       setCurrentStep(2);
       setShowConversations(false);
     } catch (error) {
@@ -238,7 +242,7 @@ export function Generate() {
     return date.toLocaleDateString();
   };
 
-  const toggleIdeaSave = async (messageId: string | number) => {
+  const toggleIdeaSave = async (messageId: string | number, ideaId: string | number | undefined) => {
       const targetMessage = chatMessages.find(msg => msg.id === messageId);
       if (!targetMessage) return;
 
@@ -252,12 +256,12 @@ export function Generate() {
       try {
         if (!isCurrentlySaved) {
           await axiosInstance.post('idea/saved-ideas', { 
-            ideaId: currentIdea?.id,
+            ideaId,
             messageId
           });
           
         } else {
-          await axiosInstance.delete(`/saved-ideas/${ currentIdea?.id }`);
+          await axiosInstance.delete(`/saved-ideas/${ ideaId }`);
         }
       } catch (error) {
         console.error("Error saving/unsaving idea:", error);
@@ -458,7 +462,7 @@ export function Generate() {
                           
                           {message.role === 'ai' && message.is_idea && message.is_full_idea && (
                             <button
-                              onClick={() => toggleIdeaSave(message.id)}
+                              onClick={() => toggleIdeaSave(message.id, message?.idea?.id)}
                               className={`ml-11 flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors text-sm border ${
                                 message.is_idea_saved
                                   ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border-neutral-200'
