@@ -81,6 +81,11 @@ const Idea = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: [],
       },
+      is_deleted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false
+      }
     },
     {
       tableName: 'ideas',

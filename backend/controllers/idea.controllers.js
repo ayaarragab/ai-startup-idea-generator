@@ -1,4 +1,4 @@
-import { findIdea, saveIdea, unsaveIdea, fetchSavedIdeas } from "../services/idea.services.js";
+import { findIdea, saveIdea, unsaveIdea, fetchSavedIdeas, fetchSavedIdea } from "../services/idea.services.js";
 
 export const saveUserIdea = async (req, res) => {
   try {
@@ -62,4 +62,22 @@ export const getSavedIdeas = async (req, res) => {
     console.log(error);
     return res.status(500).json({ message: "INTERNAL_SERVER_ERROR" });
   }
+}
+
+export const getSavedIdea = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const ideaId = req.params.id;
+    
+    const idea = await fetchSavedIdea(userId, ideaId);
+    
+    if (!idea) {
+      return res.status(404).json({ message: "Saved idea not found" });
+    }
+    
+    return res.status(200).json({ idea });
+    } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+    }
 }

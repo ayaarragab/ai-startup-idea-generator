@@ -1,162 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import axiosInstance from '../utils/axiosInstance'; // Make sure this path is correct
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Tag } from '../components/Tag';
 import { Badge } from '../components/Badge';
 import { 
   ArrowLeft,
-  Download,
-  Share2,
   Bookmark,
   Star,
-  Lightbulb,
   Users,
   DollarSign,
-  Target,
-  Briefcase,
   TrendingUp,
-  FileText,
-  BookOpen,
-  Edit,
   ExternalLink,
-  MessageSquare,
-  ThumbsUp,
-  AlertCircle,
   CheckCircle2,
-  Clock,
   Handshake,
   Package,
   Heart,
   BarChart3,
-  Copy
+  Loader2
 } from 'lucide-react';
 
-interface IdeaDetailProps {
-  onNavigate: (page: string) => void;
+// Define the interface based on your Sequelize Idea model
+interface IdeaData {
+  id: number;
+  messageId: number | null;
+  name: string;
+  subtitle: string;
+  description: string;
+  problem: string;
+  solution: string;
+  keyPartners: string[];
+  keyActivities: string[];
+  keyResources: string[];
+  valueProposition: string[];
+  customerRelationships: string[];
+  channels: string[];
+  customerSegments: string[];
+  costStructure: string[];
+  revenueStreams: string[];
+  nextSteps: string[];
+  academicReferences: any[]; // Adjust type if you store specific objects
+  createdAt: string;
 }
 
 export function IdeaDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
+  
   const [activeTab, setActiveTab] = useState('overview');
   const [rating, setRating] = useState(0);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(true); // Assuming it's saved since we are viewing it from "Saved Ideas"
+  
+  // State for fetched data
+  const [idea, setIdea] = useState<IdeaData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock generated idea data
-  const idea = {
-    name: 'MediConnect Egypt',
-    tagline: 'Bridging Healthcare Gaps in Rural Egyptian Communities',
-    problem: 'Rural Egyptian communities face severe healthcare access challenges, with limited medical facilities, long travel distances, and shortage of specialized doctors. Over 60% of rural residents must travel more than 50km to access quality healthcare.',
-    solution: 'A telemedicine platform connecting rural patients with certified Egyptian doctors through mobile and web interfaces. Features include symptom checking, video consultations, prescription delivery, and health record management - all in Arabic with dialect support.',
-    impact: 'Reaching 15+ million underserved Egyptians in rural governorates, reducing healthcare costs by 40%, and enabling preventive care through regular virtual checkups. Partnering with local pharmacies for prescription fulfillment.',
-    sectors: ['Healthcare', 'Technology', 'Rural Development'],
-    targetUsers: ['Rural Communities', 'Doctors', 'Pharmacies'],
-    bmc: {
-      keyPartners: [
-        'Egyptian Medical Syndicate',
-        'Local pharmacies network',
-        'Ministry of Health & Population',
-        'Telecom providers (Orange, Vodafone)'
-      ],
-      keyActivities: [
-        'Platform development & maintenance',
-        'Doctor onboarding & verification',
-        'Patient support & education',
-        'Partnership management'
-      ],
-      keyResources: [
-        'Medical AI for symptom checking',
-        'Secure video infrastructure',
-        'Medical database & records',
-        'Arabic NLP technology'
-      ],
-      valueProposition: [
-        'Accessible healthcare for rural Egyptians',
-        'Affordable consultation fees',
-        'Arabic & dialect support',
-        'Prescription delivery integration',
-        'Health records in one place'
-      ],
-      customerRelationships: [
-        '24/7 patient support hotline',
-        'Community health ambassadors',
-        'Automated follow-up reminders',
-        'Doctor rating & feedback system'
-      ],
-      channels: [
-        'Mobile app (Android/iOS)',
-        'Web platform',
-        'SMS for feature phones',
-        'Local community centers',
-        'Social media outreach'
-      ],
-      customerSegments: [
-        'Rural patients (primary)',
-        'Urban patients seeking convenience',
-        'Chronic disease patients',
-        'Elderly population'
-      ],
-      costStructure: [
-        'Technology infrastructure & hosting',
-        'Doctor payment commissions',
-        'Marketing & user acquisition',
-        'Customer support operations',
-        'Regulatory compliance'
-      ],
-      revenueStreams: [
-        'Consultation fees (20% commission)',
-        'Subscription plans for families',
-        'Corporate health packages',
-        'Government partnerships',
-        'Premium features (specialists)'
-      ]
-    },
-    pitch: [
-      {
-        title: 'MediConnect Egypt',
-        subtitle: 'Bridging Healthcare Gaps in Rural Communities',
-        content: 'Accessible, affordable telemedicine for every Egyptian'
-      },
-      {
-        title: 'The Problem',
-        subtitle: 'Healthcare Desert in Rural Egypt',
-        content: '60% of rural residents travel 50+ km for healthcare • Limited specialized doctors • High costs • Language barriers'
-      },
-      {
-        title: 'Our Solution',
-        subtitle: 'Telemedicine Made for Egypt',
-        content: 'Video consultations with certified doctors • Arabic dialect support • Prescription delivery • Affordable pricing'
-      },
-      {
-        title: 'Next Steps',
-        subtitle: 'Path to Launch',
-        content: 'Pilot in 3 governorates • Doctor partnerships • Ministry approval • Seed funding ($500K)'
+  // Fetch the idea data on mount
+  useEffect(() => {
+    const fetchIdeaDetails = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await axiosInstance.get(`/idea/saved-ideas/${id}`);
+        setIdea(response.data.idea);
+      } catch (err: any) {
+        console.error('Error fetching idea details:', err);
+        setError(err.response?.data?.message || 'Failed to load idea details. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
-    ],
-    references: [
-      {
-        title: 'Telemedicine adoption in developing countries: challenges and opportunities',
-        source: 'Journal of Medical Internet Research',
-        link: 'https://scholar.google.com',
-      },
-      {
-        title: 'Healthcare accessibility in rural Egypt: A systematic review',
-        source: 'Egyptian Journal of Community Medicine',
-        link: 'https://scholar.google.com',
-      },
-      {
-        title: 'Mobile health interventions in Middle East: Success factors',
-        source: 'BMC Health Services Research',
-        link: 'https://scholar.google.com',
-      },
-      {
-        title: 'Arabic NLP for healthcare applications',
-        source: 'arXiv.org',
-        link: 'https://arxiv.org',
-      }
-    ]
-  };
+    };
+
+    if (id) {
+      fetchIdeaDetails();
+    }
+  }, [id]);
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -177,17 +97,81 @@ export function IdeaDetail() {
     { key: 'revenueStreams', title: 'Revenue Streams', icon: BarChart3, color: 'bg-emerald-100 text-emerald-700' },
   ];
 
+  // Helper to generate pitch slides dynamically from available model fields
+  const generatePitchSlides = () => {
+    if (!idea) return [];
+    return [
+      {
+        title: idea.name,
+        subtitle: idea.subtitle,
+        content: idea.description
+      },
+      {
+        title: 'The Problem',
+        subtitle: 'What we are solving',
+        content: idea.problem
+      },
+      {
+        title: 'Our Solution',
+        subtitle: 'How we fix it',
+        content: idea.solution
+      },
+      {
+        title: 'Next Steps',
+        subtitle: 'Path to Launch',
+        content: idea.nextSteps && idea.nextSteps.length > 0 
+          ? idea.nextSteps.join(' • ') 
+          : 'Further market research and validation.'
+      }
+    ];
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-primary-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !idea) {
+    return (
+      <div className="min-h-screen bg-neutral-50 py-12 px-4">
+        <div className="container mx-auto max-w-2xl text-center space-y-4">
+          <div className="text-red-500 bg-red-50 p-6 rounded-lg border border-red-200">
+            <h3 className="text-lg font-semibold mb-2">Oops! Something went wrong</h3>
+            <p>{error || 'Idea not found.'}</p>
+            <Button variant="primary" className="mt-4" onClick={() => navigate('/dashboard')}>
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const pitchSlides = generatePitchSlides();
+
   return (
     <div className="min-h-screen bg-neutral-50 py-8 md:py-12">
       <div className="container mx-auto">
         <div className="max-w-6xl mx-auto">
+          
+          {/* Back Button */}
+          <button 
+            onClick={() => navigate(-1)} 
+            className="flex items-center text-neutral-600 hover:text-neutral-900 mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back
+          </button>
+
           {/* Header */}
           <Card variant="elevated" padding="lg" className="mb-8">
             <div className="space-y-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <h2 className="text-neutral-900 mb-2">{idea.name}</h2>
-                  <p className="subtitle text-neutral-600">{idea.tagline}</p>
+                  <p className="subtitle text-neutral-600">{idea.subtitle}</p>
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -200,20 +184,17 @@ export function IdeaDetail() {
                   </Button>
                 </div>
               </div>
-
+              
               <div className="flex flex-wrap gap-2">
-                {idea.sectors.map(sector => (
-                  <Tag key={sector} variant="secondary">{sector}</Tag>
-                ))}
-                {idea.targetUsers.map(user => (
-                  <Tag key={user} variant="accent">{user}</Tag>
+                 {/* Dynamically displaying top customer segments as tags since 'targetUsers' isn't explicitly in the model */}
+                {idea.customerSegments?.slice(0, 3).map((segment, idx) => (
+                  <Tag key={idx} variant="accent">{segment}</Tag>
                 ))}
               </div>
-
             </div>
           </Card>
 
-          {/* Tabs */}
+          {/* Tabs Navigation */}
           <div className="mb-6">
             <div className="border-b border-neutral-200 overflow-x-auto">
               <div className="flex gap-1 min-w-max">
@@ -234,55 +215,57 @@ export function IdeaDetail() {
             </div>
           </div>
 
-          {/* Tab Content */}
+          {/* Tab Content: Overview */}
           {activeTab === 'overview' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 <Card variant="elevated" padding="lg">
                   <h4 className="text-neutral-900 mb-4">Problem</h4>
-                  <p className="text-neutral-700">{idea.problem}</p>
+                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.problem}</p>
                 </Card>
 
                 <Card variant="elevated" padding="lg">
                   <h4 className="text-neutral-900 mb-4">Solution</h4>
-                  <p className="text-neutral-700">{idea.solution}</p>
+                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.solution}</p>
+                </Card>
+                
+                <Card variant="elevated" padding="lg">
+                  <h4 className="text-neutral-900 mb-4">Description & Impact</h4>
+                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.description}</p>
                 </Card>
               </div>
 
               <div className="space-y-6">
                 <Card variant="elevated" padding="lg">
-                  <h5 className="text-neutral-900 mb-4">Quick Stats</h5>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
-                      <span className="text-neutral-600">Feasibility</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Usefulness</span>
-                    </div>
+                  <h5 className="text-neutral-900 mb-4">Target Audience</h5>
+                  <div className="flex flex-wrap gap-2">
+                    {idea.customerSegments?.length > 0 ? (
+                       idea.customerSegments.map((segment, idx) => (
+                        <Tag key={idx} variant="accent">{segment}</Tag>
+                      ))
+                    ) : (
+                      <p className="text-neutral-500 text-sm">Not specified</p>
+                    )}
                   </div>
                 </Card>
 
                 <Card variant="elevated" padding="lg">
-                  <h5 className="text-neutral-900 mb-4">Target Sectors</h5>
+                  <h5 className="text-neutral-900 mb-4">Key Channels</h5>
                   <div className="flex flex-wrap gap-2">
-                    {idea.sectors.map(sector => (
-                      <Tag key={sector} variant="secondary">{sector}</Tag>
-                    ))}
-                  </div>
-                </Card>
-
-                <Card variant="elevated" padding="lg">
-                  <h5 className="text-neutral-900 mb-4">Target Users</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {idea.targetUsers.map(user => (
-                      <Tag key={user} variant="accent">{user}</Tag>
-                    ))}
+                    {idea.channels?.length > 0 ? (
+                      idea.channels.map((channel, idx) => (
+                        <Tag key={idx} variant="secondary">{channel}</Tag>
+                      ))
+                    ) : (
+                      <p className="text-neutral-500 text-sm">Not specified</p>
+                    )}
                   </div>
                 </Card>
               </div>
             </div>
           )}
 
+          {/* Tab Content: BMC */}
           {activeTab === 'bmc' && (
             <div>
               <Card variant="elevated" padding="lg" className="mb-6">
@@ -293,39 +276,47 @@ export function IdeaDetail() {
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {bmcSections.map((section) => (
-                  <Card key={section.key} variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className={`w-10 h-10 rounded-lg ${section.color} flex items-center justify-center flex-shrink-0`}>
-                        <section.icon className="w-5 h-5" />
+                {bmcSections.map((section) => {
+                  const items = idea[section.key as keyof IdeaData] as string[];
+                  return (
+                    <Card key={section.key} variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className={`w-10 h-10 rounded-lg ${section.color} flex items-center justify-center flex-shrink-0`}>
+                          <section.icon className="w-5 h-5" />
+                        </div>
+                        <h6 className="text-neutral-900 flex-1">{section.title}</h6>
                       </div>
-                      <h6 className="text-neutral-900 flex-1">{section.title}</h6>
-                    </div>
-                    <ul className="space-y-2">
-                      {idea.bmc[section.key as keyof typeof idea.bmc].map((item, index) => (
-                        <li key={index} className="flex items-start gap-2 text-neutral-700">
-                          <span className="text-neutral-400 mt-1">•</span>
-                          <span className="flex-1">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </Card>
-                ))}
+                      <ul className="space-y-2">
+                        {items && items.length > 0 ? (
+                          items.map((item, index) => (
+                            <li key={index} className="flex items-start gap-2 text-neutral-700">
+                              <span className="text-neutral-400 mt-1">•</span>
+                              <span className="flex-1">{item}</span>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="text-neutral-400 italic text-sm">Not defined</li>
+                        )}
+                      </ul>
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           )}
 
+          {/* Tab Content: Pitch */}
           {activeTab === 'pitch' && (
             <div>
               <Card variant="elevated" padding="lg" className="mb-6">
                 <h4 className="text-neutral-900 mb-2">Pitch Summary</h4>
                 <p className="text-neutral-600">
-                  A 5-slide pitch deck structure ready to present
+                  A dynamically generated 4-slide pitch deck structure ready to present
                 </p>
               </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {idea.pitch.map((slide, index) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {pitchSlides.map((slide, index) => (
                   <Card key={index} variant="bordered" padding="lg" className="hover:shadow-lg transition-shadow">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -333,8 +324,8 @@ export function IdeaDetail() {
                       </div>
                       <div>
                         <h5 className="text-neutral-900 mb-2">{slide.title}</h5>
-                        <p className="text-neutral-600 mb-3">{slide.subtitle}</p>
-                        <p className="text-neutral-700">{slide.content}</p>
+                        <p className="text-neutral-600 mb-3 font-medium">{slide.subtitle}</p>
+                        <p className="text-neutral-700 whitespace-pre-wrap">{slide.content}</p>
                       </div>
                     </div>
                   </Card>
@@ -343,6 +334,7 @@ export function IdeaDetail() {
             </div>
           )}
 
+          {/* Tab Content: References */}
           {activeTab === 'references' && (
             <div>
               <Card variant="elevated" padding="lg" className="mb-6">
@@ -353,22 +345,39 @@ export function IdeaDetail() {
               </Card>
 
               <div className="space-y-4">
-                {idea.references.map((ref, index) => (
-                  <Card key={index} variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                      <div className="flex-1">
-                        <h6 className="text-neutral-900 mb-2">{ref.title}</h6>
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span className="text-neutral-600">{ref.source}</span>
+                {idea.academicReferences && idea.academicReferences.length > 0 ? (
+                  idea.academicReferences.map((ref: any, index: number) => (
+                    <Card key={index} variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                      <div className="flex flex-col md:flex-row md:items-center gap-4">
+                        <div className="flex-1">
+                          {/* Handling whether references are stored as strings or objects */}
+                          <h6 className="text-neutral-900 mb-2">
+                            {typeof ref === 'string' ? ref : ref.title || 'Reference Document'}
+                          </h6>
+                          {typeof ref !== 'string' && ref.source && (
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <span className="text-neutral-600">{ref.source}</span>
+                            </div>
+                          )}
                         </div>
+                        {typeof ref !== 'string' && ref.link && (
+                          <Button 
+                            variant="outlined" 
+                            size="sm"
+                            onClick={() => window.open(ref.link, '_blank')}
+                          >
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            View Source
+                          </Button>
+                        )}
                       </div>
-                      <Button variant="outlined" size="sm">
-                        <ExternalLink className="w-4 h-4" />
-                        View Source
-                      </Button>
-                    </div>
+                    </Card>
+                  ))
+                ) : (
+                  <Card variant="bordered" padding="md">
+                    <p className="text-neutral-500 text-center py-4">No academic references provided for this idea.</p>
                   </Card>
-                ))}
+                )}
               </div>
             </div>
           )}
@@ -406,6 +415,7 @@ export function IdeaDetail() {
               </div>
             </div>
           </Card>
+          
         </div>
       </div>
     </div>

@@ -78,3 +78,17 @@ export const fetchSavedIdeas = async (userId) => {
     return false;
   }
 }
+
+export const fetchSavedIdea = async (userId, ideaId) => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) throw new Error("User not found");
+    
+    const ideas = await user.getIdeas({ where: { id: ideaId } });
+    
+    return ideas.length > 0 ? ideas[0] : null;
+  } catch (error) {
+    console.error("Error fetching saved idea:", error);
+    throw error;
+  }
+}

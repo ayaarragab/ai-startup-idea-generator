@@ -1,7 +1,7 @@
 import Router from 'express';
 import { authenticate } from '../middlewares/auth.middlewares.js';
 import { validateIdeaFields } from '../middlewares/idea.middlewares.js';
-import { saveUserIdea, unsaveUserIdea, getSavedIdeas } from '../controllers/idea.controllers.js';
+import { saveUserIdea, unsaveUserIdea, getSavedIdeas, getSavedIdea } from '../controllers/idea.controllers.js';
 
 const router = Router();
 
@@ -15,6 +15,6 @@ router.delete('/saved-ideas/:id/:messageid', authenticate, unsaveUserIdea)
 
 router.get('/saved-ideas', authenticate, getSavedIdeas);
 
-
+router.get('/saved-ideas/:id', authenticate, getSavedIdea);
 
 export default router;
