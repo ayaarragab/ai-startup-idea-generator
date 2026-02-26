@@ -51,7 +51,8 @@ export const unsaveUserIdea = async (req, res) => {
 
 export const getSavedIdeas = async (req, res) => {
   try {
-    const ideas = await fetchSavedIdeas();
+    const userId = req.user.id;
+    const ideas = await fetchSavedIdeas(userId);
     if (ideas.length > 0) {
       return res.status(200).json({ ideas });
     } else {
