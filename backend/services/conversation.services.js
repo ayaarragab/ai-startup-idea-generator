@@ -68,7 +68,6 @@ export const fetchConversation = async (userId, id) => {
       order: [[{ model: Message, as: "messages" }, "id", "ASC"]],
     });
 
-    console.log(conversation.toJSON());
     return conversation.toJSON();
   
   } catch (error) {
