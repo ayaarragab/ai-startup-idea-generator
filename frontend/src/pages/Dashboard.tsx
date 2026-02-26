@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../utils/axiosInstance'; // Make sure the path is correct
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { Input } from '../components/Input';
 import { Tag } from '../components/Tag';
-import { Badge } from '../components/Badge';
 import { EmptyState } from '../components/EmptyState';
 import { 
   Search, 
@@ -14,57 +13,76 @@ import {
   Eye,
   Trash2,
   Calendar,
-  TrendingUp,
   Bookmark,
-  Clock,
-  Filter,
-  Download,
-  Share2
+  Loader2 // Added a loader icon
 } from 'lucide-react';
+
+// Define the shape of your Idea based on your backend model
+interface Idea {
+  id: number;
+  messageId: number; // Required for your unsave route
+  name: string;
+  description: string;
+  sector: string;
+  createdAt: string; // Assuming Sequelize default timestamps
+  tags?: string[];
+}
 
 export function Dashboard() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSector, setSelectedSector] = useState('all');
+  
+  // API State
+  const [savedIdeas, setSavedIdeas] = useState<Idea[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock saved ideas
-  const savedIdeas = [
-    {
-      id: 1,
-      name: 'MediConnect Egypt',
-      description: 'Telemedicine platform for rural Egyptian communities',
-      sector: 'Healthcare',
-      dateGenerated: '2025-12-01',
-      tags: ['Healthcare', 'Rural Development'],
-    },
-    {
-      id: 2,
-      name: 'EduBridge',
-      description: 'AI-powered tutoring matching students with teachers',
-      sector: 'Education',
-      dateGenerated: '2025-11-28',
-      tags: ['Education', 'Technology'],
-    },
-    {
-      id: 3,
-      name: 'FarmSmart Egypt',
-      description: 'IoT-based precision agriculture for small Egyptian farms',
-      sector: 'Agriculture',
-      dateGenerated: '2025-11-25',
-      tags: ['Agriculture', 'IoT', 'Sustainability'],
-    },
-    {
-      id: 4,
-      name: 'WasteWise',
-      description: 'Waste collection optimization using AI routing',
-      sector: 'Environment',
-      dateGenerated: '2025-11-20',
-      tags: ['Environment', 'Smart Cities'],
-    },
-  ];
+  // Fetch saved ideas on mount
+  useEffect(() => {
+    const fetchIdeas = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await axiosInstance.get('/idea/saved-ideas');
+        setSavedIdeas(response.data.ideas || []);
+      } catch (err: any) {
+        // If it's a 404, it just means no ideas are saved yet, which is fine
+        if (err.response?.status === 404) {
+          setSavedIdeas([]);
+        } else {
+          console.error('Error fetching ideas:', err);
+          setError('Failed to load saved ideas. Please try again later.');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchIdeas();
+  }, []);
+
+  // Handle unsaving/deleting an idea
+  const handleUnsaveIdea = async (ideaId: number, messageId: number) => {
+    try {
+      await axiosInstance.delete(`/saved-ideas/${ideaId}/${messageId}`);
+      // Optimistically remove the idea from the UI
+      setSavedIdeas(prevIdeas => prevIdeas.filter(idea => idea.id !== ideaId));
+    } catch (err) {
+      console.error('Error unsaving idea:', err);
+      // Optional: Add a toast notification here to inform the user the deletion failed
+    }
+  };
 
   const sectors = ['all', 'Healthcare', 'Education', 'Agriculture', 'Environment', 'FinTech', 'Transportation'];
+
+  // Calculate stats dynamically based on fetched data
+  const currentMonth = new Date().getMonth();
+  const ideasThisMonth = savedIdeas.filter(idea => {
+    if (!idea.createdAt) return false;
+    return new Date(idea.createdAt).getMonth() === currentMonth;
+  }).length;
 
   const stats = [
     {
@@ -75,15 +93,15 @@ export function Dashboard() {
     },
     {
       label: 'This Month',
-      value: '4',
+      value: ideasThisMonth.toString(),
       icon: Calendar,
       color: 'bg-accent-100 text-accent-600',
     },
   ];
 
   const filteredIdeas = savedIdeas.filter(idea => {
-    const matchesSearch = idea.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         idea.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = idea.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         idea.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSector = selectedSector === 'all' || idea.sector === selectedSector;
     return matchesSearch && matchesSector;
   });
@@ -118,8 +136,8 @@ export function Dashboard() {
                     <stat.icon className="w-6 h-6" />
                   </div>
                   <div>
-                    <div className="text-neutral-900">{stat.value}</div>
-                    <div className="text-neutral-600">{stat.label}</div>
+                    <div className="text-neutral-900 font-semibold">{stat.value}</div>
+                    <div className="text-neutral-600 text-sm">{stat.label}</div>
                   </div>
                 </div>
               </Card>
@@ -180,8 +198,16 @@ export function Dashboard() {
           </Card>
         </div>
 
-        {/* Ideas Display */}
-        {filteredIdeas.length === 0 ? (
+        {/* Dynamic Content Display */}
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-10 text-red-500 bg-red-50 rounded-lg border border-red-200">
+            {error}
+          </div>
+        ) : filteredIdeas.length === 0 ? (
           <Card variant="elevated" padding="none">
             <EmptyState
               icon={Bookmark}
@@ -206,21 +232,21 @@ export function Dashboard() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {idea.tags.slice(0, 2).map(tag => (
+                    {idea.tags?.slice(0, 2).map(tag => (
                       <Tag key={tag} variant="primary" size="sm">{tag}</Tag>
                     ))}
-                    {idea.tags.length > 2 && (
+                    {idea.tags && idea.tags.length > 2 && (
                       <Tag variant="default" size="sm">+{idea.tags.length - 2}</Tag>
                     )}
                   </div>
 
-                  <div className="text-neutral-500">
+                  <div className="text-neutral-500 text-sm">
                     <Calendar className="w-4 h-4 inline mr-2" />
-                    {new Date(idea.dateGenerated).toLocaleDateString('en-US', { 
+                    {idea.createdAt ? new Date(idea.createdAt).toLocaleDateString('en-US', { 
                       month: 'short', 
                       day: 'numeric', 
                       year: 'numeric' 
-                    })}
+                    }) : 'Unknown date'}
                   </div>
 
                   <div className="flex gap-2 pt-2 border-t border-neutral-200 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -228,12 +254,16 @@ export function Dashboard() {
                       variant="primary" 
                       size="sm" 
                       className="flex-1"
-                      onClick={() => navigate('/idea/sample-idea-1')}
+                      onClick={() => navigate(`/idea/${idea.id}`)}
                     >
                       <Eye className="w-4 h-4" />
                       View
                     </Button>
-                    <Button variant="outlined" size="sm">
+                    <Button 
+                      variant="outlined" 
+                      size="sm"
+                      onClick={() => handleUnsaveIdea(idea.id, idea.messageId)}
+                    >
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </Button>
                   </div>
@@ -254,7 +284,7 @@ export function Dashboard() {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
-                      {idea.tags.map(tag => (
+                      {idea.tags?.map(tag => (
                         <Tag key={tag} variant="primary" size="sm">{tag}</Tag>
                       ))}
                     </div>
@@ -263,12 +293,16 @@ export function Dashboard() {
                     <Button 
                       variant="primary" 
                       size="sm"
-                      onClick={() => navigate('/idea/sample-idea-1')}
+                      onClick={() => navigate(`/idea/${idea.id}`)}
                     >
                       <Eye className="w-4 h-4" />
                       View
                     </Button>
-                    <Button variant="outlined" size="sm">
+                    <Button 
+                      variant="outlined" 
+                      size="sm"
+                      onClick={() => handleUnsaveIdea(idea.id, idea.messageId)}
+                    >
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </Button>
                   </div>

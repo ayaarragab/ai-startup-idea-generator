@@ -69,9 +69,11 @@ export const unsaveIdea = async (ideaId, userId, messageId) => {
 };
 
 export const fetchSavedIdeas = async (userId) => {
-  try {
-    const user = await User.findOne(userId);
-    return user.getIdeas()?.toJSON();
+  try {    
+    const user = await User.findByPk(userId);
+    const ideas = await user.getIdeas();
+    
+    return ideas;
   } catch (error) {
     return false;
   }
