@@ -19,7 +19,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   });
   const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
   
-  const message = await createMessage(aiResponse.content, aiResponse.conversationId, 'ai', clientMessageId)
+  const message = await createMessage(aiResponse.content, aiResponse.conversationId, 'ai', clientMessageId, aiResponse.is_idea, aiResponse.is_full_idea)
 
   let idea__ = null;
 

@@ -2,13 +2,15 @@ import db from "../models/index.js";
 
 const { Message } = db;
 
-export const createMessage = async (content, conversationId, role, clientMessageId) => {
+export const createMessage = async (content, conversationId, role, clientMessageId, is_idea=false, is_full_idea=false) => {
   try {
     const message = await Message.create({
       content,
       conversationId,
       role,
-      clientMessageId
+      clientMessageId,
+      is_idea,
+      is_full_idea
     })
     return message;
   } catch (error) {
