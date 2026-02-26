@@ -24,7 +24,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   let idea__ = null;
 
   if (aiResponse.is_idea && aiResponse.is_full_idea) {
-    idea__ = await createIdea(aiResponse.idea);
+    idea__ = await createIdea({ ...aiResponse.idea, messageId: message.id });
   }
   
   
