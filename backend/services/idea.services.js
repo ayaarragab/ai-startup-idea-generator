@@ -50,3 +50,20 @@ export const findIdeaWithMessageId = async (messageId) => {
     throw error;
   }
 };
+
+export const unsaveIdea = async (ideaId, userId, messageId) => {
+  const user = await User.findByPk(userId);
+  if (!user) throw new Error("User not found");
+
+  const idea = await Idea.findByPk(ideaId);
+  if (!idea) throw new Error("Idea not found");
+  
+  const message = await Message.findByPk(messageId);
+  if (!message) throw new Error("Message not found");
+
+  message.is_idea_saved = false;
+  await message.save();
+  await user.removeIdea(ideaId);
+
+  return { ok: true };
+};

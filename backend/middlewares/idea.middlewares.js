@@ -1,30 +1,11 @@
 export const validateIdeaFields = (req, res, next) => {
-  const requiredFields = [
-    'name',
-    'subtitle',
-    'description',
-    'problem',
-    'solution',
-    'keyPartners',
-    'keyActivities',
-    'keyResources',
-    'valueProposition',
-    'customerRelationships',
-    'channels',
-    'customerSegments',
-    'costStructure',
-    'revenueStreams',
-    'nextSteps',
-    'academicReferences'
-  ];
+  const requiredFields = ['ideaId', 'messageId'];
 
   for (const field of requiredFields) {
-    if (!req.body[field] || (Array.isArray(req.body[field]) && req.body[field].length === 0)) {
-      
+    if (!req.body[field]) {
       return res.status(400).json({ error: `Field ${field} is required and must be valid.` });
     }
   }
 
   next();
 };
-

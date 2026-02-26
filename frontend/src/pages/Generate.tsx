@@ -261,7 +261,7 @@ export function Generate() {
           });
           
         } else {
-          await axiosInstance.delete(`/saved-ideas/${ ideaId }`);
+          await axiosInstance.delete(`idea/saved-ideas/${ ideaId }/${messageId}`);
         }
       } catch (error) {
         console.error("Error saving/unsaving idea:", error);
