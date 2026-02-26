@@ -67,3 +67,12 @@ export const unsaveIdea = async (ideaId, userId, messageId) => {
 
   return { ok: true };
 };
+
+export const fetchSavedIdeas = async (userId) => {
+  try {
+    const user = await User.findOne(userId);
+    return user.getIdeas()?.toJSON();
+  } catch (error) {
+    return false;
+  }
+}
