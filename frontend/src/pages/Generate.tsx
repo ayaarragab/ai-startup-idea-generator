@@ -153,7 +153,8 @@ export function Generate() {
       const response = await axiosInstance.post('/chat/', {
         content: newMessage.content,
         conversationId: currentConversationId,
-        isNewConversation: !currentConversationId, 
+        isNewConversation: !currentConversationId,
+        history: chatMessages,
         clientMessageId
       });
 
