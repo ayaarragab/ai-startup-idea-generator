@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
+import { toast } from 'react-toastify';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Tag } from '../components/Tag';
@@ -62,6 +63,7 @@ export function IdeaDetail() {
   
   const [activeTab, setActiveTab] = useState('overview');
   const [rating, setRating] = useState(0);
+  const [text, setText] = useState('');
   const [saved, setSaved] = useState(true);
   
   const [idea, setIdea] = useState<IdeaData | null>(null);
@@ -137,6 +139,24 @@ export function IdeaDetail() {
         console.error("Error saving/unsaving idea:", error);
       }
   };
+
+  const sendFeedback = async () => {
+    try {
+      const response = await axiosInstance.post('/feedback/', {
+        rating,
+        ideaId: idea?.id,
+        text
+      })
+      if (response.status === 201) {
+        toast.success('Feedback submitted successfully!');
+        setText('');
+        setRating(0);
+      }
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      toast.error('Failed to submit feedback. Please try again.');
+    }
+  }
 
   if (isLoading) {
     return (
@@ -514,9 +534,16 @@ export function IdeaDetail() {
                   placeholder="Share your feedback or suggestions..."
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                   rows={3}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                  }}
                 />
                 <div className="mt-3">
-                  <Button variant="primary" size="md">Submit Feedback</Button>
+                  <Button variant="primary" size="md" 
+                    onClick={() => {
+                      sendFeedback();
+                    }}
+                  >Submit Feedback</Button>
                 </div>
               </div>
             </div>
