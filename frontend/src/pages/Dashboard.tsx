@@ -1,30 +1,21 @@
+// Dashboard.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../utils/axiosInstance'; // Make sure the path is correct
+import axiosInstance from '../utils/axiosInstance';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Tag } from '../components/Tag';
 import { EmptyState } from '../components/EmptyState';
-import { 
-  Search, 
-  Plus, 
-  Grid, 
-  List,
-  Eye,
-  Trash2,
-  Calendar,
-  Bookmark,
-  Loader2 // Added a loader icon
-} from 'lucide-react';
+import { Search, Plus, Grid, List, Eye, Trash2, Calendar, Bookmark, Loader2 } from 'lucide-react';
 
-// Define the shape of your Idea based on your backend model
+// UPDATED: Replaced name/description with new solution fields
 interface Idea {
   id: number;
-  messageId: number; // Required for your unsave route
-  name: string;
-  description: string;
-  sector: string;
-  createdAt: string; // Assuming Sequelize default timestamps
+  messageId: number;
+  solutionName: string;
+  solutionDescription: string;
+  marketRegion: string;
+  createdAt: string; 
   tags?: string[];
 }
 
@@ -34,12 +25,10 @@ export function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSector, setSelectedSector] = useState('all');
   
-  // API State
   const [savedIdeas, setSavedIdeas] = useState<Idea[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch saved ideas on mount
   useEffect(() => {
     const fetchIdeas = async () => {
       setIsLoading(true);
@@ -48,7 +37,6 @@ export function Dashboard() {
         const response = await axiosInstance.get('/idea/saved-ideas');
         setSavedIdeas(response.data.ideas || []);
       } catch (err: any) {
-        // If it's a 404, it just means no ideas are saved yet, which is fine
         if (err.response?.status === 404) {
           setSavedIdeas([]);
         } else {
@@ -63,21 +51,19 @@ export function Dashboard() {
     fetchIdeas();
   }, []);
 
-  // Handle unsaving/deleting an idea
   const handleUnsaveIdea = async (ideaId: number, messageId: number) => {
     try {
       await axiosInstance.delete(`/saved-ideas/${ideaId}/${messageId}`);
-      // Optimistically remove the idea from the UI
       setSavedIdeas(prevIdeas => prevIdeas.filter(idea => idea.id !== ideaId));
     } catch (err) {
       console.error('Error unsaving idea:', err);
-      // Optional: Add a toast notification here to inform the user the deletion failed
     }
   };
 
+  // Note: Using marketRegion instead of strict Sectors for mapping if applicable,
+  // but keeping your filter logic intact if the backend still relies on explicit "Sectors" 
   const sectors = ['all', 'Healthcare', 'Education', 'Agriculture', 'Environment', 'FinTech', 'Transportation'];
 
-  // Calculate stats dynamically based on fetched data
   const currentMonth = new Date().getMonth();
   const ideasThisMonth = savedIdeas.filter(idea => {
     if (!idea.createdAt) return false;
@@ -99,17 +85,19 @@ export function Dashboard() {
     },
   ];
 
+  // UPDATED: Searching using solutionName and solutionDescription
   const filteredIdeas = savedIdeas.filter(idea => {
-    const matchesSearch = idea.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         idea.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSector = selectedSector === 'all' || idea.sector === selectedSector;
+    const matchesSearch = idea.solutionName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         idea.solutionDescription?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Mapping sector filter to marketRegion temporarily (adjust logic if the API synthesizes a distinct sector tag)
+    const matchesSector = selectedSector === 'all' || idea.marketRegion === selectedSector; 
     return matchesSearch && matchesSector;
   });
 
   return (
     <div className="min-h-screen bg-neutral-50 py-8 md:py-12">
       <div className="container mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
@@ -127,7 +115,6 @@ export function Dashboard() {
             </Button>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             {stats.map((stat) => (
               <Card key={stat.label} variant="bordered" padding="md">
@@ -144,7 +131,6 @@ export function Dashboard() {
             ))}
           </div>
 
-          {/* Filters */}
           <Card variant="bordered" padding="md">
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
@@ -198,7 +184,6 @@ export function Dashboard() {
           </Card>
         </div>
 
-        {/* Dynamic Content Display */}
         {isLoading ? (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
@@ -226,8 +211,8 @@ export function Dashboard() {
                 <div className="space-y-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <h5 className="text-neutral-900 mb-1 truncate">{idea.name}</h5>
-                      <p className="text-neutral-600 line-clamp-2">{idea.description}</p>
+                      <h5 className="text-neutral-900 mb-1 truncate">{idea.solutionName}</h5>
+                      <p className="text-neutral-600 line-clamp-2">{idea.solutionDescription}</p>
                     </div>
                   </div>
 
@@ -279,8 +264,8 @@ export function Dashboard() {
                   <div className="flex-1">
                     <div className="flex items-start justify-between gap-4 mb-2">
                       <div>
-                        <h5 className="text-neutral-900 mb-1">{idea.name}</h5>
-                        <p className="text-neutral-600">{idea.description}</p>
+                        <h5 className="text-neutral-900 mb-1">{idea.solutionName}</h5>
+                        <p className="text-neutral-600">{idea.solutionDescription}</p>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">

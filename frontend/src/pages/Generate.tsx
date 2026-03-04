@@ -1,43 +1,38 @@
+// Generate.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { 
-  Settings, 
-  ChevronRight,
-  Send,
-  Bot,
-  User,
-  Loader2,
-  MessageSquare,
-  Plus,
-  Trash2,
-  Clock,
-  Save
+  Settings, ChevronRight, Send, Bot, User, Loader2, 
+  MessageSquare, Plus, Trash2, Clock, Save
 } from 'lucide-react';
 
-
+// UPDATED: Aligned with the new Sequelize model
 interface Idea {
   id: number;
-  name: string;
-  subtitle: string;
-  description: string;
-  problem: string;
-  solution: string;
-  keyPartners: string[];
-  keyActivities: string[];
-  keyResources: string[];
-  valueProposition: string[];
-  customerRelationships: string[];
-  channels: string[];
-  customerSegments: string[];
-  costStructure: string[];
-  revenueStreams: string[];
-  nextSteps: string[];
-  academicReferences: string[];
+  messageId?: number | null;
+  problemTitle: string;
+  problemDescription: string;
+  rootCause: string;
+  targetUsers: string;
+  marketRegion: string;
+  whyNow: string;
+  evidenceSignals: any[];
+  solutionName: string;
+  solutionDescription: string;
+  howItWorks: string[];
+  keyFeatures: string[];
+  technologyStack: string[];
+  retrivedStartups: any[];
+  businessModel: any;
+  marketAnalysis: any;
+  feasibility: any;
+  noveltyScore: number;
+  impact: any;
+  mvpPlan: any;
 }
-
 
 interface ChatMessage {
   id: number | string;
@@ -175,6 +170,7 @@ export function Generate() {
         is_idea: aiResponseData.is_idea || false,
         is_idea_saved: aiResponseData.is_idea_saved || false,
         is_full_idea: aiResponseData.is_full_idea || false,
+        idea: aiResponseData.idea // Pass idea object through
       };
 
       setChatMessages(prev => [...prev, aiMessage]);
@@ -200,7 +196,6 @@ export function Generate() {
       setCurrentConversationId(convData.id);
       setSelectedSectorIds(convData.sectors?.map((s: Sector) => s.id) || []);
       setChatMessages(convData.messages || []);
-      console.log(chatMessages);
       
       setCurrentStep(2);
       setShowConversations(false);

@@ -4,7 +4,33 @@ const { Idea, User, Message } = db;
 
 export const createIdea = async (ideaDetails) => {
   try {
-    const idea = await Idea.create({ ...ideaDetails });
+    const mappedData = {
+      messageId: ideaDetails.messageId,
+      problemTitle: ideaDetails.problem_title,
+      problemDescription: ideaDetails.problem_description,
+      rootCause: ideaDetails.root_cause,
+      targetUsers: ideaDetails.target_users,
+      marketRegion: ideaDetails.market_region,
+      whyNow: ideaDetails.why_now,
+      evidenceSignals: ideaDetails.evidence_signals,
+      
+      solutionName: ideaDetails.solution_name,
+      solutionDescription: ideaDetails.solution_description,
+      howItWorks: ideaDetails.how_it_works,
+      keyFeatures: ideaDetails.key_features,
+      technologyStack: ideaDetails.technology_stack,
+      
+      businessModel: ideaDetails.business_model,
+      marketAnalysis: ideaDetails.market_analysis,
+      feasibility: ideaDetails.feasibility,
+      noveltyScore: ideaDetails.novelty_score,
+      impact: ideaDetails.impact,
+      mvpPlan: ideaDetails.mvp_plan,
+      retrivedStartups: ideaDetails.retrived_startups,
+
+      is_deleted: ideaDetails.is_deleted || false
+    };
+    const idea = await Idea.create({ ...mappedData });
     return idea ? idea.toJSON() : null;
   } catch (error) {
     console.error("Error creating idea:", error);

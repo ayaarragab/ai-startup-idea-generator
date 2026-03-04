@@ -1,46 +1,58 @@
+// IdeaDetail.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axiosInstance from '../utils/axiosInstance'; // Make sure this path is correct
+import axiosInstance from '../utils/axiosInstance';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Tag } from '../components/Tag';
 import { Badge } from '../components/Badge';
 import { 
-  ArrowLeft,
-  Bookmark,
-  Star,
-  Users,
-  DollarSign,
-  TrendingUp,
-  ExternalLink,
-  CheckCircle2,
-  Handshake,
-  Package,
-  Heart,
-  BarChart3,
-  Loader2
+  ArrowLeft, Bookmark, Star, Users, DollarSign, TrendingUp, ExternalLink, 
+  CheckCircle2, Handshake, Package, Heart, BarChart3, Loader2, Globe, Rocket
 } from 'lucide-react';
 
-// Define the interface based on your Sequelize Idea model
+// UPDATED: Aligned with the new Sequelize model
 interface IdeaData {
   id: number;
   messageId: number | null;
-  name: string;
-  subtitle: string;
-  description: string;
-  problem: string;
-  solution: string;
-  keyPartners: string[];
-  keyActivities: string[];
-  keyResources: string[];
-  valueProposition: string[];
-  customerRelationships: string[];
-  channels: string[];
-  customerSegments: string[];
-  costStructure: string[];
-  revenueStreams: string[];
-  nextSteps: string[];
-  academicReferences: any[]; // Adjust type if you store specific objects
+  problemTitle: string;
+  problemDescription: string;
+  rootCause: string;
+  targetUsers: string;
+  marketRegion: string;
+  whyNow: string;
+  evidenceSignals: any[];
+  solutionName: string;
+  solutionDescription: string;
+  howItWorks: string[];
+  keyFeatures: string[];
+  technologyStack: string[];
+  retrivedStartups: any[];
+  businessModel: {
+    value_proposition: string;
+    revenue_streams: string[];
+    pricing_model: string;
+    customer_acquisition: string[];
+  };
+  marketAnalysis: {
+    market_size: string;
+    competitors: string[];
+    competitive_advantage: string;
+  };
+  feasibility: {
+    technical_feasibility: string;
+    market_feasibility: string;
+    risk_factors: string[];
+  };
+  noveltyScore: number;
+  impact: {
+    economic_impact: string;
+    social_impact: string;
+  };
+  mvpPlan: {
+    mvp_features: string[];
+    first_steps: string[];
+  };
   createdAt: string;
 }
 
@@ -50,14 +62,12 @@ export function IdeaDetail() {
   
   const [activeTab, setActiveTab] = useState('overview');
   const [rating, setRating] = useState(0);
-  const [saved, setSaved] = useState(true); // Assuming it's saved since we are viewing it from "Saved Ideas"
+  const [saved, setSaved] = useState(true);
   
-  // State for fetched data
   const [idea, setIdea] = useState<IdeaData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch the idea data on mount
   useEffect(() => {
     const fetchIdeaDetails = async () => {
       setIsLoading(true);
@@ -78,49 +88,38 @@ export function IdeaDetail() {
     }
   }, [id]);
 
+  // UPDATED: Renamed tabs to fit new model data
   const tabs = [
     { id: 'overview', label: 'Overview' },
-    { id: 'bmc', label: 'Business Model Canvas' },
+    { id: 'business', label: 'Business & Market' },
     { id: 'pitch', label: 'Pitch Summary' },
-    { id: 'references', label: 'Evidence & References' },
+    { id: 'evidence', label: 'Evidence & Signals' },
   ];
 
-  const bmcSections = [
-    { key: 'keyPartners', title: 'Key Partners', icon: Handshake, color: 'bg-purple-100 text-purple-700' },
-    { key: 'keyActivities', title: 'Key Activities', icon: CheckCircle2, color: 'bg-blue-100 text-blue-700' },
-    { key: 'keyResources', title: 'Key Resources', icon: Package, color: 'bg-green-100 text-green-700' },
-    { key: 'valueProposition', title: 'Value Proposition', icon: Star, color: 'bg-yellow-100 text-yellow-700' },
-    { key: 'customerRelationships', title: 'Customer Relationships', icon: Heart, color: 'bg-pink-100 text-pink-700' },
-    { key: 'channels', title: 'Channels', icon: TrendingUp, color: 'bg-indigo-100 text-indigo-700' },
-    { key: 'customerSegments', title: 'Customer Segments', icon: Users, color: 'bg-cyan-100 text-cyan-700' },
-    { key: 'costStructure', title: 'Cost Structure', icon: DollarSign, color: 'bg-red-100 text-red-700' },
-    { key: 'revenueStreams', title: 'Revenue Streams', icon: BarChart3, color: 'bg-emerald-100 text-emerald-700' },
-  ];
-
-  // Helper to generate pitch slides dynamically from available model fields
+  // UPDATED: Pitch slides generated from new fields
   const generatePitchSlides = () => {
     if (!idea) return [];
     return [
       {
-        title: idea.name,
-        subtitle: idea.subtitle,
-        content: idea.description
+        title: idea.solutionName,
+        subtitle: idea.problemTitle,
+        content: idea.solutionDescription
       },
       {
-        title: 'The Problem',
+        title: 'The Problem & Root Cause',
         subtitle: 'What we are solving',
-        content: idea.problem
+        content: `${idea.problemDescription}\n\nRoot Cause: ${idea.rootCause || 'Not specified'}`
       },
       {
-        title: 'Our Solution',
-        subtitle: 'How we fix it',
-        content: idea.solution
+        title: 'Value Proposition',
+        subtitle: 'Our competitive advantage',
+        content: `${idea.businessModel?.value_proposition || ''}\n\nAdvantage: ${idea.marketAnalysis?.competitive_advantage || ''}`
       },
       {
-        title: 'Next Steps',
+        title: 'MVP & Next Steps',
         subtitle: 'Path to Launch',
-        content: idea.nextSteps && idea.nextSteps.length > 0 
-          ? idea.nextSteps.join(' • ') 
+        content: idea.mvpPlan?.first_steps?.length > 0 
+          ? idea.mvpPlan.first_steps.join(' • ') 
           : 'Further market research and validation.'
       }
     ];
@@ -129,11 +128,7 @@ export function IdeaDetail() {
   const toggleIdeaSave = async (messageId: string | undefined, ideaId: string | number | undefined) => {
       try {
         if (!saved) {
-          await axiosInstance.post('idea/saved-ideas', { 
-            ideaId,
-            messageId
-          });
-          
+          await axiosInstance.post('idea/saved-ideas', { ideaId, messageId });
         } else {
           await axiosInstance.delete(`idea/saved-ideas/${ ideaId }/${messageId}`);
         }
@@ -174,7 +169,6 @@ export function IdeaDetail() {
       <div className="container mx-auto">
         <div className="max-w-6xl mx-auto">
           
-          {/* Back Button */}
           <button 
             onClick={() => navigate(-1)} 
             className="flex items-center text-neutral-600 hover:text-neutral-900 mb-6 transition-colors"
@@ -187,16 +181,17 @@ export function IdeaDetail() {
             <div className="space-y-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <h2 className="text-neutral-900 mb-2">{idea.name}</h2>
-                  <p className="subtitle text-neutral-600">{idea.subtitle}</p>
+                  <h2 className="text-neutral-900 mb-2">{idea.solutionName}</h2>
+                  <p className="subtitle text-neutral-600">{idea.problemTitle}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                  {idea.noveltyScore !== undefined && (
+                    <Badge variant="info" size="md">Novelty Score: {idea.noveltyScore}/10</Badge>
+                  )}
                   <Button
                     variant={saved ? 'primary' : 'outlined'}
                     size="md"
-                    onClick={async () => {
-                      toggleIdeaSave(messageid, id);
-                    }}
+                    onClick={async () => toggleIdeaSave(messageid, id)}
                   >
                     <Bookmark className={`w-5 h-5 ${saved ? 'fill-current' : ''}`} />
                     {saved ? 'Saved' : 'Save'}
@@ -205,9 +200,13 @@ export function IdeaDetail() {
               </div>
               
               <div className="flex flex-wrap gap-2">
-                 {/* Dynamically displaying top customer segments as tags since 'targetUsers' isn't explicitly in the model */}
-                {idea.customerSegments?.slice(0, 3).map((segment, idx) => (
-                  <Tag key={idx} variant="accent">{segment}</Tag>
+                <Tag variant="accent">
+                  <Globe className="w-3 h-3 inline mr-1"/>
+                  {idea.marketRegion}
+                </Tag>
+                {/* targetUsers is a string in the new model, displaying it as a single tag or splitting if comma-separated */}
+                {idea.targetUsers?.split(',').slice(0, 3).map((user, idx) => (
+                  <Tag key={idx} variant="secondary">{user.trim()}</Tag>
                 ))}
               </div>
             </div>
@@ -239,41 +238,59 @@ export function IdeaDetail() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 <Card variant="elevated" padding="lg">
-                  <h4 className="text-neutral-900 mb-4">Problem</h4>
-                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.problem}</p>
+                  <h4 className="text-neutral-900 mb-4">The Problem</h4>
+                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.problemDescription}</p>
+                  {idea.rootCause && (
+                    <div className="mt-4 p-4 bg-red-50 rounded-lg text-sm text-red-900 border border-red-100">
+                      <strong>Root Cause:</strong> {idea.rootCause}
+                    </div>
+                  )}
                 </Card>
 
                 <Card variant="elevated" padding="lg">
-                  <h4 className="text-neutral-900 mb-4">Solution</h4>
-                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.solution}</p>
+                  <h4 className="text-neutral-900 mb-4">The Solution</h4>
+                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.solutionDescription}</p>
                 </Card>
                 
                 <Card variant="elevated" padding="lg">
-                  <h4 className="text-neutral-900 mb-4">Description & Impact</h4>
-                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.description}</p>
+                  <h4 className="text-neutral-900 mb-4">How it Works & Features</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <h6 className="font-semibold text-neutral-800 mb-2">Key Features</h6>
+                      <ul className="list-disc pl-5 text-neutral-700 space-y-1">
+                        {idea.keyFeatures?.map((feature, i) => <li key={i}>{feature}</li>)}
+                      </ul>
+                    </div>
+                  </div>
                 </Card>
               </div>
 
               <div className="space-y-6">
                 <Card variant="elevated" padding="lg">
                   <h5 className="text-neutral-900 mb-4">Target Audience</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {idea.customerSegments?.length > 0 ? (
-                       idea.customerSegments.map((segment, idx) => (
-                        <Tag key={idx} variant="accent">{segment}</Tag>
-                      ))
-                    ) : (
-                      <p className="text-neutral-500 text-sm">Not specified</p>
-                    )}
+                  <p className="text-neutral-700">{idea.targetUsers}</p>
+                </Card>
+
+                <Card variant="elevated" padding="lg">
+                  <h5 className="text-neutral-900 mb-4">Impact</h5>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-xs text-neutral-500 uppercase font-semibold">Economic Impact</span>
+                      <p className="text-sm text-neutral-700">{idea.impact?.economic_impact || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-neutral-500 uppercase font-semibold">Social Impact</span>
+                      <p className="text-sm text-neutral-700">{idea.impact?.social_impact || 'N/A'}</p>
+                    </div>
                   </div>
                 </Card>
 
                 <Card variant="elevated" padding="lg">
-                  <h5 className="text-neutral-900 mb-4">Key Channels</h5>
+                  <h5 className="text-neutral-900 mb-4">Technology Stack</h5>
                   <div className="flex flex-wrap gap-2">
-                    {idea.channels?.length > 0 ? (
-                      idea.channels.map((channel, idx) => (
-                        <Tag key={idx} variant="secondary">{channel}</Tag>
+                    {idea.technologyStack?.length > 0 ? (
+                      idea.technologyStack.map((tech, idx) => (
+                        <Tag key={idx} variant="secondary">{tech}</Tag>
                       ))
                     ) : (
                       <p className="text-neutral-500 text-sm">Not specified</p>
@@ -284,42 +301,114 @@ export function IdeaDetail() {
             </div>
           )}
 
-          {/* Tab Content: BMC */}
-          {activeTab === 'bmc' && (
-            <div>
-              <Card variant="elevated" padding="lg" className="mb-6">
-                <h4 className="text-neutral-900 mb-2">Business Model Canvas</h4>
-                <p className="text-neutral-600">
-                  A complete business model breakdown across all 9 building blocks
-                </p>
+          {/* Tab Content: Business & Market (Replaces old BMC) */}
+          {activeTab === 'business' && (
+            <div className="space-y-6">
+              <Card variant="elevated" padding="lg">
+                <h4 className="text-neutral-900 mb-2">Business Model & Market Strategy</h4>
+                <p className="text-neutral-600">Overview of the monetization strategy and market analysis.</p>
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {bmcSections.map((section) => {
-                  const items = idea[section.key as keyof IdeaData] as string[];
-                  return (
-                    <Card key={section.key} variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className={`w-10 h-10 rounded-lg ${section.color} flex items-center justify-center flex-shrink-0`}>
-                          <section.icon className="w-5 h-5" />
-                        </div>
-                        <h6 className="text-neutral-900 flex-1">{section.title}</h6>
-                      </div>
-                      <ul className="space-y-2">
-                        {items && items.length > 0 ? (
-                          items.map((item, index) => (
-                            <li key={index} className="flex items-start gap-2 text-neutral-700">
-                              <span className="text-neutral-400 mt-1">•</span>
-                              <span className="flex-1">{item}</span>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="text-neutral-400 italic text-sm">Not defined</li>
-                        )}
+                {/* Value Proposition */}
+                <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-yellow-100 text-yellow-700 flex items-center justify-center flex-shrink-0">
+                      <Star className="w-5 h-5" />
+                    </div>
+                    <h6 className="text-neutral-900 flex-1">Value Proposition</h6>
+                  </div>
+                  <p className="text-sm text-neutral-700">{idea.businessModel?.value_proposition}</p>
+                </Card>
+
+                {/* Revenue Streams */}
+                <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                      <BarChart3 className="w-5 h-5" />
+                    </div>
+                    <h6 className="text-neutral-900 flex-1">Revenue & Pricing</h6>
+                  </div>
+                  <div className="space-y-2 text-sm text-neutral-700">
+                    <p><strong>Model:</strong> {idea.businessModel?.pricing_model}</p>
+                    <ul className="list-disc pl-4 mt-2 space-y-1">
+                      {idea.businessModel?.revenue_streams?.map((stream, i) => <li key={i}>{stream}</li>)}
+                    </ul>
+                  </div>
+                </Card>
+
+                {/* Market & Competitors */}
+                <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0">
+                      <TrendingUp className="w-5 h-5" />
+                    </div>
+                    <h6 className="text-neutral-900 flex-1">Market Analysis</h6>
+                  </div>
+                  <div className="space-y-2 text-sm text-neutral-700">
+                    <p><strong>Size:</strong> {idea.marketAnalysis?.market_size}</p>
+                    <p><strong>Advantage:</strong> {idea.marketAnalysis?.competitive_advantage}</p>
+                    <div className="mt-2">
+                      <strong>Competitors:</strong>
+                      <ul className="list-disc pl-4 mt-1">
+                        {idea.marketAnalysis?.competitors?.map((comp, i) => <li key={i}>{comp}</li>)}
                       </ul>
-                    </Card>
-                  );
-                })}
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Customer Acquisition */}
+                <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-pink-100 text-pink-700 flex items-center justify-center flex-shrink-0">
+                      <Heart className="w-5 h-5" />
+                    </div>
+                    <h6 className="text-neutral-900 flex-1">Customer Acquisition</h6>
+                  </div>
+                  <ul className="list-disc pl-4 text-sm text-neutral-700 space-y-1">
+                    {idea.businessModel?.customer_acquisition?.map((ca, i) => <li key={i}>{ca}</li>)}
+                  </ul>
+                </Card>
+                
+                {/* Feasibility & Risks */}
+                <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-red-100 text-red-700 flex items-center justify-center flex-shrink-0">
+                      <CheckCircle2 className="w-5 h-5" />
+                    </div>
+                    <h6 className="text-neutral-900 flex-1">Feasibility & Risks</h6>
+                  </div>
+                  <div className="space-y-2 text-sm text-neutral-700">
+                    <p><strong>Tech Feasibility:</strong> {idea.feasibility?.technical_feasibility}</p>
+                    <p><strong>Market Feasibility:</strong> {idea.feasibility?.market_feasibility}</p>
+                    <div className="mt-2">
+                      <strong>Risks:</strong>
+                      <ul className="list-disc pl-4 mt-1">
+                        {idea.feasibility?.risk_factors?.map((risk, i) => <li key={i}>{risk}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                </Card>
+
+                 {/* MVP Plan */}
+                 <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0">
+                      <Rocket className="w-5 h-5" />
+                    </div>
+                    <h6 className="text-neutral-900 flex-1">MVP Plan</h6>
+                  </div>
+                  <div className="space-y-2 text-sm text-neutral-700">
+                    <strong>First Steps:</strong>
+                    <ul className="list-disc pl-4 mt-1 mb-2">
+                      {idea.mvpPlan?.first_steps?.map((step, i) => <li key={i}>{step}</li>)}
+                    </ul>
+                    <strong>MVP Features:</strong>
+                    <ul className="list-disc pl-4 mt-1">
+                      {idea.mvpPlan?.mvp_features?.map((feat, i) => <li key={i}>{feat}</li>)}
+                    </ul>
+                  </div>
+                </Card>
               </div>
             </div>
           )}
@@ -353,50 +442,48 @@ export function IdeaDetail() {
             </div>
           )}
 
-          {/* Tab Content: References */}
-          {activeTab === 'references' && (
+          {/* Tab Content: Evidence & References */}
+          {activeTab === 'evidence' && (
             <div>
               <Card variant="elevated" padding="lg" className="mb-6">
-                <h4 className="text-neutral-900 mb-2">Evidence & Academic References</h4>
+                <h4 className="text-neutral-900 mb-2">Evidence & Retrieved Startups</h4>
                 <p className="text-neutral-600">
-                  Supporting research papers and data sources used to generate this idea
+                  Market signals and similar startups retrieved during idea generation.
                 </p>
               </Card>
 
-              <div className="space-y-4">
-                {idea.academicReferences && idea.academicReferences.length > 0 ? (
-                  idea.academicReferences.map((ref: any, index: number) => (
-                    <Card key={index} variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
-                      <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <div className="flex-1">
-                          {/* Handling whether references are stored as strings or objects */}
-                          <h6 className="text-neutral-900 mb-2">
-                            {typeof ref === 'string' ? ref : ref.title || 'Reference Document'}
-                          </h6>
-                          {typeof ref !== 'string' && ref.source && (
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <span className="text-neutral-600">{ref.source}</span>
-                            </div>
-                          )}
-                        </div>
-                        {typeof ref !== 'string' && ref.link && (
-                          <Button 
-                            variant="outlined" 
-                            size="sm"
-                            onClick={() => window.open(ref.link, '_blank')}
-                          >
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            View Source
-                          </Button>
-                        )}
-                      </div>
-                    </Card>
-                  ))
-                ) : (
-                  <Card variant="bordered" padding="md">
-                    <p className="text-neutral-500 text-center py-4">No academic references provided for this idea.</p>
-                  </Card>
-                )}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Evidence Signals */}
+                <div>
+                  <h5 className="text-neutral-800 mb-4 border-b pb-2">Evidence Signals</h5>
+                  <div className="space-y-3">
+                    {idea.evidenceSignals?.length > 0 ? (
+                      idea.evidenceSignals.map((signal: any, index: number) => (
+                        <Card key={index} variant="bordered" padding="md" className="bg-white">
+                           <p className="text-sm text-neutral-700">{typeof signal === 'string' ? signal : JSON.stringify(signal)}</p>
+                        </Card>
+                      ))
+                    ) : (
+                      <p className="text-neutral-500 italic">No evidence signals provided.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Retrieved Startups */}
+                <div>
+                  <h5 className="text-neutral-800 mb-4 border-b pb-2">Similar Startups</h5>
+                  <div className="space-y-3">
+                    {idea.retrivedStartups?.length > 0 ? (
+                      idea.retrivedStartups.map((startup: any, index: number) => (
+                         <Card key={index} variant="bordered" padding="md" className="bg-white">
+                           <p className="text-sm text-neutral-700">{typeof startup === 'string' ? startup : JSON.stringify(startup)}</p>
+                        </Card>
+                      ))
+                    ) : (
+                       <p className="text-neutral-500 italic">No similar startups retrieved.</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}

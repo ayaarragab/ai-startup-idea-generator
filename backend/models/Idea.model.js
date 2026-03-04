@@ -2,85 +2,111 @@ const Idea = (sequelize, DataTypes) => {
   const IdeaModel = sequelize.define(
     'Idea',
     {
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
+      // --- Operational Fields ---
       messageId: {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
-      subtitle: {
+
+      // --- Problem Space ---
+      problemTitle: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      description: {
+      problemDescription: {
+        type: DataTypes.TEXT, // Changed to TEXT to allow longer descriptions
+        allowNull: false
+      },
+      rootCause: {
+        type: DataTypes.TEXT,
+        allowNull: true
+      },
+      targetUsers: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      problem: {
+      marketRegion: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'Egypt or MENA'
+      },
+      whyNow: {
+        type: DataTypes.TEXT,
+        allowNull: true
+      },
+      evidenceSignals: {
+        type: DataTypes.JSON,
+        allowNull: false,
+        defaultValue: [],
+      },
+
+      // --- Solution Space ---
+      solutionName: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      solution: {
-        type: DataTypes.STRING,
+      solutionDescription: {
+        type: DataTypes.TEXT,
         allowNull: false
       },
-      keyPartners: {
+      howItWorks: {
         type: DataTypes.JSON,
         allowNull: false,
         defaultValue: [],
       },
-      keyActivities: {
+      keyFeatures: {
         type: DataTypes.JSON,
         allowNull: false,
         defaultValue: [],
       },
-      keyResources: {
+      technologyStack: {
         type: DataTypes.JSON,
         allowNull: false,
         defaultValue: [],
       },
-      valueProposition: {
+      retrivedStartups: {
         type: DataTypes.JSON,
         allowNull: false,
-        defaultValue: [],
+        defaultValue: [],        
       },
-      customerRelationships: {
+      // --- Grouped/Nested JSON Objects ---
+      businessModel: {
         type: DataTypes.JSON,
         allowNull: false,
-        defaultValue: [],
+        defaultValue: {},
       },
-      channels: {
+      marketAnalysis: {
         type: DataTypes.JSON,
         allowNull: false,
-        defaultValue: [],
+        defaultValue: {},
       },
-      customerSegments: {
+      feasibility: {
         type: DataTypes.JSON,
         allowNull: false,
-        defaultValue: [],
+        // Added the specific default values from your JSON structure
+        defaultValue: {
+          technical_feasibility: "Low",
+          market_feasibility: "Low",
+          risk_factors: []
+        },
       },
-      costStructure: {
+      noveltyScore: {
+        type: DataTypes.FLOAT, // Or INTEGER, depending on your scoring system
+        allowNull: false,
+        defaultValue: 0,
+      },
+      impact: {
         type: DataTypes.JSON,
         allowNull: false,
-        defaultValue: [],
+        defaultValue: {},
       },
-      revenueStreams: {
+      mvpPlan: {
         type: DataTypes.JSON,
         allowNull: false,
-        defaultValue: [],
+        defaultValue: {},
       },
-      nextSteps: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: [],
-      },
-      academicReferences: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: [],
-      },
+
+      // --- Status Fields ---
       is_deleted: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
@@ -90,6 +116,8 @@ const Idea = (sequelize, DataTypes) => {
     {
       tableName: 'ideas',
       timestamps: true,
+      // Optional: Add `underscored: true` here if your actual database 
+      // table columns need to be strict snake_case (e.g., problem_title)
     }
   );
   
