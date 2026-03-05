@@ -190,7 +190,7 @@ export function Generate() {
           content: newMessage.content,
           conversationId: currentConversationId,
           isNewConversation: !currentConversationId,
-          history: chatMessages,
+          history: chatMessages[chatMessages.length - 1].idea,
           clientMessageId,
         });
       } else {
@@ -198,7 +198,7 @@ export function Generate() {
           content: newMessage.content,
           conversationId: currentConversationId,
           isNewConversation: !currentConversationId,
-          history: chatMessages,
+          history: chatMessages[chatMessages.length - 1].idea,
           clientMessageId,
         });
       }
