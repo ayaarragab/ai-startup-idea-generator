@@ -100,7 +100,7 @@ export const fetchSavedIdeas = async (userId) => {
     const user = await User.findByPk(userId);
     const ideas = await user.getIdeas();
     
-    return ideas.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return ideas.sort((a, b) => b.createdAt - a.createdAt);
 
   } catch (error) {
     return false;
