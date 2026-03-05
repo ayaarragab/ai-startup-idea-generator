@@ -31,3 +31,22 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   
   return { ...aiResponseWithoutIdea, messageId: message.id, clientMessageId, idea: idea__ };
 }
+
+export const handleChatWithoutAuth = async ({ content, isNewConversation, history }) => {
+  try {
+    const aiResponse = await sendChat({
+      content,
+      history,
+    });
+    const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
+    let idea__ = null;
+
+    if (aiResponse.is_idea && aiResponse.is_full_idea) {
+      idea__ = await createIdea({ ...aiResponse.idea });
+    }
+  return { ...aiResponseWithoutIdea, idea: idea__ };
+  
+  } catch (error) {
+    throw error;
+  }
+}

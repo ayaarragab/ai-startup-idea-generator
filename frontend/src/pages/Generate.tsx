@@ -1,13 +1,24 @@
 // Generate.tsx
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../utils/axiosInstance';
-import { Card } from '../components/Card';
-import { Button } from '../components/Button';
-import { 
-  Settings, ChevronRight, Send, Bot, User, Loader2, 
-  MessageSquare, Plus, Trash2, Clock, Save
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../utils/axiosInstance";
+import { Card } from "../components/Card";
+import { Button } from "../components/Button";
+import { useAuth } from "../providers/AuthProvider";
+import {
+  Settings,
+  ChevronRight,
+  Send,
+  Bot,
+  User,
+  Loader2,
+  MessageSquare,
+  Plus,
+  Trash2,
+  Clock,
+  Save,
+} from "lucide-react";
+import { toast } from "react-toastify";
 
 // UPDATED: Aligned with the new Sequelize model
 interface Idea {
@@ -36,11 +47,11 @@ interface Idea {
 
 interface ChatMessage {
   id: number | string;
-  role: 'user' | 'ai';
+  role: "user" | "ai";
   content: string;
-  createdAt: string; 
+  createdAt: string;
   clientMessageId?: string;
-  is_idea?: boolean; 
+  is_idea?: boolean;
   is_idea_saved?: boolean;
   is_full_idea?: boolean;
   idea?: Idea | null;
@@ -65,31 +76,41 @@ export function Generate() {
   const navigate = useNavigate();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [currentConversationId, setCurrentConversationId] = useState<
+    string | null
+  >(null);
   const [currentIdea, setCurrentIdea] = useState<Idea | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
-  
+
+  const { isAuthenticated } = useAuth();
+
   const sectorOptions = [
-    { id: 1, name: 'Healthcare' }, { id: 2, name: 'Education' }, 
-    { id: 3, name: 'Agriculture' }, { id: 4, name: 'Transportation' }, 
-    { id: 5, name: 'Environment' }, { id: 6, name: 'FinTech' }, 
-    { id: 7, name: 'E-commerce' }, { id: 8, name: 'Tourism' }, 
-    { id: 9, name: 'Manufacturing' }, { id: 10, name: 'Energy' }, 
-    { id: 11, name: 'Real Estate' }, { id: 12, name: 'Food Tech' }
+    { id: 1, name: "Healthcare" },
+    { id: 2, name: "Education" },
+    { id: 3, name: "Agriculture" },
+    { id: 4, name: "Transportation" },
+    { id: 5, name: "Environment" },
+    { id: 6, name: "FinTech" },
+    { id: 7, name: "E-commerce" },
+    { id: 8, name: "Tourism" },
+    { id: 9, name: "Manufacturing" },
+    { id: 10, name: "Energy" },
+    { id: 11, name: "Real Estate" },
+    { id: 12, name: "Food Tech" },
   ];
-  
+
   const [selectedSectorIds, setSelectedSectorIds] = useState<number[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [userInput, setUserInput] = useState('');
+  const [userInput, setUserInput] = useState("");
   const [isAITyping, setIsAITyping] = useState(false);
   const [showConversations, setShowConversations] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await axiosInstance.get('/conversation/');
+        const response = await axiosInstance.get("/conversation/");
         setConversations(response.data);
       } catch (error) {
         console.error("Error fetching conversations:", error);
@@ -101,31 +122,43 @@ export function Generate() {
   }, []);
 
   const toggleSector = (sectorId: number) => {
-    setSelectedSectorIds(prev =>
-      prev.includes(sectorId) ? prev.filter(id => id !== sectorId) : [...prev, sectorId]
+    setSelectedSectorIds((prev) =>
+      prev.includes(sectorId)
+        ? prev.filter((id) => id !== sectorId)
+        : [...prev, sectorId],
     );
   };
 
   const handleNextStep = async () => {
     if (selectedSectorIds.length === 0) return;
-    
+
     setIsGenerating(true);
     try {
-      const response = await axiosInstance.post('/conversation/', selectedSectorIds);
-      const newConv = response.data;
-      
-      setCurrentConversationId(newConv.id);
-      
+      let newConv = null;
+      if (isAuthenticated) {
+        const response = await axiosInstance.post(
+          "/conversation/",
+          selectedSectorIds,
+        );
+        newConv = response.data;
+        setCurrentConversationId(newConv.id);
+      } else {
+        newConv = { id: "-1", userId: "-1", is_deleted: false };
+        setCurrentConversationId("-1");
+        console.log("fd");
+      }
+
       const welcomeMsg: ChatMessage = {
-        id: 'welcome',
-        role: 'ai',
-        content: "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea. What problem would you like to explore?",
-        createdAt: new Date().toISOString()
+        id: "welcome",
+        role: "ai",
+        content:
+          "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea. What problem would you like to explore?",
+        createdAt: new Date().toISOString(),
       };
       setChatMessages([welcomeMsg]);
       setCurrentStep(2);
-      
-      setConversations(prev => [newConv, ...prev]);
+
+      setConversations((prev) => [newConv, ...prev]);
     } catch (error) {
       console.error("Error creating conversation:", error);
     } finally {
@@ -134,54 +167,67 @@ export function Generate() {
   };
 
   const handleSendMessage = async () => {
-    if (userInput.trim() === '') return;
-    
+    if (userInput.trim() === "") return;
+
     const clientMessageId = Date.now().toString();
     const newMessage: ChatMessage = {
       id: clientMessageId,
-      role: 'user',
+      role: "user",
       content: userInput,
       createdAt: new Date().toISOString(),
-      clientMessageId
+      clientMessageId,
     };
 
-    setChatMessages(prev => [...prev, newMessage]);
-    setUserInput('');
+    setChatMessages((prev) => [...prev, newMessage]);
+    setUserInput("");
     setIsAITyping(true);
 
     try {
-      const response = await axiosInstance.post('/chat/', {
-        content: newMessage.content,
-        conversationId: currentConversationId,
-        isNewConversation: !currentConversationId,
-        history: chatMessages,
-        clientMessageId
-      });
+      let response: any = {};
+
+      if (isAuthenticated) {
+        response = await axiosInstance.post("/chat/", {
+          content: newMessage.content,
+          conversationId: currentConversationId,
+          isNewConversation: !currentConversationId,
+          history: chatMessages,
+          clientMessageId,
+        });
+      } else {
+        response = await axiosInstance.post("/chat/without-auth", {
+          content: newMessage.content,
+          conversationId: currentConversationId,
+          isNewConversation: !currentConversationId,
+          history: chatMessages,
+          clientMessageId,
+        });
+      }
 
       const aiResponseData = response.data;
-      
+
       if (aiResponseData.is_idea) {
         setCurrentIdea(aiResponseData.idea);
       }
       const aiMessage: ChatMessage = {
         id: aiResponseData.messageId || Date.now(),
-        role: 'ai',
+        role: "ai",
         content: aiResponseData.content,
         createdAt: new Date().toISOString(),
         is_idea: aiResponseData.is_idea || false,
         is_idea_saved: aiResponseData.is_idea_saved || false,
         is_full_idea: aiResponseData.is_full_idea || false,
-        idea: aiResponseData.idea // Pass idea object through
+        idea: aiResponseData.idea, // Pass idea object through
       };
 
-      setChatMessages(prev => [...prev, aiMessage]);
+      setChatMessages((prev) => [...prev, aiMessage]);
 
-      setConversations(prev => prev.map(conv => 
-        conv.id === currentConversationId 
-          ? { ...conv, updatedAt: new Date().toISOString() }
-          : conv
-      ));
-
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === currentConversationId
+            ? { ...conv, updatedAt: new Date().toISOString() }
+            : conv,
+        ),
+      );
     } catch (error) {
       console.error("Error in chat:", error);
     } finally {
@@ -193,11 +239,11 @@ export function Generate() {
     try {
       const response = await axiosInstance.get(`/conversation/${convId}`);
       const convData = response.data;
-      
+
       setCurrentConversationId(convData.id);
       setSelectedSectorIds(convData.sectors?.map((s: Sector) => s.id) || []);
       setChatMessages(convData.messages || []);
-      
+
       setCurrentStep(2);
       setShowConversations(false);
     } catch (error) {
@@ -219,53 +265,65 @@ export function Generate() {
     } catch (error) {
       console.log(error);
     }
-    setConversations(prev => prev.filter(c => c.id !== convId));
+    setConversations((prev) => prev.filter((c) => c.id !== convId));
     if (currentConversationId === convId) {
       handleNewConversation();
     }
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0 || diffDays === 1) return 'Today';
-    if (diffDays === 2) return 'Yesterday';
+
+    if (diffDays === 0 || diffDays === 1) return "Today";
+    if (diffDays === 2) return "Yesterday";
     if (diffDays < 7) return `${diffDays} days ago`;
     return date.toLocaleDateString();
   };
 
-  const toggleIdeaSave = async (messageId: string | number, ideaId: string | number | undefined) => {
-      const targetMessage = chatMessages.find(msg => msg.id === messageId);
-      if (!targetMessage) return;
+  const toggleIdeaSave = async (
+    messageId: string | number,
+    ideaId: string | number | undefined,
+  ) => {
+    if (!isAuthenticated) {
+      toast.info("Please signup or login first in order to save ideas!");
+      return;
+    }
+    const targetMessage = chatMessages.find((msg) => msg.id === messageId);
+    if (!targetMessage) return;
 
-      const isCurrentlySaved = targetMessage.is_idea_saved;
-      const newSavedState = !isCurrentlySaved;
+    const isCurrentlySaved = targetMessage.is_idea_saved;
+    const newSavedState = !isCurrentlySaved;
 
-      setChatMessages(prev => prev.map(msg => 
-        msg.id === messageId ? { ...msg, is_idea_saved: newSavedState } : msg
-      ));
+    setChatMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId ? { ...msg, is_idea_saved: newSavedState } : msg,
+      ),
+    );
 
-      try {
-        if (!isCurrentlySaved) {
-          await axiosInstance.post('idea/saved-ideas', { 
-            ideaId,
-            messageId
-          });
-          
-        } else {
-          await axiosInstance.delete(`idea/saved-ideas/${ ideaId }/${messageId}`);
-        }
-      } catch (error) {
-        console.error("Error saving/unsaving idea:", error);
-
-        setChatMessages(prev => prev.map(msg => 
-          msg.id === messageId ? { ...msg, is_idea_saved: isCurrentlySaved } : msg
-        ));
+    try {
+      if (!isCurrentlySaved) {
+        await axiosInstance.post("idea/saved-ideas", {
+          ideaId,
+          messageId,
+        });
+      } else {
+        await axiosInstance.delete(`idea/saved-ideas/${ideaId}/${messageId}`);
       }
+    } catch (error) {
+      console.error("Error saving/unsaving idea:", error);
+
+      setChatMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? { ...msg, is_idea_saved: isCurrentlySaved }
+            : msg,
+        ),
+      );
+    }
   };
 
   return (
@@ -274,9 +332,12 @@ export function Generate() {
         <div className="max-w-7xl mx-auto">
           <div className="mb-8 md:mb-12 flex items-center justify-between">
             <div>
-              <h2 className="text-neutral-900 mb-2">Generate Your Startup Idea</h2>
+              <h2 className="text-neutral-900 mb-2">
+                Generate Your Startup Idea
+              </h2>
               <p className="text-neutral-600">
-                Answer a few questions to help our AI create the perfect startup idea for you
+                Answer a few questions to help our AI create the perfect startup
+                idea for you
               </p>
             </div>
             <Button
@@ -298,26 +359,41 @@ export function Generate() {
               className="w-full justify-center"
             >
               <MessageSquare className="w-4 h-4" />
-              {showConversations ? 'Hide' : 'Show'} Conversations
+              {showConversations ? "Hide" : "Show"} Conversations
             </Button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className={`lg:col-span-3 ${showConversations ? 'block' : 'hidden md:block'}`}>
-              <Card variant="bordered" padding="sm" className="sticky top-24 max-h-[600px] overflow-y-auto">
+            <div
+              className={`lg:col-span-3 ${showConversations ? "block" : "hidden md:block"}`}
+            >
+              <Card
+                variant="bordered"
+                padding="sm"
+                className="sticky top-24 max-h-[600px] overflow-y-auto"
+              >
                 <div className="space-y-2">
                   <div className="px-2 py-1">
-                    <h6 className="text-neutral-900 text-sm font-medium">Previous Conversations</h6>
+                    <h6 className="text-neutral-900 text-sm font-medium">
+                      Previous Conversations
+                    </h6>
                   </div>
-                  
+
                   {isLoadingHistory ? (
                     <div className="flex justify-center p-4">
                       <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
                     </div>
                   ) : conversations.length === 0 ? (
                     <div className="px-2 py-8 text-center">
-                      <p className="text-neutral-500 text-sm">No conversations yet</p>
-                      <Button variant="primary" size="sm" onClick={handleNewConversation} className="mt-4">
+                      <p className="text-neutral-500 text-sm">
+                        No conversations yet
+                      </p>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={handleNewConversation}
+                        className="mt-4"
+                      >
                         <Plus className="w-4 h-4" />
                         Start New Chat
                       </Button>
@@ -329,24 +405,34 @@ export function Generate() {
                           key={conv.id}
                           className={`group relative p-3 rounded-lg transition-colors cursor-pointer ${
                             currentConversationId === conv.id
-                              ? 'bg-primary-50 border border-primary-200'
-                              : 'hover:bg-neutral-50 border border-transparent'
+                              ? "bg-primary-50 border border-primary-200"
+                              : "hover:bg-neutral-50 border border-transparent"
                           }`}
                           onClick={() => handleSelectConversation(conv.id)}
                         >
                           <div className="flex items-start gap-2">
-                            <MessageSquare className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
-                              currentConversationId === conv.id ? 'text-primary-600' : 'text-neutral-500'
-                            }`} />
+                            <MessageSquare
+                              className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
+                                currentConversationId === conv.id
+                                  ? "text-primary-600"
+                                  : "text-neutral-500"
+                              }`}
+                            />
                             <div className="flex-1 min-w-0">
-                              <h6 className={`text-sm font-medium truncate ${
-                                currentConversationId === conv.id ? 'text-primary-900' : 'text-neutral-900'
-                              }`}>
-                                {conv.title || 'Untitled Conversation'}
+                              <h6
+                                className={`text-sm font-medium truncate ${
+                                  currentConversationId === conv.id
+                                    ? "text-primary-900"
+                                    : "text-neutral-900"
+                                }`}
+                              >
+                                {conv.title || "Untitled Conversation"}
                               </h6>
                               <div className="flex items-center gap-2 mt-1">
                                 <Clock className="w-3 h-3 text-neutral-400" />
-                                <span className="text-xs text-neutral-500">{formatDate(conv.updatedAt)}</span>
+                                <span className="text-xs text-neutral-500">
+                                  {formatDate(conv.updatedAt)}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -372,9 +458,12 @@ export function Generate() {
                 {currentStep === 1 && (
                   <div className="space-y-6">
                     <div>
-                      <h4 className="text-neutral-900 mb-2">Your Preferences</h4>
+                      <h4 className="text-neutral-900 mb-2">
+                        Your Preferences
+                      </h4>
                       <p className="text-neutral-600">
-                        Customize your startup idea based on your interests and goals
+                        Customize your startup idea based on your interests and
+                        goals
                       </p>
                     </div>
 
@@ -389,8 +478,8 @@ export function Generate() {
                             onClick={() => toggleSector(sector.id)}
                             className={`px-4 py-2 rounded-full border-2 transition-colors ${
                               selectedSectorIds.includes(sector.id)
-                                ? 'border-secondary-600 bg-secondary-50 text-secondary-700'
-                                : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                                ? "border-secondary-600 bg-secondary-50 text-secondary-700"
+                                : "border-neutral-200 text-neutral-700 hover:border-neutral-300"
                             }`}
                           >
                             {sector.name}
@@ -403,9 +492,13 @@ export function Generate() {
                       <Button
                         variant="primary"
                         onClick={handleNextStep}
-                        disabled={selectedSectorIds.length === 0 || isGenerating}
+                        disabled={
+                          selectedSectorIds.length === 0 || isGenerating
+                        }
                       >
-                        {isGenerating ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                        {isGenerating ? (
+                          <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                        ) : null}
                         Next: Chat with AI
                         <ChevronRight className="w-5 h-5 ml-1" />
                       </Button>
@@ -416,62 +509,78 @@ export function Generate() {
                 {currentStep === 2 && (
                   <div className="flex flex-col h-[600px]">
                     <div className="mb-6">
-                      <h4 className="text-neutral-900 mb-1">Refine Your Idea</h4>
+                      <h4 className="text-neutral-900 mb-1">
+                        Refine Your Idea
+                      </h4>
                       <p className="text-neutral-500 text-sm">
                         Discuss your vision with our AI assistant
                       </p>
                     </div>
 
                     <div className="flex-1 overflow-y-auto space-y-4 mb-4 px-1">
-                      {chatMessages.map((message) => (                        
-                        <div 
-                          key={message.id} 
-                          className={`flex flex-col gap-2 ${message.role === 'user' ? 'items-end' : 'items-start'}`}
+                      {chatMessages.map((message) => (
+                        <div
+                          key={message.id}
+                          className={`flex flex-col gap-2 ${message.role === "user" ? "items-end" : "items-start"}`}
                         >
-                          <div className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                            {message.role === 'ai' && (
+                          <div
+                            className={`flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                          >
+                            {message.role === "ai" && (
                               <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <Bot className="w-4 h-4 text-neutral-600" />
                               </div>
                             )}
-                            <div 
+                            <div
                               className={`max-w-[75%] rounded-lg px-4 py-2.5 ${
-                                message.role === 'user'
-                                  ? 'bg-neutral-900 text-white' 
-                                  : 'bg-neutral-50 text-neutral-900 border border-neutral-100'
+                                message.role === "user"
+                                  ? "bg-neutral-900 text-white"
+                                  : "bg-neutral-50 text-neutral-900 border border-neutral-100"
                               }`}
                             >
-                              <p className={`text-sm leading-relaxed whitespace-pre-wrap ${message.role === 'user' ? 'text-white' : 'text-neutral-800'}`}>
+                              <p
+                                className={`text-sm leading-relaxed whitespace-pre-wrap ${message.role === "user" ? "text-white" : "text-neutral-800"}`}
+                              >
                                 {message.content}
                               </p>
-                              <span className={`text-xs mt-1.5 block ${message.role === 'user' ? 'text-neutral-400' : 'text-neutral-400'}`}>
-                                {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+                              <span
+                                className={`text-xs mt-1.5 block ${message.role === "user" ? "text-neutral-400" : "text-neutral-400"}`}
+                              >
+                                {new Date(message.createdAt).toLocaleTimeString(
+                                  [],
+                                  { hour: "2-digit", minute: "2-digit" },
+                                )}
                               </span>
                             </div>
-                            {message.role === 'user' && (
+                            {message.role === "user" && (
                               <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <User className="w-4 h-4 text-white" />
                               </div>
                             )}
                           </div>
-                         
-                          
-                          {message.role === 'ai' && message.is_idea && message.is_full_idea && (
-                            <button
-                              onClick={() => toggleIdeaSave(message.id, message?.idea?.id)}
-                              className={`ml-11 flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors text-sm border ${
-                                message.is_idea_saved
-                                  ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border-neutral-200'
-                                  : 'bg-green-50 hover:bg-green-100 text-green-700 border-green-200'
-                              }`}
-                            >
-                              <Save className="w-3.5 h-3.5" />
-                              {message.is_idea_saved ? 'Unsave Idea' : 'Save Idea'}
-                            </button>
-                          )}
+
+                          {message.role === "ai" &&
+                            message.is_idea &&
+                            message.is_full_idea && (
+                              <button
+                                onClick={() =>
+                                  toggleIdeaSave(message.id, message?.idea?.id)
+                                }
+                                className={`ml-11 flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors text-sm border ${
+                                  message.is_idea_saved
+                                    ? "bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border-neutral-200"
+                                    : "bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                                }`}
+                              >
+                                <Save className="w-3.5 h-3.5" />
+                                {message.is_idea_saved
+                                  ? "Unsave Idea"
+                                  : "Save Idea"}
+                              </button>
+                            )}
                         </div>
                       ))}
-                      
+
                       {isAITyping && (
                         <div className="flex gap-3 justify-start">
                           <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -479,9 +588,18 @@ export function Generate() {
                           </div>
                           <div className="max-w-[75%] rounded-lg px-4 py-3 bg-neutral-50 border border-neutral-100">
                             <div className="flex gap-1">
-                              <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                              <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                              <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                              <div
+                                className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
+                                style={{ animationDelay: "0ms" }}
+                              ></div>
+                              <div
+                                className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
+                                style={{ animationDelay: "150ms" }}
+                              ></div>
+                              <div
+                                className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
+                                style={{ animationDelay: "300ms" }}
+                              ></div>
                             </div>
                           </div>
                         </div>
@@ -495,7 +613,11 @@ export function Generate() {
                             type="text"
                             value={userInput}
                             onChange={(e) => setUserInput(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                            onKeyPress={(e) =>
+                              e.key === "Enter" &&
+                              !e.shiftKey &&
+                              handleSendMessage()
+                            }
                             placeholder="Type your message..."
                             disabled={isAITyping}
                             className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:bg-white focus:border-neutral-400 transition-all placeholder:text-neutral-400"
@@ -510,7 +632,7 @@ export function Generate() {
                           <span className="hidden sm:inline">Send</span>
                         </button>
                       </div>
-                      
+
                       <div className="mt-4">
                         <button
                           onClick={handleNewConversation}
