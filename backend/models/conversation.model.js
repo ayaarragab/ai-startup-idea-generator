@@ -9,6 +9,10 @@ const Conversation = (sequelize, DataTypes) => {
           model: "users",
           key: "id",
         },
+        title: {
+          type: DataTypes.STRING,
+          allowNull: true
+        },
       },
       is_deleted: {
         type: DataTypes.BOOLEAN,
