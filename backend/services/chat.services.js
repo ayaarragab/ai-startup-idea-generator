@@ -2,6 +2,7 @@ import sendChat from "./ai/index.js";
 import { createConversation } from "./conversation.services.js";
 import { createMessage } from "./message.services.js";
 import { createIdea } from "./idea.services.js";
+import { updateConversationTitle } from "./conversation.services.js";
 
 export const handleChat = async ({ content, conversationId, userId, isNewConversation, clientMessageId, history, convSectors }) => {
   
@@ -29,7 +30,11 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
     idea__ = await createIdea({ ...aiResponse.idea, messageId: message.id }, convSectors);
   }
   
-  
+  if (aiResponse.conversation_title) {
+        
+    await updateConversationTitle(conversationId, aiResponse.conversation_title)
+  }
+
   return { ...aiResponseWithoutIdea, messageId: message.id, clientMessageId, idea: idea__ };
 }
 

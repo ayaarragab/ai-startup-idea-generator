@@ -71,6 +71,7 @@ const sendChat = async ({ content, conversationId, userId, history, convSectors 
     role: 'ai',
     is_idea: true,
     is_idea_saved: false,
+    conversation_title: "Education startup",
     is_full_idea: true,
     idea
   };

@@ -115,3 +115,21 @@ export const deleteConversation = async (id) => {
     return false;
   }
 };
+
+export const updateConversationTitle = async (id, title) => {
+  try {
+    await Conversation.update(
+      {
+        title,
+      },
+      {
+        where: {
+          id,
+        },
+      },
+    );
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}
