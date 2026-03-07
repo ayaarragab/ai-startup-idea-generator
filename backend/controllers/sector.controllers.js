@@ -1,4 +1,4 @@
-import { fetchSectors } from "../services/sector.services";
+import { fetchSectors } from "../services/sector.services.js";
 
 export const getSectors = async (req, res) => {
   try {
