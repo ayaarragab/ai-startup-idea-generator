@@ -22,8 +22,21 @@ export const createConversation = async (userId, sectorIds = []) => {
     if (sectorIds.length > 0) {
       await conversation.setSectors(sectorIds);
     }
-    return conversation;
+
+    const updatedConversation = await Conversation.findByPk(conversation.id, {
+      include: [
+        {
+          model: db.Sector,
+          as: 'sectors',
+          attributes: ['id', 'name'],
+          through: { attributes: [] }
+        }
+      ]
+    });
+
+    return updatedConversation;
   } catch (error) {
+    console.error("Create Conversation Error:", error);
     return false;
   }
 };

@@ -11,7 +11,7 @@ export const fetchSectors = async () => {
         }
       }
     );
-    return sectors ? sectors.toJSON() : null;
+    return Array.isArray(sectors) ? sectors.map((sector) => sector.toJSON()) : [];
   } catch (error) {
     throw error;
   }
