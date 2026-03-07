@@ -115,6 +115,8 @@ export function Generate() {
     const fetchHistory = async () => {
       try {
         const response = await axiosInstance.get("/conversation/");
+        console.log(response.data);
+        
         setConversations(response.data);
       } catch (error) {
         console.error("Error fetching conversations:", error);

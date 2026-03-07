@@ -41,7 +41,8 @@ export const createOneConversation = async (req, res) => {
     }
 
     const conversationData = req.body;
-    const newConversation = await createConversation(userId, conversationData);
+    const sectorIds = conversationData.sectorIds;
+    const newConversation = await createConversation({ userId, ...conversationData }, sectorIds);
     
     res.status(201).json(newConversation);
   } catch (error) {

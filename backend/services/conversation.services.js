@@ -15,11 +15,12 @@ export const findConversation = async (id) => {
   }
 };
 
-export const createConversation = async (userId, sectorIds = []) => {
+export const createConversation = async (convData, sectorIds = []) => {
+  
   try {
-    const conversation = await Conversation.create({ userId });
+    const conversation = await Conversation.create({ ...convData });
 
-    if (sectorIds.length > 0) {
+    if (sectorIds.length > 0) {      
       await conversation.setSectors(sectorIds);
     }
 
@@ -51,13 +52,19 @@ export const fetchConversations = async (userId) => {
         {
           model: Message,
           as: "messages",
-        },
-        {
-          model: Sector,
-          as: "sectors",
-        },
+        }
       ],
     });
+
+    const conversationsWithSectors = await Promise.all(conversations.map(async (conversation) => {
+      const sectors = await conversation.getSectors();      
+      return {
+        ...conversation.toJSON(),
+        sectors: sectors.map(sector => ({ id: sector.id, name: sector.name })),
+      };
+    }));
+
+    return conversationsWithSectors.filter(c => !c.is_deleted);
 
     return conversations.filter((c) => !c.is_deleted);
   } catch (error) {
