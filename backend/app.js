@@ -13,6 +13,7 @@ import chatRouter from './routers/chat.router.js';
 import conversationRouter from "./routers/conversation.router.js";
 import ideaRouter from './routers/idea.router.js';
 import feedbackRouter from './routers/feedback.router.js';
+import sectorsRouter from './routers/sector.router.js';
 
 dotenv.config();
 
@@ -43,5 +44,6 @@ app.use('/chat', chatRouter);
 app.use('/conversation', conversationRouter);
 app.use('/idea', ideaRouter);
 app.use('/feedback', feedbackRouter);
+app.use('/sector', sectorsRouter);
 
 export default app;
