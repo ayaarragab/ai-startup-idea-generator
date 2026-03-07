@@ -17,6 +17,7 @@ import {
   Clock,
   Save,
 } from "lucide-react";
+import { Tag } from '../components/Tag';
 import { toast } from "react-toastify";
 
 // Types aligned with Sequelize models
@@ -413,6 +414,12 @@ export function Generate() {
                               <div className="flex items-center gap-2 mt-1">
                                 <Clock className="w-3 h-3 text-neutral-400" />
                                 <span className="text-xs text-neutral-500">{formatDate(conv.updatedAt)}</span>
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                {conv?.sectors?.slice(0, 2).map(s => (<Tag key={s.id} variant="primary" size="sm">{s.name}</Tag>))}
+                                {conv?.sectors && conv.sectors.length > 2 && (
+                                  <span className="text-xs text-neutral-500">+{conv.sectors.length - 2}</span>
+                                )}
                               </div>
                             </div>
                           </div>
