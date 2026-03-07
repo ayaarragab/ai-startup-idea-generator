@@ -3,10 +3,10 @@ import { createConversation } from "./conversation.services.js";
 import { createMessage } from "./message.services.js";
 import { createIdea } from "./idea.services.js";
 
-export const handleChat = async ({ content, conversationId, userId, isNewConversation, clientMessageId, history }) => {
+export const handleChat = async ({ content, conversationId, userId, isNewConversation, clientMessageId, history, convSectors }) => {
   
   if (isNewConversation) {
-    const conversation = await createConversation(userId);
+    const conversation = await createConversation(userId, convSectors);
     conversationId = conversation.id;
   }
 
@@ -16,7 +16,8 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
     content,
     conversationId,
     history,
-    userId
+    userId,
+    convSectors
   });
   const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
   
@@ -32,11 +33,12 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   return { ...aiResponseWithoutIdea, messageId: message.id, clientMessageId, idea: idea__ };
 }
 
-export const handleChatWithoutAuth = async ({ content, isNewConversation, history }) => {
+export const handleChatWithoutAuth = async ({ content, isNewConversation, history, convSectors }) => {
   try {
     const aiResponse = await sendChat({
       content,
       history,
+      convSectors
     });
     const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
     let idea__ = null;

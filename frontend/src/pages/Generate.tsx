@@ -54,6 +54,7 @@ interface ChatMessage {
   is_idea_saved?: boolean;
   is_full_idea?: boolean;
   idea?: Idea | null;
+  convSectors: number[];
 }
 
 interface Sector {
@@ -157,6 +158,7 @@ export function Generate() {
         content:
           "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea. What problem would you like to explore?",
         createdAt: new Date().toISOString(),
+        convSectors: []
       };
       setChatMessages([welcomeMsg]);
       setCurrentStep(2);
@@ -182,6 +184,7 @@ export function Generate() {
       content: userInput,
       createdAt: new Date().toISOString(),
       clientMessageId,
+      convSectors: selectedSectorIds
     };
 
     setChatMessages((prev) => [...prev, newMessage]);
@@ -198,6 +201,7 @@ export function Generate() {
           isNewConversation: !currentConversationId,
           history: chatMessages[chatMessages.length - 1]?.idea,
           clientMessageId,
+          convSectors: selectedSectorIds
         });
       } else {
         response = await axiosInstance.post("/chat/without-auth", {
@@ -206,6 +210,7 @@ export function Generate() {
           isNewConversation: !currentConversationId,
           history: chatMessages[chatMessages.length - 1]?.idea,
           clientMessageId,
+          convSectors: selectedSectorIds
         });
       }
 
@@ -223,6 +228,7 @@ export function Generate() {
         is_idea_saved: aiResponseData.is_idea_saved || false,
         is_full_idea: aiResponseData.is_full_idea || false,
         idea: aiResponseData.idea,
+        convSectors: []
       };
 
       setChatMessages((prev) => [...prev, aiMessage]);

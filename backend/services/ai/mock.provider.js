@@ -63,7 +63,7 @@ const generateIdea = async (prompt = '') => {
   };
 };
 
-const sendChat = async ({ content, conversationId, userId, history }) => {
+const sendChat = async ({ content, conversationId, userId, history, convSectors }) => {
   const idea = await generateIdea();
   return {
     content: `Mock reply to: "${content}"`,
