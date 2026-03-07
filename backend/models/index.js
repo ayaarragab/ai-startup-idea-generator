@@ -66,12 +66,14 @@ db.Idea.belongsToMany(db.Sector, {
   through: "ideasSectors",
   foreignKey: "ideaId",
   otherKey: "sectorId",
+  as: "sectors",
 });
 
 db.Sector.belongsToMany(db.Idea, {
   through: "ideasSectors",
   foreignKey: "sectorId",
   otherKey: "ideaId",
+  as: "sectors",
 });
 
 // Idea <-> Users associations (many-to-many)

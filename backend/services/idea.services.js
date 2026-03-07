@@ -2,7 +2,7 @@ import db from "../models/index.js";
 
 const { Idea, User, Message } = db;
 
-export const createIdea = async (ideaDetails) => {
+export const createIdea = async (ideaDetails, convSectors) => {
   try {
     const mappedData = {
       messageId: ideaDetails.messageId,
@@ -31,7 +31,22 @@ export const createIdea = async (ideaDetails) => {
       is_deleted: ideaDetails.is_deleted || false
     };
     const idea = await Idea.create({ ...mappedData });
-    return idea ? idea.toJSON() : null;
+    if (convSectors.length > 0) {
+      await idea.setSectors(convSectors);
+    }
+
+    const updatedIdea = await Idea.findByPk(idea.id, {
+      include: [
+        {
+          model: db.Sector,
+          as: 'sectors',
+          attributes: ['id', 'name'],
+          through: { attributes: [] }
+        }
+      ]
+    })
+
+    return updatedIdea ? updatedIdea.toJSON() : null;
   } catch (error) {
     console.error("Error creating idea:", error);
     throw error; // rethrow the error for further handling
@@ -99,7 +114,14 @@ export const fetchSavedIdeas = async (userId) => {
   try {    
     const user = await User.findByPk(userId);
     const ideas = await user.getIdeas();
-    
+    for (const idea of ideas) {
+      const sectors = await idea.getSectors();
+      const sectorJson = Array.isArray(sectors)
+        ? sectors.map((sector) => sector.toJSON())
+        : [];
+      idea.dataValues.sectors = sectorJson;
+    }
+          
     return ideas.sort((a, b) => b.createdAt - a.createdAt);
 
   } catch (error) {
