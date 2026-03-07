@@ -8,7 +8,12 @@ import { Tag } from '../components/Tag';
 import { EmptyState } from '../components/EmptyState';
 import { Search, Plus, Grid, List, Eye, Trash2, Calendar, Bookmark, Loader2 } from 'lucide-react';
 
-// UPDATED: Replaced name/description with new solution fields
+// Updated Sector interface
+interface Sector {
+  id: number;
+  name: string;
+}
+
 interface Idea {
   id: number;
   messageId: number;
@@ -16,7 +21,7 @@ interface Idea {
   solutionDescription: string;
   marketRegion: string;
   createdAt: string; 
-  tags?: string[];
+  sectors?: Sector[]; // Changed from tags?: string[]
 }
 
 export function Dashboard() {
@@ -60,9 +65,7 @@ export function Dashboard() {
     }
   };
 
-  // Note: Using marketRegion instead of strict Sectors for mapping if applicable,
-  // but keeping your filter logic intact if the backend still relies on explicit "Sectors" 
-  const sectors = ['all', 'Healthcare', 'Education', 'Agriculture', 'Environment', 'FinTech', 'Transportation'];
+  const sectorsOptions = ['all', 'Healthcare', 'Education', 'Agriculture', 'Environment', 'FinTech', 'Transportation'];
 
   const currentMonth = new Date().getMonth();
   const ideasThisMonth = savedIdeas.filter(idea => {
@@ -85,13 +88,14 @@ export function Dashboard() {
     },
   ];
 
-  // UPDATED: Searching using solutionName and solutionDescription
   const filteredIdeas = savedIdeas.filter(idea => {
     const matchesSearch = idea.solutionName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          idea.solutionDescription?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Mapping sector filter to marketRegion temporarily (adjust logic if the API synthesizes a distinct sector tag)
-    const matchesSector = selectedSector === 'all' || idea.marketRegion === selectedSector; 
+    // UPDATED: Check if any sector name in the array matches the selectedSector
+    const matchesSector = selectedSector === 'all' || 
+                         idea.sectors?.some(s => s.name === selectedSector); 
+                         
     return matchesSearch && matchesSector;
   });
 
@@ -102,19 +106,15 @@ export function Dashboard() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-neutral-900 mb-2">Saved Ideas</h2>
-              <p className="text-neutral-600">
-                Manage and review your generated startup ideas
-              </p>
+              <p className="text-neutral-600">Manage and review your generated startup ideas</p>
             </div>
-            <Button 
-              variant="primary" 
-              onClick={() => navigate('/generate')}
-            >
+            <Button variant="primary" onClick={() => navigate('/generate')}>
               <Plus className="w-5 h-5" />
               Generate New Idea
             </Button>
           </div>
 
+          {/* Stats Section */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             {stats.map((stat) => (
               <Card key={stat.label} variant="bordered" padding="md">
@@ -131,6 +131,7 @@ export function Dashboard() {
             ))}
           </div>
 
+          {/* Filter Bar */}
           <Card variant="bordered" padding="md">
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
@@ -138,7 +139,7 @@ export function Dashboard() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
                   <input
                     type="text"
-                    placeholder="Search by idea name, sector, or keyword"
+                    placeholder="Search by idea name or description"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -151,104 +152,65 @@ export function Dashboard() {
                   onChange={(e) => setSelectedSector(e.target.value)}
                   className="px-4 py-2.5 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
-                  {sectors.map(sector => (
+                  {sectorsOptions.map(sector => (
                     <option key={sector} value={sector}>
                       {sector === 'all' ? 'All Sectors' : sector}
                     </option>
                   ))}
                 </select>
+                {/* View Toggles */}
                 <div className="flex border border-neutral-300 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`px-3 py-2 ${
-                      viewMode === 'grid'
-                        ? 'bg-primary-50 text-primary-600'
-                        : 'text-neutral-600 hover:bg-neutral-50'
-                    }`}
-                  >
-                    <Grid className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`px-3 py-2 border-l border-neutral-300 ${
-                      viewMode === 'list'
-                        ? 'bg-primary-50 text-primary-600'
-                        : 'text-neutral-600 hover:bg-neutral-50'
-                    }`}
-                  >
-                    <List className="w-5 h-5" />
-                  </button>
+                  <button onClick={() => setViewMode('grid')} className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-primary-50 text-primary-600' : 'text-neutral-600'}`}><Grid className="w-5 h-5" /></button>
+                  <button onClick={() => setViewMode('list')} className={`px-3 py-2 border-l border-neutral-300 ${viewMode === 'list' ? 'bg-primary-50 text-primary-600' : 'text-neutral-600'}`}><List className="w-5 h-5" /></button>
                 </div>
               </div>
             </div>
           </Card>
         </div>
 
+        {/* Content State Handling */}
         {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-          </div>
+          <div className="flex justify-center items-center py-20"><Loader2 className="w-8 h-8 text-primary-500 animate-spin" /></div>
         ) : error ? (
-          <div className="text-center py-10 text-red-500 bg-red-50 rounded-lg border border-red-200">
-            {error}
-          </div>
+          <div className="text-center py-10 text-red-500 bg-red-50 rounded-lg border border-red-200">{error}</div>
         ) : filteredIdeas.length === 0 ? (
-          <Card variant="elevated" padding="none">
-            <EmptyState
-              icon={Bookmark}
-              title="No ideas found"
-              description={searchQuery || selectedSector !== 'all' 
-                ? "Try adjusting your search or filter criteria"
-                : "Generate your first startup idea to get started"}
-              actionLabel="Generate New Idea"
-              onAction={() => navigate('/generate')}
-            />
-          </Card>
+          <EmptyState
+            icon={Bookmark}
+            title="No ideas found"
+            description="Try adjusting your search or filter criteria"
+            actionLabel="Generate New Idea"
+            onAction={() => navigate('/generate')}
+          />
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredIdeas.map((idea) => (
               <Card key={idea.id} variant="elevated" padding="lg" className="hover:shadow-xl transition-shadow group">
                 <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <h5 className="text-neutral-900 mb-1 truncate">{idea.solutionName}</h5>
-                      <p className="text-neutral-600 line-clamp-2">{idea.solutionDescription}</p>
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <h5 className="text-neutral-900 mb-1 truncate">{idea.solutionName}</h5>
+                    <p className="text-neutral-600 line-clamp-2 text-sm">{idea.solutionDescription}</p>
                   </div>
 
+                  {/* UPDATED: Rendering Sector Tags */}
                   <div className="flex flex-wrap gap-2">
-                    {idea.tags?.slice(0, 2).map(tag => (
-                      <Tag key={tag} variant="primary" size="sm">{tag}</Tag>
+                    {idea.sectors?.slice(0, 2).map(sector => (
+                      <Tag key={sector.id} variant="primary" size="sm">{sector.name}</Tag>
                     ))}
-                    {idea.tags && idea.tags.length > 2 && (
-                      <Tag variant="default" size="sm">+{idea.tags.length - 2}</Tag>
+                    {idea.sectors && idea.sectors.length > 2 && (
+                      <Tag variant="default" size="sm">+{idea.sectors.length - 2}</Tag>
                     )}
                   </div>
 
-                  <div className="text-neutral-500 text-sm">
-                    <Calendar className="w-4 h-4 inline mr-2" />
-                    {idea.createdAt ? new Date(idea.createdAt).toLocaleDateString('en-US', { 
-                      month: 'short', 
-                      day: 'numeric', 
-                      year: 'numeric' 
-                    }) : 'Unknown date'}
+                  <div className="text-neutral-500 text-xs">
+                    <Calendar className="w-3.5 h-3.5 inline mr-1" />
+                    {new Date(idea.createdAt).toLocaleDateString()}
                   </div>
 
-                  <div className="flex gap-2 pt-2 border-t border-neutral-200 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button 
-                      variant="primary" 
-                      size="sm" 
-                      className="flex-1"
-                      onClick={() => navigate(`/idea/${idea.id}/${idea.messageId}`)}
-                    >
-                      <Eye className="w-4 h-4" />
-                      View
+                  <div className="flex gap-2 pt-2 border-t border-neutral-200">
+                    <Button variant="primary" size="sm" className="flex-1" onClick={() => navigate(`/idea/${idea.id}/${idea.messageId}`)}>
+                      <Eye className="w-4 h-4" /> View
                     </Button>
-                    <Button 
-                      variant="outlined" 
-                      size="sm"
-                      onClick={() => handleUnsaveIdea(idea.id, idea.messageId)}
-                    >
+                    <Button variant="outlined" size="sm" onClick={() => handleUnsaveIdea(idea.id, idea.messageId)}>
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </Button>
                   </div>
@@ -257,37 +219,26 @@ export function Dashboard() {
             ))}
           </div>
         ) : (
+          /* List View */
           <div className="space-y-4">
             {filteredIdeas.map((idea) => (
-              <Card key={idea.id} variant="bordered" padding="md" className="hover:shadow-md transition-shadow group">
+              <Card key={idea.id} variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                   <div className="flex-1">
-                    <div className="flex items-start justify-between gap-4 mb-2">
-                      <div>
-                        <h5 className="text-neutral-900 mb-1">{idea.solutionName}</h5>
-                        <p className="text-neutral-600">{idea.solutionDescription}</p>
-                      </div>
-                    </div>
+                    <h5 className="text-neutral-900 mb-1">{idea.solutionName}</h5>
+                    <p className="text-neutral-600 text-sm">{idea.solutionDescription}</p>
                     <div className="flex flex-wrap gap-2 mt-3">
-                      {idea.tags?.map(tag => (
-                        <Tag key={tag} variant="primary" size="sm">{tag}</Tag>
+                      {/* UPDATED: Sector Tags in List View */}
+                      {idea.sectors?.map(sector => (
+                        <Tag key={sector.id} variant="primary" size="sm">{sector.name}</Tag>
                       ))}
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button 
-                      variant="primary" 
-                      size="sm"
-                      onClick={() => navigate(`/idea/${idea.id}`)}
-                    >
-                      <Eye className="w-4 h-4" />
-                      View
+                    <Button variant="primary" size="sm" onClick={() => navigate(`/idea/${idea.id}/${idea.messageId}`)}>
+                      <Eye className="w-4 h-4" /> View
                     </Button>
-                    <Button 
-                      variant="outlined" 
-                      size="sm"
-                      onClick={() => handleUnsaveIdea(idea.id, idea.messageId)}
-                    >
+                    <Button variant="outlined" size="sm" onClick={() => handleUnsaveIdea(idea.id, idea.messageId)}>
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </Button>
                   </div>

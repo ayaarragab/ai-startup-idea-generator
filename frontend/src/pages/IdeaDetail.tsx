@@ -12,6 +12,11 @@ import {
   CheckCircle2, Handshake, Package, Heart, BarChart3, Loader2, Globe, Rocket
 } from 'lucide-react';
 
+interface Sector {
+  id: number;
+  name: string;
+}
+
 // UPDATED: Aligned with the new Sequelize model
 interface IdeaData {
   id: number;
@@ -54,6 +59,7 @@ interface IdeaData {
     mvp_features: string[];
     first_steps: string[];
   };
+  sectors?: Sector[];
   createdAt: string;
 }
 
@@ -76,6 +82,8 @@ export function IdeaDetail() {
       setError(null);
       try {
         const response = await axiosInstance.get(`/idea/saved-ideas/${id}`);
+        console.log(response.data.idea);
+        
         setIdea(response.data.idea);
       } catch (err: any) {
         console.error('Error fetching idea details:', err);
@@ -196,41 +204,57 @@ export function IdeaDetail() {
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </button>
 
-          {/* Header */}
-          <Card variant="elevated" padding="lg" className="mb-8">
-            <div className="space-y-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h2 className="text-neutral-900 mb-2">{idea.solutionName}</h2>
-                  <p className="subtitle text-neutral-600">{idea.problemTitle}</p>
-                </div>
-                <div className="flex gap-2 items-center">
-                  {idea.noveltyScore !== undefined && (
-                    <Badge variant="info" size="md">Novelty Score: {idea.noveltyScore}/10</Badge>
-                  )}
-                  <Button
-                    variant={saved ? 'primary' : 'outlined'}
-                    size="md"
-                    onClick={async () => toggleIdeaSave(messageid, id)}
-                  >
-                    <Bookmark className={`w-5 h-5 ${saved ? 'fill-current' : ''}`} />
-                    {saved ? 'Saved' : 'Save'}
-                  </Button>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                <Tag variant="accent">
-                  <Globe className="w-3 h-3 inline mr-1"/>
-                  {idea.marketRegion}
-                </Tag>
-                {/* targetUsers is a string in the new model, displaying it as a single tag or splitting if comma-separated */}
-                {idea.targetUsers?.split(',').slice(0, 3).map((user, idx) => (
-                  <Tag key={idx} variant="secondary">{user.trim()}</Tag>
-                ))}
-              </div>
-            </div>
-          </Card>
+{/* Header Section */}
+<Card variant="elevated" padding="lg" className="mb-8">
+  <div className="space-y-4">
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex-1">
+        <h2 className="text-neutral-900 mb-2">{idea.solutionName}</h2>
+        <p className="subtitle text-neutral-600">{idea.problemTitle}</p>
+      </div>
+      <div className="flex gap-2 items-center">
+        {idea.noveltyScore !== undefined && (
+          <Badge variant="info" size="md">Novelty Score: {idea.noveltyScore}/10</Badge>
+        )}
+        <Button
+          variant={saved ? 'primary' : 'outlined'}
+          size="md"
+          onClick={() => toggleIdeaSave(messageid, id)}
+        >
+          <Bookmark className={`w-5 h-5 ${saved ? 'fill-current' : ''}`} />
+          {saved ? 'Saved' : 'Save'}
+        </Button>
+      </div>
+    </div>
+    
+    <div className="flex flex-wrap items-center gap-3">
+      {/* 1. Sectors (Industry Categories) */}
+      <div className="flex flex-wrap gap-2">
+        {idea.sectors?.map((sector) => (
+          <Tag key={sector.id} variant="primary">
+            {sector.name}
+          </Tag>
+        ))}
+      </div>
+
+      {/* Vertical Divider (Optional) */}
+      {idea.sectors && idea.sectors.length > 0 && (
+        <div className="hidden md:block w-px h-4 bg-neutral-300 mx-1" />
+      )}
+
+      {/* 2. Market Region (Geographic) */}
+      <Tag variant="accent">
+        <Globe className="w-3.5 h-3.5 inline mr-1.5" />
+        {idea.marketRegion}
+      </Tag>
+
+      {/* 3. Target Users */}
+      {idea.targetUsers?.split(',').slice(0, 3).map((user, idx) => (
+        <Tag key={idx} variant="secondary">{user.trim()}</Tag>
+      ))}
+    </div>
+  </div>
+</Card>
 
           {/* Tabs Navigation */}
           <div className="mb-6">
