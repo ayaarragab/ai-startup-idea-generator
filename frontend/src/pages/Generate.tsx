@@ -222,6 +222,15 @@ export function Generate() {
       if (aiResponseData.is_idea) {
         setCurrentIdea(aiResponseData.idea);
       }
+      if (aiResponseData.conversation_title) {
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === currentConversationId
+              ? { ...conv, title: aiResponseData.conversation_title }
+              : conv
+          )
+        );
+      }
       const aiMessage: ChatMessage = {
         id: aiResponseData.messageId || Date.now(),
         role: "ai",
