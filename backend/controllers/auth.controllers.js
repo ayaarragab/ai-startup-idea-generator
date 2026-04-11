@@ -88,10 +88,10 @@ export const handleOAuthTokens = (req, res, user, info) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   if (info === "registered") {
-    return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/login`);
+    return res.redirect(`https://ai-startup-idea-generator.netlify.app/login`);
   } else if (info === "loggedin") {
     return res.redirect(
-      `http://localhost:${process.env.FRONTEND_PORT}/auth/callback`,
+      `https://ai-startup-idea-generator.netlify.app/auth/callback`,
     );
   }
 };

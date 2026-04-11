@@ -56,7 +56,7 @@ export function Login() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/auth/google";
+    window.location.href = "https://ai-startup-idea-generator.netlify.app/google";
   };
 
   return (
