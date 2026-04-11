@@ -61,7 +61,7 @@ router.get("/google/callback", (req, res, next) => {
   passport.authenticate("google", async (err, user, info) => {
     if (err) return next(err);
     if (!user)
-      return res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/`);
+      return res.redirect(`https://ai-startup-idea-generator.netlify.app/`);
 
     await handleOAuthTokens(req, res, user, info);
   })(req, res, next);
@@ -70,7 +70,7 @@ router.get("/google/callback", (req, res, next) => {
 router.get("/logout", (req, res) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
-  res.redirect(`http://localhost:${process.env.FRONTEND_PORT}/`);
+  res.redirect(`https://ai-startup-idea-generator.netlify.app/`);
 });
 
 export default router;
