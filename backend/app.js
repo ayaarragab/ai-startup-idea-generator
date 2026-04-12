@@ -20,9 +20,11 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: `https://ai-startup-idea-generator.netlify.app/`,
+  origin: "https://ai-startup-idea-generator.netlify.app",
   credentials: true,
 }));
+
+app.set("trust proxy", 1);
 
 app.use(express.json());
 app.use(requestId);
