@@ -2,7 +2,10 @@ import { hashText } from "../utils/hashing.utils.js";
 import { compareTexts } from "../utils/hashing.utils.js";
 import { generateOTP, sendVerificationEmail } from "../utils/email.utils.js";
 import db from "../models/index.js";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/jwt.utils.js";
 
 const { User } = db;
 
@@ -10,19 +13,18 @@ export const findUser = async (email) => {
   const user = await User.findOne({
     where: { email },
   });
-  
+
   return user?.toJSON();
 };
 
 export const findUserById = async (id) => {
   const user = await User.findByPk(id);
-  
+
   return user?.toJSON();
-} 
+};
 
 export const handleExistingUser = async (user, password, res) => {
-  
-  const isCorrectPassword = await compareTexts(password, user.password);  
+  const isCorrectPassword = await compareTexts(password, user.password);
   if (isCorrectPassword) {
     const accessToken = generateAccessToken({
       id: user.id,
@@ -35,16 +37,16 @@ export const handleExistingUser = async (user, password, res) => {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false, // Set to true if using HTTPS
-      sameSite: "Strict",
+      secure: true, // Set to true if using HTTPS
+      sameSite: "None",
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false, // Set to true if using HTTPS
-      sameSite: "Strict",
-      maxAge: 7 * 60 * 60 * 24 * 1000
+      secure: true, // Set to true if using HTTPS
+      sameSite: "None",
+      maxAge: 7 * 60 * 60 * 24 * 1000,
     });
 
     return res.status(200).json({
@@ -57,7 +59,7 @@ export const handleExistingUser = async (user, password, res) => {
 
 export const handleNewUser = async (fullName, email, password, res) => {
   const hashedPassword = await hashText(password);
-  
+
   const otp = generateOTP();
   const hashedOTP = await hashText(otp);
 
@@ -81,16 +83,16 @@ export const handleNewUser = async (fullName, email, password, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false, // Set to true if using HTTPS
-    sameSite: "Strict",
-    maxAge: 60 * 15 * 1000
+    secure: true, // Set to true if using HTTPS
+    sameSite: "None",
+    maxAge: 60 * 15 * 1000,
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false, // Set to true if using HTTPS
-    sameSite: "Strict",
-    maxAge: 7 * 60 * 60 * 24 * 1000
+    secure: true, // Set to true if using HTTPS
+    sameSite: "None",
+    maxAge: 7 * 60 * 60 * 24 * 1000,
   });
   await sendVerificationEmail(email, otp);
   return res.status(200).json({
@@ -100,11 +102,11 @@ export const handleNewUser = async (fullName, email, password, res) => {
       fullName: newUser.fullName,
       email: newUser.email,
     },
-  })
+  });
 };
 
 export const handleOAuthSignup = (payload) => {
   const accessToken = generateAccessToken(payload);
   const refreshToken = generateRefreshToken(payload);
-  return { accessToken, refreshToken }
-}
+  return { accessToken, refreshToken };
+};

@@ -76,15 +76,15 @@ export const handleOAuthTokens = (req, res, user, info) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false, // Set to true if using HTTPS
-    sameSite: "Strict",
+    secure: true, // Set to true if using HTTPS
+    sameSite: "None",
     maxAge: 15 * 60 * 1000,
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false, // Set to true if using HTTPS
-    sameSite: "Strict",
+    secure: true, // Set to true if using HTTPS
+    sameSite: "None",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   if (info === "registered") {
@@ -268,15 +268,15 @@ export const generateNewAccessToken = async (req, res) => {
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "None",
       maxAge: 15 * 60 * 1000,
     });
 
