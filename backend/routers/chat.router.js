@@ -7,8 +7,8 @@ import { handleAIChat, handleAIChatWithoutAuth } from "../controllers/chat.contr
 
 const router = Router()
 
-router.post('/', authenticate, chatRateLimit, validateMessageLength, validatePrompt, handleAIChat);
+router.post('/', authenticate, /*chatRateLimit,*/ validateMessageLength, validatePrompt, handleAIChat);
 
-router.post('/without-auth', chatRateLimit, validateMessageLength, handleAIChatWithoutAuth)
+router.post('/without-auth', /*chatRateLimit,*/ validateMessageLength, handleAIChatWithoutAuth)
 
 export default router;
