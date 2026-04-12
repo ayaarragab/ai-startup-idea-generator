@@ -46,4 +46,9 @@ app.use('/idea', ideaRouter);
 app.use('/feedback', feedbackRouter);
 app.use('/sector', sectorsRouter);
 
+app.use((req,res,next)=>{
+  console.log("METHOD:",req.method);
+  next();
+});
+
 export default app;
