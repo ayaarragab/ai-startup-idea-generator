@@ -4,6 +4,6 @@ import { getSectors } from '../controllers/sector.controllers.js';
 
 const router = Router();
 
-router.get('/', authenticate, getSectors);
+router.get('/', getSectors);
 
 export default router;
