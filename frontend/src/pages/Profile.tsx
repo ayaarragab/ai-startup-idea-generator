@@ -66,8 +66,7 @@ export function Profile() {
         setTimeout(() => setSaveSuccess(false), 3000);   
       }
     } catch (error: any) {
-      toast.error("Error while updating");
-      console.log(error.response.data.message || error.response.data.error);
+      toast.error(error.response.data.message || error.response.data?.error || "Error while updating");
     }
   };
 
