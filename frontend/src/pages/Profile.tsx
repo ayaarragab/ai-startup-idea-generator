@@ -71,7 +71,7 @@ export function Profile() {
       toast.error(
         error.response?.data?.error ||
           error.response?.data?.message ||
-          "Error while updating",
+          "Error while updating. Full name must be 3-50 characters and contain only letters and spaces.",
       );
     }
   };
