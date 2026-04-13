@@ -58,7 +58,7 @@ export function Dashboard() {
 
   const handleUnsaveIdea = async (ideaId: number, messageId: number) => {
     try {
-      await axiosInstance.delete(`/saved-ideas/${ideaId}/${messageId}`);
+      await axiosInstance.delete(`idea/saved-ideas/${ideaId}/${messageId}`);
       setSavedIdeas(prevIdeas => prevIdeas.filter(idea => idea.id !== ideaId));
     } catch (err) {
       console.error('Error unsaving idea:', err);
