@@ -69,8 +69,8 @@ export function Profile() {
       }
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
+        error.response?.data?.error ||
+          error.response?.data?.message ||
           "Error while updating",
       );
     }
