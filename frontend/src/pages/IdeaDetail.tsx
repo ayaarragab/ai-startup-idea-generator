@@ -555,6 +555,7 @@ export function IdeaDetail() {
               </div>
               <div className="flex-1 w-full">
                 <textarea
+                  value={text}
                   placeholder="Share your feedback or suggestions..."
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                   rows={3}
