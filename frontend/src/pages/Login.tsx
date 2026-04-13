@@ -174,7 +174,7 @@ export function Login() {
 
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between text-xs">
-              <label className="flex items-center gap-1.5 cursor-pointer">
+              {/* <label className="flex items-center gap-1.5 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={rememberMe}
@@ -182,7 +182,7 @@ export function Login() {
                   className="w-3.5 h-3.5 text-primary-600 border-neutral-300 rounded focus:ring-2 focus:ring-primary-200"
                 />
                 <span className="text-neutral-700">Remember</span>
-              </label>
+              </label> */}
               <button
                 type="button"
                 onClick={() => navigate('/forgot-password')}
