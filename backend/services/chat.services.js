@@ -4,7 +4,7 @@ import { createMessage } from "./message.services.js";
 import { createIdea } from "./idea.services.js";
 import { updateConversationTitle } from "./conversation.services.js";
 
-export const handleChat = async ({ content, conversationId, userId, isNewConversation, clientMessageId, history, convSectors }) => {
+export const handleChat = async ({ content, conversationId, userId, isNewConversation, history, clientMessageId, convSectors }) => {
   
   if (isNewConversation) {
     const conversation = await createConversation(userId, convSectors);
@@ -16,9 +16,11 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   const aiResponse = await sendChat({
     content,
     conversationId,
+    isNewConversation,
     history,
+    clientMessageId,
+    convSectors,
     userId,
-    convSectors
   });
   const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
   
