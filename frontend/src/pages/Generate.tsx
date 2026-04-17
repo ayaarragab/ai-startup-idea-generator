@@ -196,14 +196,17 @@ export function Generate() {
 
     try {
       let response: any = {};
-      console.log(currentConversationId, );
-      
+      console.log(currentConversationId, clientMessageId);
+      let data = null
+      if (chatMessages[chatMessages.length - 1]?.idea) {
+        data = chatMessages[chatMessages.length - 1]?.idea
+      }
       if (isAuthenticated) {
         response = await axiosInstance.post("/chat/", {
           content: newMessage.content,
           conversationId: currentConversationId,
-          isNewConversation: currentConversationId == '0' ? false : true,
-          history: chatMessages[chatMessages.length - 1]?.idea || null,
+          isNewConversation: currentConversationId == null ? true : false,
+          history: data,
           clientMessageId,
           convSectors: selectedSectorIds
         });
