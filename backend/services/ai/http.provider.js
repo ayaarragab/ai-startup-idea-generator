@@ -24,7 +24,7 @@ const sendChat = async ({ content, conversationId, isNewConversation, history, c
   const data = await response.json();
 
   return {
-    reply: data.reply,
+    reply: data,
     meta: {
       provider: "http"
     }
