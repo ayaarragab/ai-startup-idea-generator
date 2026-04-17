@@ -336,6 +336,8 @@ export function Generate() {
 
     try {
       if (!isCurrentlySaved) {
+        console.log({ ideaId, messageId });
+        
         await axiosInstance.post("idea/saved-ideas", { ideaId, messageId });
       } else {
         await axiosInstance.delete(`idea/saved-ideas/${ideaId}/${messageId}`);
