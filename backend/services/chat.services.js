@@ -3,6 +3,7 @@ import { createConversation } from "./conversation.services.js";
 import { createMessage } from "./message.services.js";
 import { createIdea } from "./idea.services.js";
 import { updateConversationTitle } from "./conversation.services.js";
+import { fetchSectorsNames } from "./sector.services.js";
 
 export const handleChat = async ({ content, conversationId, userId, isNewConversation, history, clientMessageId, convSectors }) => {
   
@@ -12,6 +13,8 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   }
 
   await createMessage(content, conversationId, 'user', clientMessageId)
+  
+  const sectorsNames = await fetchSectorsNames(convSectors);
 
   const aiResponse = await sendChat({
     content,
@@ -19,7 +22,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
     isNewConversation,
     history,
     clientMessageId,
-    convSectors,
+    convSectors: sectorsNames,
     userId,
   });
   const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
