@@ -34,7 +34,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
 
   if (aiResponse.is_full_idea) {
     console.log("ideaaaaaaaaaaaaaaaaaaa");
-    console.log(aiResponse.idea);
+    console.log(aiResponse);
     
     idea__ = await createIdea({ ...aiResponse.idea, messageId: message.id }, convSectors);
   }
