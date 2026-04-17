@@ -6,7 +6,7 @@ import { saveUserIdea, unsaveUserIdea, getSavedIdeas, getSavedIdea } from '../co
 const router = Router();
 
 // save
-router.post('/saved-ideas', authenticate, validateIdeaFields,saveUserIdea);
+router.post('/saved-ideas', authenticate, validateIdeaFields, saveUserIdea);
 
 // unsave
 router.delete('/saved-ideas/:id/:messageid', authenticate, unsaveUserIdea)

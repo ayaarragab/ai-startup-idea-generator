@@ -14,6 +14,8 @@ export const saveUserIdea = async (req, res) => {
     const ideaSaved = await saveIdea(ideaId, userId, messageId);
     
     if (!ideaSaved) {
+      console.log("or here??");
+      
       return res.status(400).json({ message: "Failed to save idea." });      
     }
     
