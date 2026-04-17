@@ -523,7 +523,7 @@ export function Generate() {
                             )}
                             <div
                               className={`max-w-[75%] rounded-lg px-4 py-2.5 ${
-                                message.role === "user" ? "bg-neutral-900 text-white" : "bg-neutral-50 text-neutral-900 border border-neutral-100"
+                                message.role === "user" ? "bg-red-300 text-white" : "bg-neutral-50 text-neutral-900 border border-neutral-100"
                               }`}
                             >
                               <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
