@@ -26,15 +26,9 @@ const sendChat = async ({ content, conversationId, isNewConversation, history, c
   }
 
   const data = await response.json();
-  console.log(data);
-  console.log("body");
-  console.log(data.body);
   
   return {
-    reply: data,
-    meta: {
-      provider: "http"
-    }
+    ...data,
   };
 };
 
