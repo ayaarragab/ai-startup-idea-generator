@@ -15,7 +15,8 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   await createMessage(content, conversationId, 'user', clientMessageId)
   
   const sectorsNames = await fetchSectorsNames(convSectors);
-
+  console.log("type of conv id", typeof conversationId);
+  
   const aiResponse = await sendChat({
     content,
     conversationId,
