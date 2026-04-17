@@ -1,6 +1,6 @@
 const Idea = (sequelize, DataTypes) => {
   const IdeaModel = sequelize.define(
-    'Idea',
+    "Idea",
     {
       // --- Operational Fields ---
       messageId: {
@@ -11,28 +11,29 @@ const Idea = (sequelize, DataTypes) => {
       // --- Problem Space ---
       problemTitle: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       problemDescription: {
         type: DataTypes.TEXT, // Changed to TEXT to allow longer descriptions
-        allowNull: false
+        allowNull: false,
       },
       rootCause: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       targetUsers: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.JSON,
+        allowNull: false,
+        defaultValue: [],
       },
       marketRegion: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'Egypt or MENA'
+        defaultValue: "Egypt or MENA",
       },
       whyNow: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       evidenceSignals: {
         type: DataTypes.JSON,
@@ -43,11 +44,11 @@ const Idea = (sequelize, DataTypes) => {
       // --- Solution Space ---
       solutionName: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       solutionDescription: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: false,
       },
       howItWorks: {
         type: DataTypes.JSON,
@@ -67,7 +68,7 @@ const Idea = (sequelize, DataTypes) => {
       retrivedStartups: {
         type: DataTypes.JSON,
         allowNull: false,
-        defaultValue: [],        
+        defaultValue: [],
       },
       // --- Grouped/Nested JSON Objects ---
       businessModel: {
@@ -87,7 +88,7 @@ const Idea = (sequelize, DataTypes) => {
         defaultValue: {
           technical_feasibility: "Low",
           market_feasibility: "Low",
-          risk_factors: []
+          risk_factors: [],
         },
       },
       noveltyScore: {
@@ -110,18 +111,18 @@ const Idea = (sequelize, DataTypes) => {
       is_deleted: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
-        defaultValue: false
-      }
+        defaultValue: false,
+      },
     },
     {
-      tableName: 'ideas',
+      tableName: "ideas",
       timestamps: true,
-      // Optional: Add `underscored: true` here if your actual database 
+      // Optional: Add `underscored: true` here if your actual database
       // table columns need to be strict snake_case (e.g., problem_title)
-    }
+    },
   );
-  
+
   return IdeaModel;
-}
+};
 
 export default Idea;
