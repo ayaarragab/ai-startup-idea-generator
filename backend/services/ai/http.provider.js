@@ -1,17 +1,19 @@
 import fetch from "node-fetch";
 
 // لما تيجي تربطي اعملي موضوع الtimeout متنسيش 
-const sendChat = async ({ message, conversationId, userId }) => {
+const sendChat = async ({ content, conversationId, isNewConversation, history, clientMessageId, convSectors, userId }) => {
   const response = await fetch(`${process.env.AI_BASE_URL}/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.AI_API_KEY}`
     },
     body: JSON.stringify({
-      message,
+      content,
       conversationId,
-      userId
+      isNewConversation,
+      data: history,
+      clientMessageId,
+      sectors: convSectors,
     })
   });
 
