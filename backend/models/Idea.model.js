@@ -23,7 +23,7 @@ const Idea = (sequelize, DataTypes) => {
       },
       targetUsers: {
         type: DataTypes.JSON,
-        allowNull: false,
+        allowNull: true,
         defaultValue: [],
       },
       marketRegion: {
