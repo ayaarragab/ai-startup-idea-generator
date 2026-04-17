@@ -214,7 +214,7 @@ export function IdeaDetail() {
       </div>
       <div className="flex gap-2 items-center">
         {idea.noveltyScore !== undefined && (
-          <Badge variant="info" size="md">Novelty Score: {idea.noveltyScore}/10</Badge>
+          <Badge variant="info" size="md">Novelty Score: {idea.noveltyScore}/100</Badge>
         )}
         <Button
           variant={saved ? 'primary' : 'outlined'}
