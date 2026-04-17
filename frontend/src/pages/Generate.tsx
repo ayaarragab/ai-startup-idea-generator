@@ -532,7 +532,7 @@ export function Generate() {
                               </span>
                             </div>
                             {message.role === "user" && (
-                              <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center mt-0.5">
+                              <div className="w-8 h-8 rounded-lg bg-red-300 flex items-center justify-center mt-0.5">
                                 <User className="w-4 h-4 text-white" />
                               </div>
                             )}
