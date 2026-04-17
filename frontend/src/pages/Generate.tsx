@@ -538,7 +538,7 @@ export function Generate() {
                             )}
                           </div>
 
-                          {message.role === "ai" && message.is_idea && message.is_full_idea && (
+                          {message.role === "ai" && message.is_full_idea && (
                             <button
                               onClick={() => toggleIdeaSave(message.id, message?.idea?.id)}
                               className={`ml-11 flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors text-sm border ${
