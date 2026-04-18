@@ -52,13 +52,14 @@ export const handleChatWithoutAuth = async ({ content, isNewConversation, histor
       isNewConversation: true,
       history,
       clientMessageId: '-11111',
-      convSectors
+      convSectors,
+      userId: -1
     });
     const { data: _, ...aiResponseWithoutIdea } = aiResponse;
     let idea__ = null;
 
     if (aiResponse.is_full_idea) {
-      idea__ = await createIdea({ ...data }, convSectors);
+      idea__ = await createIdea({ ...aiResponse.data }, convSectors);
     }
   return { ...aiResponseWithoutIdea, idea: idea__ };
   
