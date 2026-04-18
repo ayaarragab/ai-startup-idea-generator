@@ -28,7 +28,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   });
   const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
   
-  const message = await createMessage(aiResponse.content, aiResponse.conversationId, 'ai', clientMessageId, aiResponse.is_idea, aiResponse.is_full_idea)
+  const message = await createMessage(aiResponse.content, aiResponse.conversationId, 'ai', clientMessageId, aiResponse.is_full_idea, aiResponse.is_full_idea)
 
   let idea__ = null;
 
@@ -48,14 +48,17 @@ export const handleChatWithoutAuth = async ({ content, isNewConversation, histor
   try {
     const aiResponse = await sendChat({
       content,
+      conversationId: -1,
+      isNewConversation: true,
       history,
+      clientMessageId: '-11111',
       convSectors
     });
-    const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
+    const { data: _, ...aiResponseWithoutIdea } = aiResponse;
     let idea__ = null;
 
-    if (aiResponse.is_idea && aiResponse.is_full_idea) {
-      idea__ = await createIdea({ ...aiResponse.idea }, convSectors);
+    if (aiResponse.is_full_idea) {
+      idea__ = await createIdea({ ...data }, convSectors);
     }
   return { ...aiResponseWithoutIdea, idea: idea__ };
   
