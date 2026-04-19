@@ -13,8 +13,7 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 passport.use(new GoogleStrategy({
   clientID:     GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://ai-startup-idea-generator-production-3a4e.up.railway.app/auth/google/callback",
-  passReqToCallback: true
+callbackURL: "https://ai-startup-idea-generator.netlify.app/api/auth/google/callback",  passReqToCallback: true
   },
   async function(request, accessToken, refreshToken, profile, done) {
   try {

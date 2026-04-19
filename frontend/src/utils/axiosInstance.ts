@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "https://ai-startup-idea-generator-production-3a4e.up.railway.app";
+const baseURL = "/api";
 
 const instance = axios.create({
   baseURL: baseURL,
