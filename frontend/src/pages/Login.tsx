@@ -56,7 +56,7 @@ export function Login() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "https://ai-startup-idea-generator.netlify.app/google";
+    window.location.href = "https://ai-startup-idea-generator-production-3a4e.up.railway.app/google";
   };
 
   return (
