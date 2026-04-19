@@ -4,7 +4,7 @@ const { Idea, User, Message } = db;
 
 export const createIdea = async (ideaDetails, convSectors) => {
   console.log(ideaDetails);
-  
+
   try {
     const mappedData = {
       messageId: ideaDetails.messageId,
@@ -15,22 +15,22 @@ export const createIdea = async (ideaDetails, convSectors) => {
       marketRegion: ideaDetails.market_region,
       whyNow: ideaDetails.why_now,
       evidenceSignals: ideaDetails.evidence_signals,
-      
+
       solutionName: ideaDetails.solution_name,
       solutionDescription: ideaDetails.solution_description,
       howItWorks: ideaDetails.how_it_works,
       keyFeatures: ideaDetails.key_features,
       technologyStack: ideaDetails.technology_stack,
-      
+
       businessModel: ideaDetails.business_model,
       marketAnalysis: ideaDetails.market_analysis,
       feasibility: ideaDetails.feasibility,
       noveltyScore: ideaDetails.novelty_score,
       impact: ideaDetails.impact,
       mvpPlan: ideaDetails.mvp_plan,
-      retrivedStartups: ideaDetails.retrived_startups,
+      inspiredBy: ideaDetails.inspired_by,
 
-      is_deleted: ideaDetails.is_deleted || false
+      is_deleted: ideaDetails.is_deleted || false,
     };
     const idea = await Idea.create({ ...mappedData });
     if (convSectors.length > 0) {
@@ -41,28 +41,27 @@ export const createIdea = async (ideaDetails, convSectors) => {
       include: [
         {
           model: db.Sector,
-          as: 'sectors',
-          attributes: ['id', 'name'],
-          through: { attributes: [] }
-        }
-      ]
-    })
+          as: "sectors",
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+        },
+      ],
+    });
 
     return updatedIdea ? updatedIdea.toJSON() : null;
   } catch (error) {
     console.error("Error creating idea:", error);
     throw error; // rethrow the error for further handling
   }
-}
+};
 
 export const saveIdea = async (ideaId, userId, messageId) => {
-
   const user = await User.findByPk(userId);
   if (!user) throw new Error("User not found");
 
   const idea = await Idea.findByPk(ideaId);
   if (!idea) throw new Error("Idea not found");
-  
+
   const message = await Message.findByPk(messageId);
   if (!message) throw new Error("Message not found");
 
@@ -77,13 +76,13 @@ export const findIdea = async (id) => {
   try {
     const idea = await Idea.findByPk(id);
     if (!idea) {
-      return false; 
+      return false;
     }
     return true;
   } catch (error) {
     return true;
   }
-}
+};
 
 export const findIdeaWithMessageId = async (messageId) => {
   try {
@@ -100,12 +99,12 @@ export const unsaveIdea = async (ideaId, userId, messageId) => {
 
   const idea = await Idea.findByPk(ideaId);
   if (!idea) throw new Error("Idea not found");
-  
+
   const message = await Message.findByPk(messageId);
   if (message) {
     message.is_idea_saved = false;
     await message.save();
-  };
+  }
 
   await user.removeIdea(ideaId);
 
@@ -113,7 +112,7 @@ export const unsaveIdea = async (ideaId, userId, messageId) => {
 };
 
 export const fetchSavedIdeas = async (userId) => {
-  try {    
+  try {
     const user = await User.findByPk(userId);
     const ideas = await user.getIdeas();
     for (const idea of ideas) {
@@ -123,29 +122,30 @@ export const fetchSavedIdeas = async (userId) => {
         : [];
       idea.dataValues.sectors = sectorJson;
     }
-          
-    return ideas.sort((a, b) => b.createdAt - a.createdAt);
 
+    return ideas.sort((a, b) => b.createdAt - a.createdAt);
   } catch (error) {
     return false;
   }
-}
+};
 
 export const fetchSavedIdea = async (userId, ideaId) => {
   try {
     const user = await User.findByPk(userId);
     if (!user) throw new Error("User not found");
-    
+
     const ideas = await user.getIdeas({ where: { id: ideaId } });
-    
+
     const ideasJSON = ideas[0].toJSON();
     const sectorsJSON = await ideas[0].getSectors();
-    
+
     const targetUsers = JSON.parse(ideasJSON.targetUsers);
 
-    return ideas.length > 0 ? { ...ideasJSON, sectors: sectorsJSON, targetUsers } : null;
+    return ideas.length > 0
+      ? { ...ideasJSON, sectors: sectorsJSON, targetUsers }
+      : null;
   } catch (error) {
     console.error("Error fetching saved idea:", error);
     throw error;
   }
-}
+};

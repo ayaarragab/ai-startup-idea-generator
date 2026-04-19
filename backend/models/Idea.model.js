@@ -65,7 +65,7 @@ const Idea = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: [],
       },
-      retrivedStartups: {
+      inspiredBy: {
         type: DataTypes.JSON,
         allowNull: false,
         defaultValue: [],
