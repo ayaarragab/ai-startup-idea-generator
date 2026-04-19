@@ -69,8 +69,7 @@ export function Signup() {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "https://api/auth/google";
-  };
+window.location.href = "https://ai-startup-idea-generator.netlify.app/api/auth/google";  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 py-8 px-4">
