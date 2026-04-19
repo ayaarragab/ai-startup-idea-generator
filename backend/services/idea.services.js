@@ -140,8 +140,10 @@ export const fetchSavedIdea = async (userId, ideaId) => {
     
     const ideasJSON = ideas[0].toJSON();
     const sectorsJSON = await ideas[0].getSectors();
+    
+    const targetUsers = JSON.parse(ideasJSON.targetUsers);
 
-    return ideas.length > 0 ? { ...ideasJSON, sectors: sectorsJSON } : null;
+    return ideas.length > 0 ? { ...ideasJSON, sectors: sectorsJSON, targetUsers } : null;
   } catch (error) {
     console.error("Error fetching saved idea:", error);
     throw error;
