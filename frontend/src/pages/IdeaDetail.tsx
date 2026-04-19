@@ -24,7 +24,7 @@ interface IdeaData {
   problemTitle: string;
   problemDescription: string;
   rootCause: string;
-  targetUsers: string;
+  targetUsers: string[];
   marketRegion: string;
   whyNow: string;
   evidenceSignals: any[];
@@ -249,7 +249,7 @@ export function IdeaDetail() {
       </Tag>
 
       {/* 3. Target Users */}
-      {idea.targetUsers?.split(',').slice(0, 3).map((user, idx) => (
+      {idea.targetUsers.map((user, idx) => (
         <Tag key={idx} variant="secondary">{user.trim()}</Tag>
       ))}
     </div>
