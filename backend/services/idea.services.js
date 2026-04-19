@@ -122,7 +122,8 @@ export const fetchSavedIdeas = async (userId) => {
         : [];
       idea.dataValues.sectors = sectorJson;
     }
-
+    console.log(ideas);
+    
     return ideas.sort((a, b) => b.createdAt - a.createdAt);
   } catch (error) {
     return false;
