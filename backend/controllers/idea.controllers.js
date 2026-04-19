@@ -53,6 +53,7 @@ export const getSavedIdeas = async (req, res) => {
   try {
     const userId = req.user.id;
     const ideas = await fetchSavedIdeas(userId);
+    console.log("ideas", console.log(ideas));
     if (ideas.length > 0) {
       return res.status(200).json({ ideas });
     } else {
