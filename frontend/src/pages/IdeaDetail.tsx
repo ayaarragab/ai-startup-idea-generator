@@ -312,7 +312,15 @@ export function IdeaDetail() {
               <div className="space-y-6">
                 <Card variant="elevated" padding="lg">
                   <h5 className="text-neutral-900 mb-4">Target Audience</h5>
-                  <p className="text-neutral-700">{idea.targetUsers}</p>
+                  {idea.targetUsers?.length > 0 ? (
+                    <ul className="list-disc pl-5 text-neutral-700 space-y-1">
+                      {idea.targetUsers.map((user, idx) => (
+                        <li key={idx}>{user.trim()}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-neutral-500 text-sm">Not specified</p>
+                  )}
                 </Card>
 
                 <Card variant="elevated" padding="lg">
