@@ -628,11 +628,11 @@ export function IdeaDetail() {
             <div>
               <Card variant="elevated" padding="lg" className="mb-6">
                 <h4 className="text-neutral-900 mb-2">
-                  Evidence & Retrieved Startups
+                  Evidence & Inspiring Startups
                 </h4>
                 <p className="text-neutral-600">
-                  Market signals and similar startups retrieved during idea
-                  generation.
+                  Market signals and startups the model was inspired by during
+                  idea generation.
                 </p>
               </Card>
 
@@ -666,10 +666,10 @@ export function IdeaDetail() {
                   </div>
                 </div>
 
-                {/* Retrieved Startups */}
+                {/* Inspiring Startups */}
                 <div>
                   <h5 className="text-neutral-800 mb-4 border-b pb-2">
-                    Similar Startups
+                    Inspiring Startups
                   </h5>
                   <div className="space-y-3">
                     {idea.inspiredBy?.length > 0 ? (
