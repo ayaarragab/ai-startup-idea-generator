@@ -140,8 +140,15 @@ export const fetchSavedIdea = async (userId, ideaId) => {
     const ideasJSON = ideas[0].toJSON();
     const sectorsJSON = await ideas[0].getSectors();
 
-    const targetUsers = JSON.parse(ideasJSON.targetUsers);
+    let targetUsers = ideasJSON.targetUsers;
 
+    if (typeof targetUsers === "string") {
+      try {
+        targetUsers = JSON.parse(targetUsers);
+      } catch (error) {
+        targetUsers = targetUsers.split(",");
+      }
+    }
     return ideas.length > 0
       ? { ...ideasJSON, sectors: sectorsJSON, targetUsers }
       : null;
