@@ -147,7 +147,7 @@ export function Dashboard() {
                 </div>
               </div>
               <div className="flex gap-3">
-                <select
+                {/* <select
                   value={selectedSector}
                   onChange={(e) => setSelectedSector(e.target.value)}
                   className="px-4 py-2.5 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -157,7 +157,7 @@ export function Dashboard() {
                       {sector === 'all' ? 'All Sectors' : sector}
                     </option>
                   ))}
-                </select>
+                </select> */}
                 {/* View Toggles */}
                 <div className="flex border border-neutral-300 rounded-lg overflow-hidden">
                   <button onClick={() => setViewMode('grid')} className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-primary-50 text-primary-600' : 'text-neutral-600'}`}><Grid className="w-5 h-5" /></button>
