@@ -25,6 +25,8 @@ import dotenv from "dotenv";
 const router = Router();
 dotenv.config();
 
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
 router.post("/signup", validateCredentialsSignup, signup);
 
 router.post("/verify-email", validateOTPAndEmail, verifyEmail);
@@ -70,7 +72,7 @@ router.get("/google/callback", (req, res, next) => {
 router.get("/logout", (req, res) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
-  res.redirect(`https://ai-startup-idea-generator.netlify.app/`);
+  res.redirect(`${FRONTEND_URL}`);
 });
 
 export default router;
