@@ -35,11 +35,17 @@ jobs:
         working-directory: backend
         run: npm run test --if-present
 
+      # خطوة جديدة: ضغط ملفات الباك إند بعد الـ Build
+      - name: Zip artifact for deployment
+        working-directory: backend
+        run: zip -r release.zip .
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: backend
+          # بنرفع الملف المضغوط بس
+          path: backend/release.zip 
 
   deploy:
     runs-on: ubuntu-latest
@@ -66,4 +72,5 @@ jobs:
         with:
           app-name: 'ai-startup-idea-generator'
           slot-name: 'Production'
-          package: backend
+          # التعديل هنا: بنقول لـ Azure يرفع الملف المضغوط
+          package: release.zip
