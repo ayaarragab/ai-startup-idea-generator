@@ -141,6 +141,7 @@ export const fetchSavedIdea = async (userId, ideaId) => {
     const sectorsJSON = await ideas[0].getSectors();
 
     let targetUsers = ideasJSON.targetUsers;
+    let inspiredBy = ideasJSON.inspiredBy;
 
     if (typeof targetUsers === "string") {
       try {
@@ -149,8 +150,17 @@ export const fetchSavedIdea = async (userId, ideaId) => {
         targetUsers = targetUsers.split(",");
       }
     }
+
+    if (typeof inspiredBy === "string") {
+      try {
+        inspiredBy = JSON.parse(inspiredBy);
+      } catch (error) {
+        inspiredBy = inspiredBy.split(","); 
+      }
+    }
+
     return ideas.length > 0
-      ? { ...ideasJSON, sectors: sectorsJSON, targetUsers }
+      ? { ...ideasJSON, sectors: sectorsJSON, targetUsers, inspiredBy }
       : null;
   } catch (error) {
     console.error("Error fetching saved idea:", error);
