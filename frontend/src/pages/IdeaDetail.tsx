@@ -673,7 +673,7 @@ export function IdeaDetail() {
                   </h5>
                   <div className="space-y-3">
                     {idea.inspiredBy?.length > 0 ? (
-                      idea.inspiredBy.map((startup: any, index: number) => (
+                      idea.inspiredBy?.map((startup: any, index: number) => (
                         <Card
                           key={index}
                           variant="bordered"
