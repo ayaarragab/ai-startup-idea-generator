@@ -125,6 +125,9 @@ export function IdeaDetail() {
   // UPDATED: Pitch slides generated from new fields
   const generatePitchSlides = () => {
     if (!idea) return [];
+    console.log(idea.inspiredBy);
+    console.log(typeof idea.inspiredBy);
+    
     return [
       {
         title: idea.solutionName,
