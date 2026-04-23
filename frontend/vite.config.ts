@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: "autoUpdate", // بيعمل تحديث للـ app تلقائياً لما ترفعي كود جديد
+      registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png"],
       manifest: {
         name: "AI Startup Idea Generator",
@@ -16,7 +16,7 @@ export default defineConfig({
           "Generate business models and identify societal needs in the Egyptian market.",
         theme_color: "#ffffff",
         background_color: "#ffffff",
-        display: "standalone", // عشان يفتح كأنه أبلكيشن منفصل بدون شريط المتصفح
+        display: "standalone",
         icons: [
           {
             src: "pwa-192x192.png",
@@ -28,6 +28,19 @@ export default defineConfig({
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",
+          },
+        ],
+      },
+      // إعدادات الـ Workbox المضافة لحل مشكلة الـ API
+      workbox: {
+        navigateFallbackDenylist: [/^\/api/], // يمنع إرجاع index.html لطلبات الـ API
+        runtimeCaching: [
+          {
+            urlPattern: /^\/api\/.*/i, // يطابق أي مسار يبدأ بـ /api/
+            handler: "NetworkOnly", // يجبر المتصفح على الاتصال بالسيرفر مباشرة بدون استخدام الكاش
+            options: {
+              cacheName: "api-cache",
+            },
           },
         ],
       },
