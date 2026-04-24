@@ -242,8 +242,7 @@ export function IdeaDetail() {
                     {idea.problemTitle}
                   </p>
                 </div>
-                <div className="flex gap-2 items-center">
-                  {idea.noveltyScore !== undefined && (
+                <div className="flex flex-col sm:flex-row gap-2 items-center">                  {idea.noveltyScore !== undefined && (
                     <Badge variant="info" size="md">
                       Novelty Score: {idea.noveltyScore}/100
                     </Badge>
