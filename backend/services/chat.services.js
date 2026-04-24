@@ -46,13 +46,15 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
 
 export const handleChatWithoutAuth = async ({ content, isNewConversation, history, convSectors }) => {
   try {
+    const sectorsNames = await fetchSectorsNames(convSectors);
+
     const aiResponse = await sendChat({
       content,
       conversationId: -1,
       isNewConversation: true,
       history,
       clientMessageId: '-11111',
-      convSectors,
+      convSectors: sectorsNames,
       userId: -1
     });
     const { data: _, ...aiResponseWithoutIdea } = aiResponse;
