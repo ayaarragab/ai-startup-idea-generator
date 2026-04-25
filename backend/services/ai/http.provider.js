@@ -15,13 +15,14 @@ const sendChat = async ({ content, conversationId, isNewConversation, history, c
       content,
       conversationId,
       isNewConversation,
-      data: history,
+      history,
       clientMessageId,
       sectors: convSectors,
       lastIdea
     })
   });
   console.log(
+    "after",
     {
       content,
       conversationId,
