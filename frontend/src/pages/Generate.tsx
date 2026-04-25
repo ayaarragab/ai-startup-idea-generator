@@ -161,15 +161,15 @@ export function Generate() {
         setCurrentConversationId("-1");
       }
 
-      const welcomeMsg: ChatMessage = {
-        id: "welcome",
-        role: "ai",
-        content:
-          "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea. What problem would you like to explore?",
-        createdAt: new Date().toISOString(),
-        convSectors: [],
-      };
-      setChatMessages([welcomeMsg]);
+      // const welcomeMsg: ChatMessage = {
+      //   id: "welcome",
+      //   role: "ai",
+      //   content:
+      //     "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea. What problem would you like to explore?",
+      //   createdAt: new Date().toISOString(),
+      //   convSectors: [],
+      // };
+      setChatMessages([]);
       setCurrentStep(2);
 
       if (isAuthenticated) {
@@ -207,12 +207,19 @@ export function Generate() {
       if (chatMessages[chatMessages.length - 1]?.idea) {
         data = chatMessages[chatMessages.length - 1]?.idea;
       }
+
+      const history = chatMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
       if (isAuthenticated) {
         response = await axiosInstance.post("/chat/", {
           content: newMessage.content,
           conversationId: currentConversationId,
           isNewConversation: currentConversationId == null ? true : false,
-          history: data,
+          lastIdea: data,
+          history: history.slice(0, 10),
           clientMessageId,
           convSectors: selectedSectorIds,
         });
@@ -221,7 +228,8 @@ export function Generate() {
           content: newMessage.content,
           conversationId: currentConversationId,
           isNewConversation: !currentConversationId,
-          history: data,
+          lastIdea: data,
+          history: history.slice(0, 10),
           clientMessageId,
           convSectors: selectedSectorIds,
         });

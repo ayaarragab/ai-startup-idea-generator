@@ -5,7 +5,7 @@ import { createIdea } from "./idea.services.js";
 import { updateConversationTitle } from "./conversation.services.js";
 import { fetchSectorsNames } from "./sector.services.js";
 
-export const handleChat = async ({ content, conversationId, userId, isNewConversation, history, clientMessageId, convSectors }) => {
+export const handleChat = async ({ content, conversationId, userId, isNewConversation, history, clientMessageId, convSectors, lastIdea }) => {
   
   if (isNewConversation) {
     const conversation = await createConversation(userId, convSectors);
@@ -23,6 +23,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
     isNewConversation,
     history,
     clientMessageId,
+    lastIdea,
     convSectors: sectorsNames,
     userId,
   });
@@ -44,7 +45,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   return { ...aiResponseWithoutIdea, messageId: message.id, clientMessageId, idea: idea__ };
 }
 
-export const handleChatWithoutAuth = async ({ content, isNewConversation, history, convSectors }) => {
+export const handleChatWithoutAuth = async ({ content, isNewConversation, history, convSectors, lastIdea }) => {
   try {
     const sectorsNames = await fetchSectorsNames(convSectors);
 
@@ -54,6 +55,7 @@ export const handleChatWithoutAuth = async ({ content, isNewConversation, histor
       isNewConversation: true,
       history,
       clientMessageId: '-11111',
+      lastIdea,
       convSectors: sectorsNames,
       userId: -1
     });
