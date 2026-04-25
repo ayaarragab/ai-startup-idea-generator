@@ -15,7 +15,16 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   await createMessage(content, conversationId, 'user', clientMessageId)
   
   const sectorsNames = await fetchSectorsNames(convSectors);
-  console.log("type of conv id", typeof conversationId);
+  console.log("before",
+    {
+      content,
+      conversationId,
+      isNewConversation,
+      history,
+      clientMessageId,
+      sectors: convSectors,
+      lastIdea
+    })
   
   const aiResponse = await sendChat({
     content,
@@ -48,7 +57,6 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
 export const handleChatWithoutAuth = async ({ content, isNewConversation, history, convSectors, lastIdea }) => {
   try {
     const sectorsNames = await fetchSectorsNames(convSectors);
-
     const aiResponse = await sendChat({
       content,
       conversationId: -1,
