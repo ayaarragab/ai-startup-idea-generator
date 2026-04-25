@@ -204,6 +204,7 @@ export function Generate() {
       let response: any = {};
       console.log(currentConversationId, clientMessageId);
       let data = null;
+      
       if (chatMessages[chatMessages.length - 1]?.idea) {
         data = chatMessages[chatMessages.length - 1]?.idea;
       }
@@ -219,7 +220,7 @@ export function Generate() {
           conversationId: currentConversationId,
           isNewConversation: currentConversationId == null ? true : false,
           lastIdea: data,
-          history: history.slice(0, 10),
+          history: history.slice(-10),
           clientMessageId,
           convSectors: selectedSectorIds,
         });
