@@ -216,9 +216,6 @@ export function Generate() {
           break;
         }
       }
-      console.log(chatMessages);
-      
-      console.log(lastIdea);
       
       if (isAuthenticated) {
         response = await axiosInstance.post("/chat/", {
