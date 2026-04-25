@@ -212,15 +212,18 @@ export function Generate() {
       const history = chatMessages.map((m) => ({
         role: m.role,
         content: m.content,
-      }));
-
+      })).slice(-10);
+      
+      console.log(history);
+      console.log(chatMessages);
+      
       if (isAuthenticated) {
         response = await axiosInstance.post("/chat/", {
           content: newMessage.content,
           conversationId: currentConversationId,
           isNewConversation: currentConversationId == null ? true : false,
           lastIdea: data,
-          history: history.reverse().slice(10),
+          history,
           clientMessageId,
           convSectors: selectedSectorIds,
         });
