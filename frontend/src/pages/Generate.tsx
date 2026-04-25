@@ -220,7 +220,7 @@ export function Generate() {
           conversationId: currentConversationId,
           isNewConversation: currentConversationId == null ? true : false,
           lastIdea: data,
-          history: history.slice(10),
+          history: history.reverse().slice(10),
           clientMessageId,
           convSectors: selectedSectorIds,
         });
