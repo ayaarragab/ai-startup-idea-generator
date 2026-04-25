@@ -21,6 +21,17 @@ const sendChat = async ({ content, conversationId, isNewConversation, history, c
       lastIdea
     })
   });
+  console.log(
+    {
+      content,
+      conversationId,
+      isNewConversation,
+      data: history,
+      clientMessageId,
+      sectors: convSectors,
+      lastIdea
+    }
+  );
   
   if (!response.ok) {
     throw new Error("AI service error");
