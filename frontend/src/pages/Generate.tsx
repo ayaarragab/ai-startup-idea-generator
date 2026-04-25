@@ -214,9 +214,6 @@ export function Generate() {
         content: m.content,
       })).slice(-10);
       
-      console.log(history);
-      console.log(chatMessages);
-      
       if (isAuthenticated) {
         response = await axiosInstance.post("/chat/", {
           content: newMessage.content,
@@ -233,7 +230,7 @@ export function Generate() {
           conversationId: currentConversationId,
           isNewConversation: !currentConversationId,
           lastIdea: data,
-          history: history.slice(0, 10),
+          history: history,
           clientMessageId,
           convSectors: selectedSectorIds,
         });
