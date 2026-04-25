@@ -202,24 +202,27 @@ export function Generate() {
 
     try {
       let response: any = {};
-      console.log(currentConversationId, clientMessageId);
-      let data = null;
-
-      if (chatMessages[chatMessages.length - 1]?.idea) {
-        data = chatMessages[chatMessages.length - 1]?.idea;
-      }
 
       const history = chatMessages.map((m) => ({
         role: m.role,
         content: m.content,
       })).slice(-10);
       
+      let lastIdea = null;
+      const msgs_rev = chatMessages.reverse()
+      for (const msg of msgs_rev) {
+        if (msg.idea) {
+          lastIdea = msg.idea;
+          break;
+        }
+      }
+
       if (isAuthenticated) {
         response = await axiosInstance.post("/chat/", {
           content: newMessage.content,
           conversationId: currentConversationId,
           isNewConversation: currentConversationId == null ? true : false,
-          lastIdea: data,
+          lastIdea,
           history,
           clientMessageId,
           convSectors: selectedSectorIds,
@@ -229,7 +232,7 @@ export function Generate() {
           content: newMessage.content,
           conversationId: currentConversationId,
           isNewConversation: !currentConversationId,
-          lastIdea: data,
+          lastIdea,
           history: history,
           clientMessageId,
           convSectors: selectedSectorIds,
