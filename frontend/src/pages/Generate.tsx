@@ -206,7 +206,7 @@ export function Generate() {
       const history = chatMessages.map((m) => ({
         role: m.role,
         content: m.content,
-      })).slice(-10);
+      })).slice(-3);
       
       let lastIdea = null;
       const msgs_rev = chatMessages.reverse()
