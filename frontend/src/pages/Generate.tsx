@@ -196,20 +196,20 @@ export function Generate() {
       convSectors: selectedSectorIds,
     };
 
+    // 1. Update user message and start typing indicator
     setChatMessages((prev) => [...prev, newMessage]);
     setUserInput("");
     setIsAITyping(true);
 
     try {
-      let response: any = {};
-
-      const history = chatMessages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })).slice(-3);
+      // 2. Get history WITHOUT mutating the original state array
+      const history = chatMessages
+        .map((m) => ({ role: m.role, content: m.content }))
+        .slice(-3);
       
+      // 3. Find the last idea using a copy to avoid in-place reversal
       let lastIdea = null;
-      const msgs_rev = chatMessages.reverse()
+      const msgs_rev = [...chatMessages].reverse(); 
       for (const msg of msgs_rev) {
         if (msg.idea) {
           lastIdea = msg.idea;
@@ -217,44 +217,38 @@ export function Generate() {
         }
       }
       
-      if (isAuthenticated) {
-        response = await axiosInstance.post("/chat/", {
-          content: newMessage.content,
-          conversationId: currentConversationId,
-          isNewConversation: currentConversationId == null ? true : false,
-          lastIdea,
-          history,
-          clientMessageId,
-          convSectors: selectedSectorIds,
-        });
-      } else {
-        response = await axiosInstance.post("/chat/without-auth", {
-          content: newMessage.content,
-          conversationId: currentConversationId,
-          isNewConversation: !currentConversationId,
-          lastIdea,
-          history: history,
-          clientMessageId,
-          convSectors: selectedSectorIds,
-        });
-      }
+      const payload = {
+        content: newMessage.content,
+        conversationId: currentConversationId,
+        isNewConversation: currentConversationId == null,
+        lastIdea,
+        history,
+        clientMessageId,
+        convSectors: selectedSectorIds,
+      };
+
+      const response = isAuthenticated 
+        ? await axiosInstance.post("/chat/", payload)
+        : await axiosInstance.post("/chat/without-auth", payload);
 
       const aiResponseData = response.data;
 
       if (aiResponseData.is_idea) {
         setCurrentIdea(aiResponseData.idea);
       }
+
       if (aiResponseData.conversation_title) {
         setConversations((prev) =>
           prev.map((conv) =>
             conv.id === currentConversationId
               ? { ...conv, title: aiResponseData.conversation_title }
-              : conv,
-          ),
+              : conv
+          )
         );
       }
+
       const aiMessage: ChatMessage = {
-        id: aiResponseData.messageId || Date.now(),
+        id: aiResponseData.messageId || `ai-${Date.now()}`, // Ensure unique ID
         role: "ai",
         content: aiResponseData.content,
         createdAt: new Date().toISOString(),
@@ -265,14 +259,16 @@ export function Generate() {
         convSectors: [],
       };
 
+      // 4. Append AI message to the current state
       setChatMessages((prev) => [...prev, aiMessage]);
 
+      // Update conversation timestamp
       setConversations((prev) =>
         prev.map((conv) =>
           conv.id === currentConversationId
             ? { ...conv, updatedAt: new Date().toISOString() }
-            : conv,
-        ),
+            : conv
+        )
       );
     } catch (error) {
       console.error("Error in chat:", error);
