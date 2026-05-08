@@ -15,16 +15,7 @@ export const handleChat = async ({ content, conversationId, userId, isNewConvers
   await createMessage(content, conversationId, 'user', clientMessageId)
   
   const sectorsNames = await fetchSectorsNames(convSectors);
-  console.log("before",
-    {
-      content,
-      conversationId,
-      isNewConversation,
-      history,
-      clientMessageId,
-      sectors: convSectors,
-      lastIdea
-    })
+
   
   const aiResponse = await sendChat({
     content,
