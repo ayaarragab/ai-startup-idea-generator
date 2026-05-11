@@ -17,6 +17,7 @@ import {
   Clock,
   Save,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { Tag } from "../components/Tag";
 import { toast } from "react-toastify";
 
@@ -593,23 +594,43 @@ export function Generate() {
                                 <Bot className="w-4 h-4 text-neutral-600" />
                               </div>
                             )}
-                            <div
-                              className={`max-w-[75%] rounded-lg px-4 py-2.5 ${
-                                message.role === "user"
-                                  ? "bg-red-300 text-white"
-                                  : "bg-neutral-50 text-neutral-900 border border-neutral-100"
-                              }`}
-                            >
+                          <div
+                            className={`max-w-[75%] rounded-lg px-4 py-2.5 ${
+                              message.role === "user"
+                                ? "bg-red-300 text-white"
+                                : "bg-neutral-50 text-neutral-900 border border-neutral-100"
+                            }`}
+                          >
+                            {message.role === "ai" ? (
+                              <div className="text-sm leading-relaxed break-words">
+                                <ReactMarkdown
+                                  components={{
+                                    h1: ({ node, ...props }) => <h1 className="text-xl font-bold mt-4 mb-2 text-neutral-900" {...props} />,
+                                    h2: ({ node, ...props }) => <h2 className="text-lg font-bold mt-3 mb-2 text-neutral-900" {...props} />,
+                                    h3: ({ node, ...props }) => <h3 className="text-base font-bold mt-2 mb-1 text-neutral-900" {...props} />,
+                                    p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                                    ul: ({ node, ...props }) => <ul className="list-disc ml-5 mb-2" {...props} />,
+                                    ol: ({ node, ...props }) => <ol className="list-decimal ml-5 mb-2" {...props} />,
+                                    li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                                    strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
+                                  }}
+                                >
+                                  {message.content}
+                                </ReactMarkdown>
+                              </div>
+                            ) : (
+                              // Keep plain text formatting for user messages
                               <p className="text-sm leading-relaxed whitespace-pre-wrap">
                                 {message.content}
                               </p>
-                              <span className="text-xs mt-1.5 block text-neutral-400">
-                                {new Date(message.createdAt).toLocaleTimeString(
-                                  [],
-                                  { hour: "2-digit", minute: "2-digit" },
-                                )}
-                              </span>
-                            </div>
+                            )}
+                            <span className="text-xs mt-1.5 block text-neutral-400">
+                              {new Date(message.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          </div>
                             {message.role === "user" && (
                               <div className="w-8 h-8 rounded-lg bg-red-300 flex items-center justify-center mt-0.5">
                                 <User className="w-4 h-4 text-white" />
