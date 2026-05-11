@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { Card } from "../components/Card";
@@ -97,7 +97,8 @@ export function Generate() {
   const [userInput, setUserInput] = useState("");
   const [isAITyping, setIsAITyping] = useState(false);
   const [showConversations, setShowConversations] = useState(false);
-
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
   // FETCH: Dynamic Sectors from Backend
   useEffect(() => {
     const fetchSectors = async () => {
@@ -201,7 +202,9 @@ export function Generate() {
     setChatMessages((prev) => [...prev, newMessage]);
     setUserInput("");
     setIsAITyping(true);
-
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
     try {
       // 2. Get history WITHOUT mutating the original state array
       const history = chatMessages
@@ -680,18 +683,28 @@ export function Generate() {
 
                     <div className="pt-4 border-t border-neutral-200">
                       <div className="flex items-end gap-2">
-                        <input
-                          type="text"
+                        <textarea
+                          ref={textareaRef}
                           value={userInput}
-                          onChange={(e) => setUserInput(e.target.value)}
-                          onKeyPress={(e) =>
-                            e.key === "Enter" &&
-                            !e.shiftKey &&
-                            handleSendMessage()
-                          }
+                          onChange={(e) => {
+                            setUserInput(e.target.value);
+                            if (textareaRef.current) {
+                              textareaRef.current.style.height = "auto";
+                              textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              if (userInput.trim() !== "") {
+                                handleSendMessage();
+                              }
+                            }
+                          }}
                           placeholder="Type your message..."
                           disabled={isAITyping}
-                          className="flex-1 px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:bg-white focus:border-neutral-400 transition-all"
+                          rows={1}
+                          className="flex-1 px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:bg-white focus:border-neutral-400 transition-all resize-none overflow-y-auto max-h-[150px]"
                         />
                         <button
                           onClick={handleSendMessage}
