@@ -24,6 +24,14 @@ export const findUserById = async (id) => {
 };
 
 export const handleExistingUser = async (user, password, res) => {
+  
+  if (!user.password) {
+    return res.status(400).json({
+      error: "OAuth account detected",
+      message: "You've signed up with google, please continue with google."
+    });
+  }
+  
   const isCorrectPassword = await compareTexts(password, user.password);
   if (isCorrectPassword) {
     const accessToken = generateAccessToken({
