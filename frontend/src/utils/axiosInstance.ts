@@ -27,16 +27,20 @@ instance.interceptors.response.use(
     const isRetry = request._retry;
     const isRefreshRoute = request.url.includes("/auth/refresh-token");
 
-    if (status === 401 && !isRetry && !isRefreshRoute) {
+if (status === 401 && !isRetry && !isRefreshRoute) {
       request._retry = true;
       try {
         await instance.post("/auth/refresh-token");
         return instance(request);
-      } catch (error) {
-        window.location.href = "/login";
-        return Promise.reject(error);
+      } catch (refreshError) {
+        // التعديل هنا: التأكد من المسار الحالي قبل التوجيه
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+        return Promise.reject(refreshError);
       }
     }
+    return Promise.reject(error);
   },
 );
 

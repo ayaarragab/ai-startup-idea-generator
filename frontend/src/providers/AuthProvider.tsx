@@ -69,12 +69,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   return false;
   }
 
-  const login = async (email='', password='') => {
+const login = async (email='', password='') => {
     try {
       const res = await axios.post('/auth/login', {
         email, password
       });
-      if (res.status == 200) {
+      
+      if (res?.status === 200) {
         const me = await axios.get("/auth/me");
 
         setUser(me.data);
@@ -82,17 +83,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         toast.success("Login successful!");
         return true;
-      } else {
-        toast.error(res.data.error);      
-        setIsAuthenticated(false);
-        return false;
       }
+      console.log(res);
     } catch (error: any) {    
-      console.log(error.response);
+      console.log(error);
       
-      toast.error(error.response?.data?.error || "Login failed");
+      const errorMessage = 
+        error.response?.data?.message || 
+        error.response?.data?.error || 
+        "Login failed";
+
+      toast.error(errorMessage);      
       setIsAuthenticated(false);
     }
+    
     return false;
   }
 

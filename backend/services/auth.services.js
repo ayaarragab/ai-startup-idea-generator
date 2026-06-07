@@ -23,9 +23,9 @@ export const findUserById = async (id) => {
   return user?.toJSON();
 };
 
-export const handleExistingUser = async (user, password, res) => {
+export const handleExistingUser = async (user, password, res) => {  
   
-  if (!user.password && user.provider === 'google') {
+  if (!user.password || user.provider === 'google') {    
     return res.status(400).json({
       error: "OAuth account detected",
       message: "You've signed up with google, please continue with google."

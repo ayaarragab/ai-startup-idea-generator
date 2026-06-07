@@ -8,7 +8,7 @@ async function startServer() {
     await db.connection.authenticate();
     await db.connection.sync();
     app.listen(PORT, () => {
-      console.log("Hello from ai-startup-idea-generator backend server!");
+      console.log(`Hello from ai-startup-idea-generator backend server in port ${PORT}!`);
     });
   } catch (err) {
     console.error("Startup error:", err);
