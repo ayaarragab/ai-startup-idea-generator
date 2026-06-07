@@ -24,6 +24,7 @@ export const findUserById = async (id) => {
 };
 
 export const handleExistingUser = async (user, password, res) => {  
+  console.error(user);
   
   if (!user.password || user.provider === 'Google') {    
     return res.status(400).json({
