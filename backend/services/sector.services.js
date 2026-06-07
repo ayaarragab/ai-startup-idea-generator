@@ -29,7 +29,7 @@ export const fetchSector = async (id) => {
 export const fetchSectorsNames = async (convSectors) => {
   try {
     if (!Array.isArray(convSectors) || convSectors.length === 0) {
-      return res.status(200).json([]);
+      return [];
     }
 
     const sectors = await Promise.all(
@@ -38,7 +38,6 @@ export const fetchSectorsNames = async (convSectors) => {
 
     return sectors;
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: 'Error while retrieving sector' });
+    throw error;
   }
 }
