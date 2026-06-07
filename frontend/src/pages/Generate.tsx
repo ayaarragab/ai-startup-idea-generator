@@ -88,7 +88,7 @@ export function Generate() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
-  // NEW: Dynamic Sectors State
+  // Dynamic Sectors State (Kept as array, but will only hold max 1 item)
   const [sectorOptions, setSectorOptions] = useState<Sector[]>([]);
   const [isLoadingSectors, setIsLoadingSectors] = useState(true);
   const [selectedSectorIds, setSelectedSectorIds] = useState<number[]>([]);
@@ -120,8 +120,6 @@ export function Generate() {
     const fetchHistory = async () => {
       try {
         const response = await axiosInstance.get("/conversation/");
-        console.log(response.data);
-
         setConversations(response.data);
       } catch (error) {
         console.error("Error fetching conversations:", error);
@@ -132,11 +130,12 @@ export function Generate() {
     fetchHistory();
   }, []);
 
+  // Modified: Keep it as an array but restrict to a single selection
   const toggleSector = (sectorId: number) => {
     setSelectedSectorIds((prev) =>
-      prev.includes(sectorId)
-        ? prev.filter((id) => id !== sectorId)
-        : [...prev, sectorId],
+      // If the sector is already selected, unselect it (empty array).
+      // Otherwise, set the array to contain ONLY the newly clicked sectorId.
+      prev.includes(sectorId) ? [] : [sectorId]
     );
   };
 
@@ -147,7 +146,7 @@ export function Generate() {
     try {
       let newConv = null;
       if (isAuthenticated) {
-        // Backend now expects [id1, id2] and returns the conversation with sectors
+        // Backend expects [id1]
         const response = await axiosInstance.post("/conversation/", {
           sectorIds: selectedSectorIds,
         });
@@ -163,18 +162,10 @@ export function Generate() {
         setCurrentConversationId("-1");
       }
 
-      // const welcomeMsg: ChatMessage = {
-      //   id: "welcome",
-      //   role: "ai",
-      //   content:
-      //     "Hello! I'm your AI startup advisor. Based on your preferences, I'll help you develop a startup idea. What problem would you like to explore?",
-      //   createdAt: new Date().toISOString(),
-      //   convSectors: [],
-      // };
       setChatMessages([]);
       setCurrentStep(2);
 
-      if (isAuthenticated) {
+      if (isAuthenticated && newConv) {
         setConversations((prev) => [newConv, ...prev]);
       }
     } catch (error) {
@@ -288,7 +279,8 @@ export function Generate() {
       const convData = response.data;
 
       setCurrentConversationId(convData.id);
-      setSelectedSectorIds(convData.sectors?.map((s: Sector) => s.id) || []);
+      // Ensure we only set max 1 sector when loading history, just in case old data has multiple
+      setSelectedSectorIds(convData.sectors?.slice(0, 1).map((s: Sector) => s.id) || []);
       setChatMessages(convData.messages || []);
 
       setCurrentStep(2);
@@ -354,8 +346,6 @@ export function Generate() {
 
     try {
       if (!isCurrentlySaved) {
-        console.log({ ideaId, messageId });
-
         await axiosInstance.post("idea/saved-ideas", { ideaId, messageId });
       } else {
         await axiosInstance.delete(`idea/saved-ideas/${ideaId}/${messageId}`);
@@ -481,16 +471,11 @@ export function Generate() {
                                 </span>
                               </div>
                               <div className="flex items-center gap-2 mt-1">
-                                {conv?.sectors?.slice(0, 2).map((s) => (
+                                {conv?.sectors?.slice(0, 1).map((s) => (
                                   <Tag key={s.id} variant="primary" size="sm">
                                     {s.name}
                                   </Tag>
                                 ))}
-                                {conv?.sectors && conv.sectors.length > 2 && (
-                                  <span className="text-xs text-neutral-500">
-                                    +{conv.sectors.length - 2}
-                                  </span>
-                                )}
                               </div>
                             </div>
                           </div>
@@ -526,7 +511,7 @@ export function Generate() {
 
                     <div>
                       <label className="block text-neutral-700 mb-3">
-                        Target sectors (select one or more)
+                        Target sector (select one)
                       </label>
                       {isLoadingSectors ? (
                         <div className="flex items-center gap-2 text-neutral-500 py-4">
@@ -622,7 +607,6 @@ export function Generate() {
                                 </ReactMarkdown>
                               </div>
                             ) : (
-                              // Keep plain text formatting for user messages
                               <p className="text-sm leading-relaxed whitespace-pre-wrap">
                                 {message.content}
                               </p>
