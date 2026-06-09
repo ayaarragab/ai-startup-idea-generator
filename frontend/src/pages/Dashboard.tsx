@@ -41,6 +41,8 @@ export function Dashboard() {
       try {
         const response = await axiosInstance.get('/idea/saved-ideas');
         setSavedIdeas(response?.data?.ideas || []);
+        console.log(response?.data?.ideas || []);
+        
       } catch (err: any) {
         if (err.response?.status === 404) {
           setSavedIdeas([]);
