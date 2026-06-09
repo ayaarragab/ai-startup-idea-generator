@@ -114,7 +114,7 @@ export const fetchSavedIdeas = async (userId) => {
   try {
     const user = await User.findByPk(userId);
     const ideas = await user.getIdeas();
-    const orders = Order.findAll({
+    const orders = await Order.findAll({
       where: {
         userId, status: "paid"
       }
@@ -127,10 +127,11 @@ export const fetchSavedIdeas = async (userId) => {
         : [];
       idea.dataValues.sectors = sectorJson;
     }
-    orders = Set(orders.map(o => o.ideaId))
+    
+    const purchasedIdeaIds = new Set(orders.map(o => o.ideaId));    
     
     for (const idea of ideas) {
-      idea.dataValues.isPurchased = orders.has(idea.id)  
+      idea.dataValues.isPurchased = purchasedIdeaIds.has(idea.id)  
     }
     
     return ideas.sort((a, b) => b.createdAt - a.createdAt);
