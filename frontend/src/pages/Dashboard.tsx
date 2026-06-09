@@ -189,48 +189,54 @@ export function Dashboard() {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredIdeas.map((idea) => (
-              <Card key={idea.id} variant="elevated" padding="lg" className="hover:shadow-xl transition-shadow group">
-                <div className="space-y-4">
-                  {idea.isPurchased && (
-                    <Badge variant="success" size="md" className="flex items-center gap-1.5">
-                    <Unlock className="w-4 h-4" /> Unlocked
-                    </Badge>
-                  )}
-                  {!idea.isPurchased && (
-                    <Badge variant="info" size="md" className="flex items-center gap-1.5">
-                    <Lock className="w-4 h-4" /> Locked
-                    </Badge>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h5 className="text-neutral-900 mb-1 truncate">{idea.solutionName}</h5>
-                    <p className="text-neutral-600 line-clamp-2 text-sm">{idea.solutionDescription}</p>
-                  </div>
-
-                  {/* UPDATED: Rendering Sector Tags */}
-                  <div className="flex flex-wrap gap-2">
-                    {idea.sectors?.slice(0, 2).map(sector => (
-                      <Tag key={sector.id} variant="primary" size="sm">{sector.name}</Tag>
-                    ))}
-                    {idea.sectors && idea.sectors.length > 2 && (
-                      <Tag variant="default" size="sm">+{idea.sectors.length - 2}</Tag>
+            <Card key={idea.id} variant="elevated" padding="lg" className="hover:shadow-xl transition-shadow group">
+              <div className="space-y-4">
+                
+                {/* Updated section: Merged the title and Badge in the same row */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-3 mb-1">
+                    <h5 className="text-neutral-900 truncate m-0">{idea.solutionName}</h5>
+                    
+                    {/* Using Ternary Operator for cleaner conditional rendering */}
+                    {idea.isPurchased ? (
+                      <Badge variant="success" size="md" className="flex items-center gap-1.5 shrink-0">
+                        <Unlock className="w-4 h-4" /> Unlocked
+                      </Badge>
+                    ) : (
+                      <Badge variant="info" size="md" className="flex items-center gap-1.5 shrink-0">
+                        <Lock className="w-4 h-4" /> Locked
+                      </Badge>
                     )}
                   </div>
-
-                  <div className="text-neutral-500 text-xs">
-                    <Calendar className="w-3.5 h-3.5 inline mr-1" />
-                    {new Date(idea.createdAt).toLocaleDateString()}
-                  </div>
-
-                  <div className="flex gap-2 pt-2 border-t border-neutral-200">
-                    <Button variant="primary" size="sm" className="flex-1" onClick={() => navigate(`/idea/${idea.id}/${idea.messageId}`)}>
-                      <Eye className="w-4 h-4" /> View
-                    </Button>
-                    <Button variant="outlined" size="sm" onClick={() => handleUnsaveIdea(idea.id, idea.messageId)}>
-                      <Trash2 className="w-4 h-4 text-red-600" />
-                    </Button>
-                  </div>
+                  
+                  <p className="text-neutral-600 line-clamp-2 text-sm my-2">{idea.solutionDescription}</p>
                 </div>
-              </Card>
+
+                {/* UPDATED: Rendering Sector Tags */}
+                <div className="flex flex-wrap gap-2">
+                  {idea.sectors?.slice(0, 2).map(sector => (
+                    <Tag key={sector.id} variant="primary" size="sm">{sector.name}</Tag>
+                  ))}
+                  {idea.sectors && idea.sectors.length > 2 && (
+                    <Tag variant="default" size="sm">+{idea.sectors.length - 2}</Tag>
+                  )}
+                </div>
+
+                <div className="text-neutral-500 text-xs">
+                  <Calendar className="w-3.5 h-3.5 inline mr-1" />
+                  {new Date(idea.createdAt).toLocaleDateString()}
+                </div>
+
+                <div className="flex gap-2 pt-2 border-t border-neutral-200">
+                  <Button variant="primary" size="sm" className="flex-1" onClick={() => navigate(`/idea/${idea.id}/${idea.messageId}`)}>
+                    <Eye className="w-4 h-4" /> View
+                  </Button>
+                  <Button variant="outlined" size="sm" onClick={() => handleUnsaveIdea(idea.id, idea.messageId)}>
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </Button>
+                </div>
+              </div>
+            </Card>
             ))}
           </div>
         ) : (
