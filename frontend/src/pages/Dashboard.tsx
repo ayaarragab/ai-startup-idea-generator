@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { Tag } from '../components/Tag';
 import { Badge } from "../components/Badge";
 import { EmptyState } from '../components/EmptyState';
-import { Search, Plus, Grid, List, Eye, Trash2, Calendar, Bookmark, Loader2, Unlock } from 'lucide-react';
+import { Search, Plus, Grid, List, Eye, Trash2, Calendar, Bookmark, Loader2, Unlock, Lock } from 'lucide-react';
 
 // Updated Sector interface
 interface Sector {
@@ -194,6 +194,11 @@ export function Dashboard() {
                   {idea.isPurchased && (
                     <Badge variant="success" size="md" className="flex items-center gap-1.5">
                     <Unlock className="w-4 h-4" /> Unlocked
+                    </Badge>
+                  )}
+                  {!idea.isPurchased && (
+                    <Badge variant="info" size="md" className="flex items-center gap-1.5">
+                    <Lock className="w-4 h-4" /> Locked
                     </Badge>
                   )}
                   <div className="flex-1 min-w-0">
