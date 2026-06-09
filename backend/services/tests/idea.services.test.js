@@ -87,10 +87,16 @@ const mockUserInstance = {
   getIdeas: jest.fn(),
 };
 
+
 const mockIdea = {
   create: jest.fn(),
-  findByPk: jest.fn(),
+  findByPk: jest.fn().mockResolvedValue(null),
+  findAll: jest.fn().mockResolvedValue([]),
   findOne: jest.fn(),
+};
+const mockOrder = {
+  findAll: jest.fn().mockResolvedValue([]),
+  findOne: jest.fn().mockResolvedValue(null), 
 };
 
 const mockUser = {
@@ -109,6 +115,7 @@ jest.unstable_mockModule("../../models/index.js", () => ({
     User: mockUser,
     Message: mockMessage,
     Sector: mockSector,
+    Order: mockOrder,
   },
 }));
 
