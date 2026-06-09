@@ -1,11 +1,15 @@
 import axios from 'axios';
 import crypto from "crypto";
+import db from '../models/index.js';
+
+const { Idea } = db;
 
 const PAYMOB_API_KEY = process.env.PAYMOB_API_KEY;
 const PAYMOB_API_URL = process.env.PAYMOB_API_URL;
 const PAYMOB_INTEGRATION_ID = process.env.PAYMOB_INTEGRATION_ID;
 
-import db from '../models/index.js';
+
+
 
 export const getAuthToken = async () => {
     const response = await axios.post(`${PAYMOB_API_URL}/auth/tokens`, {
@@ -109,22 +113,76 @@ export const verifyHmac = (query, hmacSecret) => {
     return hashed === query.hmac;
 };
 
+
 export const finalizePurchase = async (userId, ideaId) => {
-    try {
-        console.log("Inputs received -> userId:", userId, "| ideaId:", ideaId);
+  const transaction = await db.connection.transaction();
 
-        const deletedCount = await db.connection.models.usersSavedIdeas.destroy({
-            where: {
-                ideaId: Number(ideaId),
-                userId: {
-                    [db.Sequelize.Op.ne]: Number(userId)
-                }
-            },
-            logging: console.log
-        });
+  try {
+    console.log("Inputs received -> userId:", userId, "| ideaId:", ideaId);
 
-        console.log(`# of deleted is ${deletedCount}`);
-    } catch (error) {
-        console.error("Error while updating idea records:", error);
+    const purchasedIdea = await db.connection.models.Idea.findByPk(Number(ideaId), { transaction });
+
+    if (!purchasedIdea) {
+      throw new Error("Idea not found in the database.");
     }
-}
+
+    const targetSolutionName = purchasedIdea.solutionName;
+
+    const deletedCount = await db.connection.models.usersSavedIdeas.destroy({
+      where: {
+        ideaId: Number(ideaId),
+        userId: {
+          [db.Sequelize.Op.ne]: Number(userId),
+        },
+      },
+      transaction,
+      logging: console.log,
+    });
+
+    console.log(`# of deleted saved ideas is ${deletedCount}`);
+
+    const similarIdeas = await db.connection.models.Idea.findAll({
+      where: {
+        solutionName: targetSolutionName,
+        id: {
+          [db.Sequelize.Op.ne]: Number(ideaId),
+        },
+        messageId: {
+          [db.Sequelize.Op.not]: null,
+        },
+      },
+      attributes: ["messageId"],
+      transaction,
+    });
+
+    const messageIdsToUpdate = similarIdeas.map((idea) => idea.messageId);
+
+    if (messageIdsToUpdate.length > 0) {
+      const updatedMessages = await db.connection.models.Message.update(
+        {
+          content: "This idea has been purchased by another user and is no longer available.",
+          is_idea: false,
+          is_full_idea: false,
+        },
+        {
+          where: {
+            id: {
+              [db.Sequelize.Op.in]: messageIdsToUpdate,
+            },
+          },
+          transaction,
+        }
+      );
+
+      console.log(`# of updated messages is ${updatedMessages[0]}`);
+    }
+
+    await transaction.commit();
+    console.log("Purchase finalized and messages updated successfully.");
+
+  } catch (error) {
+    if (transaction) await transaction.rollback();
+    console.error("Error while updating idea records:", error);
+    throw error;
+  }
+};
