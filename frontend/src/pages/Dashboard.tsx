@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { Tag } from '../components/Tag';
 import { Badge } from "../components/Badge";
 import { EmptyState } from '../components/EmptyState';
-import { Search, Plus, Grid, List, Eye, Trash2, Calendar, Bookmark, Loader2, Unlock, Lock } from 'lucide-react';
+import { Search, Plus, Grid, List, Eye, Trash2, Calendar, CheckCircle2, Bookmark, Loader2, Lock } from 'lucide-react';
 
 // Updated Sector interface
 interface Sector {
@@ -200,11 +200,11 @@ export function Dashboard() {
                     {/* Using Ternary Operator for cleaner conditional rendering */}
                     {idea.isPurchased ? (
                       <Badge variant="success" size="md" className="flex items-center gap-1.5 shrink-0">
-                        <Unlock className="w-4 h-4" /> Unlocked
+                        <CheckCircle2 className="w-4 h-4" /> Purchased
                       </Badge>
                     ) : (
                       <Badge variant="info" size="md" className="flex items-center gap-1.5 shrink-0">
-                        <Lock className="w-4 h-4" /> Locked
+                        <Eye className="w-4 h-4" /> Available
                       </Badge>
                     )}
                   </div>
