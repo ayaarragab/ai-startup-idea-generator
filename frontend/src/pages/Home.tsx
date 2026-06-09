@@ -83,10 +83,9 @@ export function Home() {
   ];
 
   const stats = [
-    { label: 'Local Problems Analyzed', value: '1,200+', icon: TrendingUp },
-    { label: 'Egyptian Data Sources', value: '50+', icon: Database },
-    { label: 'Target Sectors', value: '12', icon: MapPin },
-    { label: 'Ideas Generated', value: '340+', icon: Lightbulb },
+    { label: 'Local Problems Analyzed', value: '10,000+', icon: TrendingUp },
+    { label: 'Target Sectors', value: '68', icon: MapPin },
+    { label: 'Ideas Generated', value: '110+', icon: Lightbulb },
   ];
 
   return (
@@ -156,7 +155,7 @@ export function Home() {
       {/* Stats Section */}
       <section className="py-12 bg-white border-y border-neutral-200">
         <div className="container mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-8">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded-lg mb-3">
