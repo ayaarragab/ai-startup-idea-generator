@@ -128,15 +128,6 @@ export const fetchSavedIdeas = async (userId) => {
       idea.dataValues.sectors = sectorJson;
     }
 
-    const purchasedIdeaIds = new Set(
-      orders.map(order => order.ideaId)
-    );
-
-    for (const idea of ideas) {
-      idea.dataValues.isPurchased =
-        purchasedIdeaIds.has(idea.id);
-    }
-    
     return ideas.sort((a, b) => b.createdAt - a.createdAt);
   } catch (error) {
     return false;
@@ -171,6 +162,15 @@ export const fetchSavedIdea = async (userId, ideaId) => {
         inspiredBy = inspiredBy.split(","); 
       }
     }
+    const orders = await Order.findAll({
+      where: { userId, status: "paid" }
+    });
+
+    const purchasedIdeaIds = new Set(
+      orders.map(order => order.ideaId)
+    );
+
+    ideasJSON.isPurchased = purchasedIdeaIds.has(ideasJSON.id);
 
     return ideas.length > 0
       ? { ...ideasJSON, sectors: sectorsJSON, targetUsers, inspiredBy }

@@ -73,9 +73,7 @@ export const transactionCallback = async (req, res) => {
                     orderId
                 }
              });
-            if (order) {
-                console.log("did you enter here?");
-                
+            if (order) {                
                 order.status = 'paid';
                 await order.save();
             }
