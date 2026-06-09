@@ -1,6 +1,4 @@
-import {
-  validateAccessToken,
-} from "../utils/jwt.utils.js";
+import { validateAccessToken } from "../utils/jwt.utils.js";
 
 export const validateCredentialsSignup = (req, res, next) => {
   const { fullName, email, password } = req.body; // Extract email, password, and username from the request body
@@ -17,7 +15,7 @@ export const validateCredentialsSignup = (req, res, next) => {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-  const fullNameRegex = /^[A-Za-z]{3,50}$/;
+  const fullNameRegex = /^[A-Za-z\s]{3,50}$/;
 
   if (!fullName || !fullNameRegex.test(fullName)) {
     return res.status(400).json({ error: "Invalid full name format" });
