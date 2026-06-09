@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **AI Startup Idea Generator** is a full-stack web application designed to help entrepreneurs and innovators generate, manage, and refine startup ideas using artificial intelligence. The platform leverages AI to provide intelligent suggestions, feedback, and insights on startup concepts, enabling users to develop their business ideas more effectively.
+Fakarnalk is a full-stack web application designed to help entrepreneurs and innovators generate, manage, and refine startup ideas using artificial intelligence. The platform leverages AI to provide intelligent suggestions, feedback, and insights on startup concepts, enabling users to develop their business ideas more effectively.
 
 ## Project Description
 

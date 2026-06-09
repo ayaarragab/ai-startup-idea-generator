@@ -16,18 +16,11 @@ import {
 
 export function About() {
   const projectInfo = {
-    university: 'Helwan University',
+    university: 'Capital University',
     faculty: 'Faculty of Computer Science & Artificial Intelligence',
     department: 'Computer Science',
     year: '2025-2026',
     type: 'Graduation Project',
-  };
-
-  const supervisor = {
-    name: 'Dr. Mohammed El-Said',
-    title: 'Professor of Artificial Intelligence & NLP',
-    department: 'Computer Science',
-    expertise: ['Natural Language Processing', 'Machine Learning', 'Generative AI', 'Arabic Language Technologies'],
   };
 
   const teamMembers = [
@@ -98,11 +91,11 @@ export function About() {
     },
   ];
 
+
   const technologies = [
-    { category: 'AI & NLP', items: ['GPT-4', 'Arabic NLP', 'Sentiment Analysis', 'Topic Modeling'] },
+    { category: 'AI & NLP', items: ['GenAI', 'NLP', 'Sentiment Analysis', 'BERT', 'SBERT', 'Qwen-32B', 'LLaMA-70B'] },
     { category: 'Frontend', items: ['React', 'TypeScript', 'Tailwind CSS', 'Responsive Design'] },
-    { category: 'Backend', items: ['Python', 'FastAPI', 'PostgreSQL', 'Redis'] },
-    { category: 'Evaluation', items: ['GraphEval', 'Custom Metrics', 'A/B Testing', 'User Feedback'] },
+    { category: 'Backend', items: ['Node.js', 'Express.js', 'MySQL'] },
   ];
 
   return (
@@ -118,7 +111,7 @@ export function About() {
           </div>
 
           {/* Project Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-1 mb-12">
             <Card variant="elevated" padding="lg">
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -135,6 +128,10 @@ export function About() {
                   <span className="text-neutral-900">{projectInfo.university}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-neutral-200">
+                  <span className="text-neutral-600">Project Superviser</span>
+                  <span className="text-neutral-900">Dr. Mohammed El-Said</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-neutral-200">
                   <span className="text-neutral-600">Faculty</span>
                   <span className="text-neutral-900 text-right max-w-[60%]">{projectInfo.faculty}</span>
                 </div>
@@ -149,35 +146,6 @@ export function About() {
                 <div className="flex justify-between py-2">
                   <span className="text-neutral-600">Project Type</span>
                   <Tag variant="primary">{projectInfo.type}</Tag>
-                </div>
-              </div>
-            </Card>
-
-            <Card variant="elevated" padding="lg">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center">
-                  <Award className="w-6 h-6 text-secondary-600" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-neutral-900 mb-2">Project Supervisor</h4>
-                  <p className="text-neutral-600">Academic guidance and mentorship</p>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <h5 className="text-neutral-900 mb-1">{supervisor.name}</h5>
-                  <p className="text-neutral-600 mb-2">{supervisor.title}</p>
-                  <p className="text-neutral-500">{supervisor.department}</p>
-                </div>
-                <div>
-                  <h6 className="text-neutral-900 mb-2">Areas of Expertise</h6>
-                  <div className="flex flex-wrap gap-2">
-                    {supervisor.expertise.map((area) => (
-                      <Tag key={area} variant="secondary" size="sm">
-                        {area}
-                      </Tag>
-                    ))}
-                  </div>
                 </div>
               </div>
             </Card>
@@ -311,7 +279,7 @@ export function About() {
           <Card variant="bordered" padding="md" className="mt-8">
             <div className="text-center">
               <p className="text-neutral-600">
-                Special thanks to Helwan University, our supervisor Dr. Mohammed El-Said, and all the data sources and 
+                Special thanks to Capital University, our supervisor Dr. Mohammed El-Said, and all the data sources and 
                 communities that made this research possible. This project is dedicated to advancing AI research 
                 and empowering Egyptian entrepreneurship.
               </p>

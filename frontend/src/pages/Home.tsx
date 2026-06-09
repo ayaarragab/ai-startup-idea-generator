@@ -94,10 +94,11 @@ export function Home() {
       <section className="bg-gradient-to-br from-white via-primary-50/30 to-accent-50/30 pt-12 md:pt-20 pb-16 md:pb-24">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 gap-12 items-center">
-            <div className="flex flex-col gap-6 max-w-3xl mx-auto text-center">        
-              <h1 className="text-neutral-900">
+            <div className="flex flex-col gap-6 max-w-3xl mx-auto text-center"> 
+              <h1>Fakarnalk</h1>       
+              <h4 className="text-neutral-900">
                 AI Startup Idea Generator for the Egyptian Market
-              </h1>
+              </h4>
               
               <p className="subtitle text-neutral-600">
                 A web-based system that uses NLP + Generative AI to create original, market-fit startup ideas specifically designed for Egypt's unique challenges and opportunities.

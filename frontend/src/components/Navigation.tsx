@@ -49,7 +49,7 @@ export function Navigation() {
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div className="hidden sm:block">
-              <div className="text-neutral-900">AI Startup Idea Generator</div>
+              <div className="text-neutral-900">Fakarnalk</div>
             </div>
           </Link>
           

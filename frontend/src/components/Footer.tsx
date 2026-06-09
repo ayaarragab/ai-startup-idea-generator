@@ -12,7 +12,7 @@ export function Footer() {
             <h6 className="text-white font-semibold">Project Information</h6>
             <div className="space-y-2 text-neutral-400">
               <p>Graduation Project (2025-2026)</p>
-              <p>Helwan University</p>
+              <p>Capital University</p>
               <p>Faculty of Computer Science & Artificial Intelligence</p>
               <p>Computer Science Department</p>
             </div>
@@ -23,7 +23,6 @@ export function Footer() {
             <h6 className="text-white font-semibold">Project Supervisor</h6>
             <div className="space-y-2 text-neutral-400">
               <p>Dr. Mohammed El-Said</p>
-              <p>Professor of Artificial Intelligence & NLP</p>
             </div>
           </div>
 
@@ -46,11 +45,11 @@ export function Footer() {
                 <Github className="w-5 h-5" />
                 GitHub Repository
               </a>
-              <a href="#" className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors">
+              <a href="https://drive.google.com/file/d/1QPiNXJhNRULoTDmwxqaBfPKEqnn1d9pN/view?usp=sharing" className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors">
                 <FileText className="w-5 h-5" />
                 Documentation
               </a>
-              <a href="#" className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors">
+              <a href="mailto:AyaRagabSaleh@outlook.com" className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors">
                 <Mail className="w-5 h-5" />
                 Contact Us
               </a>
@@ -61,7 +60,7 @@ export function Footer() {
 
         <div className="border-t border-neutral-800 mt-12 pt-8">
           <p className="text-center text-neutral-500">
-            © 2026 Egyptian AI Startup Idea Generator — Graduation Project
+            © 2026 Egyptian Fakarnalk — Graduation Project
           </p>
         </div>
       </div>
