@@ -38,7 +38,7 @@ export const createIdeaPayment = async (req, res) => {
         await Order.create({ orderId, userId: user.id, ideaId: ideaId });
 
         const iframeUrl = `${PAYMOB_API_URL}/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${paymentKey}`;
-        await finalizePurchase(userData.id, ideaId);
+        await finalizePurchase(user.id, ideaId);
         res.status(200).json({ 
             success: true, 
             iframeUrl,
