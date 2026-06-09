@@ -2,13 +2,9 @@ import axios from 'axios';
 import crypto from "crypto";
 import db from '../models/index.js';
 
-const { Idea } = db;
-
 const PAYMOB_API_KEY = process.env.PAYMOB_API_KEY;
 const PAYMOB_API_URL = process.env.PAYMOB_API_URL;
 const PAYMOB_INTEGRATION_ID = process.env.PAYMOB_INTEGRATION_ID;
-
-
 
 
 export const getAuthToken = async () => {
