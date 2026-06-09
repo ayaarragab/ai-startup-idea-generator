@@ -162,15 +162,11 @@ export const fetchSavedIdea = async (userId, ideaId) => {
         inspiredBy = inspiredBy.split(","); 
       }
     }
-    const orders = await Order.findAll({
-      where: { userId, status: "paid" }
+    const order = await Order.findAll({
+      where: { userId, status: "paid", ideaId }
     });
 
-    const purchasedIdeaIds = new Set(
-      orders.map(order => order.ideaId)
-    );
-
-    ideasJSON.isPurchased = purchasedIdeaIds.has(ideasJSON.id);
+    ideasJSON.isPurchased = order && order.status == "paid"
 
     return ideas.length > 0
       ? { ...ideasJSON, sectors: sectorsJSON, targetUsers, inspiredBy }
