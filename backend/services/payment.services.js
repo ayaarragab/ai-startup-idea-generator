@@ -111,16 +111,19 @@ export const verifyHmac = (query, hmacSecret) => {
 
 export const finalizePurchase = async (userId, ideaId) => {
     try {
-        await db.connection.models.usersSavedIdeas.destroy({
+        console.log("Inputs received -> userId:", userId, "| ideaId:", ideaId);
+
+        const deletedCount = await db.connection.models.usersSavedIdeas.destroy({
             where: {
-                ideaId: ideaId,
+                ideaId: Number(ideaId),
                 userId: {
-                    [db.Sequelize.Op.ne]: userId // db.Sequelize هتنفع لأنك ضيفاها في الـ db object
+                    [db.Sequelize.Op.ne]: Number(userId)
                 }
-            }
+            },
+            logging: console.log
         });
 
-        console.log("Idea updated successfully and removed from other users' libraries.");
+        console.log(`# of deleted is ${deletedCount}`);
     } catch (error) {
         console.error("Error while updating idea records:", error);
     }
