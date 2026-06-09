@@ -1,5 +1,5 @@
 import { handleChat, handleChatWithoutAuth } from "../services/chat.services.js";
-
+import { getDailyIdeasCount } from "../services/idea.services.js";
 
 export const handleAIChat = async (req, res) => {
   try {
@@ -7,7 +7,12 @@ export const handleAIChat = async (req, res) => {
     if (!userId) {
       return res.status(401).json({ error: 'UNAUTHORIZED' });
     }
-    const aiResponse = await handleChat({ ...req.body, userId });
+
+    const dailyIdeasCount = await getDailyIdeasCount(userId);
+
+    const limitReached = dailyIdeasCount >= 3
+
+    const aiResponse = await handleChat({ ...req.body, userId, limitReached });
     if (aiResponse) {
       return res.status(201).json(aiResponse);
     }

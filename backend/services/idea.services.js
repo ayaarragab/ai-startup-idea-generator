@@ -1,4 +1,5 @@
 import db from "../models/index.js";
+import { Op } from "sequelize";
 
 const { Idea, User, Message, Order } = db;
 
@@ -181,4 +182,35 @@ export const fetchSavedIdea = async (userId, ideaId) => {
     console.error("Error fetching saved idea:", error);
     throw error;
   }
+};
+
+export const getDailyIdeasCount = async (userId) => {
+  const twentyFourHoursAgo = new Date(new Date() - 24 * 60 * 60 * 1000);
+  
+  const count = await db.Idea.count({
+    where: {
+      createdAt: {
+        [Op.gte]: twentyFourHoursAgo
+      }
+    },
+    include: [
+      {
+        model: db.Message,
+        as: "message",
+        required: true,
+        include: [
+          {
+            model: db.Conversation,
+            as: "conversation",
+            required: true,
+            where: {
+              userId: userId
+            }
+          }
+        ]
+      }
+    ]
+  });
+
+  return count;
 };

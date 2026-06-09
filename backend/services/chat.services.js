@@ -5,47 +5,95 @@ import { createIdea } from "./idea.services.js";
 import { updateConversationTitle } from "./conversation.services.js";
 import { fetchSectorsNames } from "./sector.services.js";
 
-export const handleChat = async ({ content, conversationId, userId, isNewConversation, history, clientMessageId, convSectors, lastIdea }) => {
-  
+export const handleChat = async ({
+  content,
+  conversationId,
+  userId,
+  isNewConversation,
+  history,
+  clientMessageId,
+  convSectors,
+  lastIdea,
+  limitReached
+}) => {
   if (isNewConversation) {
     const conversation = await createConversation(userId, convSectors);
     conversationId = conversation.id;
   }
 
-  await createMessage(content, conversationId, 'user', clientMessageId)
-  
-  const sectorsNames = await fetchSectorsNames(convSectors);
+  await createMessage(content, conversationId, "user", clientMessageId);
 
-  
-  const aiResponse = await sendChat({
-    content,
-    conversationId,
-    isNewConversation,
-    history,
-    clientMessageId,
-    lastIdea,
-    convSectors: sectorsNames,
-    userId,
-  });
+  const sectorsNames = await fetchSectorsNames(convSectors);
+  let aiResponse = {};
+
+  if (limitReached) {
+    aiResponse = {
+      content:
+        "You have reached your daily limit of 3 ideas. Please try again after 24 hours.",
+      conversationId,
+      clientMessageId,
+      createdAt: new Date().toISOString(),
+      role: "ai",
+      is_idea: false,
+      is_idea_saved: false,
+      is_full_idea: false,
+      idea: null,
+    };
+  } else {
+    aiResponse = await sendChat({
+      content,
+      conversationId,
+      isNewConversation,
+      history,
+      clientMessageId,
+      lastIdea,
+      convSectors: sectorsNames,
+      userId,
+    });
+  }
+
   const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
-  
-  const message = await createMessage(aiResponse.content, aiResponse.conversationId, 'ai', clientMessageId, aiResponse.is_full_idea, aiResponse.is_full_idea)
+
+  const message = await createMessage(
+    aiResponse.content,
+    aiResponse.conversationId,
+    "ai",
+    clientMessageId,
+    aiResponse.is_full_idea,
+    aiResponse.is_full_idea,
+  );
 
   let idea__ = null;
 
   if (aiResponse.is_full_idea) {
-    idea__ = await createIdea({ ...aiResponse.data, messageId: message.id }, convSectors);
+    idea__ = await createIdea(
+      { ...aiResponse.data, messageId: message.id },
+      convSectors,
+    );
   }
-  
+
   if (aiResponse.conversation_title) {
-        
-    await updateConversationTitle(conversationId, aiResponse.conversation_title)
+    await updateConversationTitle(
+      conversationId,
+      aiResponse.conversation_title,
+    );
   }
 
-  return { ...aiResponseWithoutIdea, messageId: message.id, clientMessageId, idea: idea__ };
-}
+  return {
+    ...aiResponseWithoutIdea,
+    messageId: message.id,
+    clientMessageId,
+    idea: idea__,
+  };
+};
 
-export const handleChatWithoutAuth = async ({ content, isNewConversation, history, convSectors, lastIdea }) => {
+export const handleChatWithoutAuth = async ({
+  content,
+  isNewConversation,
+  history,
+  convSectors,
+  lastIdea,
+}) => {
   try {
     const sectorsNames = await fetchSectorsNames(convSectors);
     const aiResponse = await sendChat({
@@ -53,10 +101,10 @@ export const handleChatWithoutAuth = async ({ content, isNewConversation, histor
       conversationId: -1,
       isNewConversation: true,
       history,
-      clientMessageId: '-11111',
+      clientMessageId: "-11111",
       lastIdea,
       convSectors: sectorsNames,
-      userId: -1
+      userId: -1,
     });
     const { data: _, ...aiResponseWithoutIdea } = aiResponse;
     let idea__ = null;
@@ -64,9 +112,8 @@ export const handleChatWithoutAuth = async ({ content, isNewConversation, histor
     if (aiResponse.is_full_idea) {
       idea__ = await createIdea({ ...aiResponse.data }, convSectors);
     }
-  return { ...aiResponseWithoutIdea, idea: idea__ };
-  
+    return { ...aiResponseWithoutIdea, idea: idea__ };
   } catch (error) {
     throw error;
   }
-}
+};
