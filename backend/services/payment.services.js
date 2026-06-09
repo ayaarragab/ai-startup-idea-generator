@@ -124,9 +124,25 @@ export const finalizePurchase = async (userId, ideaId) => {
 
     const targetSolutionName = purchasedIdea.solutionName;
 
+    const similarIdeas = await db.connection.models.Idea.findAll({
+      where: {
+        solutionName: targetSolutionName,
+        id: {
+          [db.Sequelize.Op.ne]: Number(ideaId),
+        },
+      },
+      attributes: ["id", "messageId"],
+      transaction,
+    });
+
+    const similarIdeaIds = similarIdeas.map((idea) => idea.id);
+    const allRelatedIdeaIds = [Number(ideaId), ...similarIdeaIds];
+
     const deletedCount = await db.connection.models.usersSavedIdeas.destroy({
       where: {
-        ideaId: Number(ideaId),
+        ideaId: {
+          [db.Sequelize.Op.in]: allRelatedIdeaIds,
+        },
         userId: {
           [db.Sequelize.Op.ne]: Number(userId),
         },
@@ -137,21 +153,9 @@ export const finalizePurchase = async (userId, ideaId) => {
 
     console.log(`# of deleted saved ideas is ${deletedCount}`);
 
-    const similarIdeas = await db.connection.models.Idea.findAll({
-      where: {
-        solutionName: targetSolutionName,
-        id: {
-          [db.Sequelize.Op.ne]: Number(ideaId),
-        },
-        messageId: {
-          [db.Sequelize.Op.not]: null,
-        },
-      },
-      attributes: ["messageId"],
-      transaction,
-    });
-
-    const messageIdsToUpdate = similarIdeas.map((idea) => idea.messageId);
+    const messageIdsToUpdate = similarIdeas
+      .filter((idea) => idea.messageId !== null)
+      .map((idea) => idea.messageId);
 
     if (messageIdsToUpdate.length > 0) {
       const updatedMessages = await db.connection.models.Message.update(
