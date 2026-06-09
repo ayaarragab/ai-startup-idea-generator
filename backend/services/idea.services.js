@@ -3,7 +3,6 @@ import db from "../models/index.js";
 const { Idea, User, Message, Order } = db;
 
 export const createIdea = async (ideaDetails, convSectors) => {
-  console.log(ideaDetails);
 
   try {
     const mappedData = {
