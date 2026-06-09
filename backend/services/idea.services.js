@@ -128,14 +128,14 @@ export const fetchSavedIdeas = async (userId) => {
       idea.dataValues.sectors = sectorJson;
     }
 
-    for (const order of orders) {
-      for (const idea of ideas) {
-        if (order.dataValues.ideaId == idea.id && order.dataValues.status == "paid") {
-          idea.dataValues.isPurchased = true
-        }
-      }
+    const purchasedIdeaIds = new Set(
+      orders.map(order => order.ideaId)
+    );
+
+    for (const idea of ideas) {
+      idea.dataValues.isPurchased =
+        purchasedIdeaIds.has(idea.id);
     }
-    console.log(orders);
     
     return ideas.sort((a, b) => b.createdAt - a.createdAt);
   } catch (error) {

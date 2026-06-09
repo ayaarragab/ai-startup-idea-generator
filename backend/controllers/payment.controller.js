@@ -68,7 +68,11 @@ export const transactionCallback = async (req, res) => {
         if (paymentData.success === true) {
             const orderId = paymentData.order.id;
 
-            const order = await Order.findOne({ orderId });
+            const order = await Order.findOne({ 
+                where: {
+                    orderId
+                }
+             });
             if (order) {
                 console.log("did you enter here?");
                 
