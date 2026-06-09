@@ -130,7 +130,7 @@ export const fetchSavedIdeas = async (userId) => {
 
     for (const order of orders) {
       for (const idea of ideas) {
-        if (order.ideaId == idea.id && order.status == "paid") {
+        if (order.dataValues.ideaId == idea.id && order.dataValues.status == "paid") {
           idea.dataValues.isPurchased = true
         }
       }
