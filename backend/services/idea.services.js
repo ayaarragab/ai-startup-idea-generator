@@ -136,8 +136,7 @@ export const fetchSavedIdeas = async (userId) => {
         }
       }
     }
-
-    console.log(ideas);
+    console.log(orders);
     
     return ideas.sort((a, b) => b.createdAt - a.createdAt);
   } catch (error) {
