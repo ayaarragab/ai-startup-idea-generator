@@ -1,4 +1,4 @@
-import { getAuthToken, createOrder, createPaymentKey, verifyHmac } from "../services/payment.services.js";
+import { getAuthToken, createOrder, createPaymentKey, verifyHmac, finalizePurchase } from "../services/payment.services.js";
 import db from "../models/index.js";
 
 const { Order } = db;
@@ -38,7 +38,7 @@ export const createIdeaPayment = async (req, res) => {
         await Order.create({ orderId, userId: user.id, ideaId: ideaId });
 
         const iframeUrl = `${PAYMOB_API_URL}/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${paymentKey}`;
-        
+        await finalizePurchase(userData.id, ideaId);
         res.status(200).json({ 
             success: true, 
             iframeUrl,
@@ -55,7 +55,6 @@ export const transactionCallback = async (req, res) => {
         const hmacFromQuery = req.query.hmac;
         const paymentData = req.body.obj;
 
-        // 1. التأكد من أن الطلب قادم من Paymob باستخدام HMAC
         const isValidHmac = verifyHmac(
             { ...paymentData, hmac: hmacFromQuery }, 
             PAYMOB_HMAC_SECRET
@@ -77,7 +76,6 @@ export const transactionCallback = async (req, res) => {
                 order.status = 'paid';
                 await order.save();
             }
-            
             console.log(`Payment successful for Order ID: ${orderId}`);
         } else {
             console.log(`Payment failed for Order ID: ${paymentData.order.id}`);

@@ -5,6 +5,8 @@ const PAYMOB_API_KEY = process.env.PAYMOB_API_KEY;
 const PAYMOB_API_URL = process.env.PAYMOB_API_URL;
 const PAYMOB_INTEGRATION_ID = process.env.PAYMOB_INTEGRATION_ID;
 
+import db from '../models/index.js';
+
 export const getAuthToken = async () => {
     const response = await axios.post(`${PAYMOB_API_URL}/auth/tokens`, {
         api_key: PAYMOB_API_KEY,
@@ -106,3 +108,20 @@ export const verifyHmac = (query, hmacSecret) => {
 
     return hashed === query.hmac;
 };
+
+export const finalizePurchase = async (userId, ideaId) => {
+    try {
+        await db.connection.models.usersSavedIdeas.destroy({
+            where: {
+                ideaId: ideaId,
+                userId: {
+                    [db.Sequelize.Op.ne]: userId // db.Sequelize هتنفع لأنك ضيفاها في الـ db object
+                }
+            }
+        });
+
+        console.log("Idea updated successfully and removed from other users' libraries.");
+    } catch (error) {
+        console.error("Error while updating idea records:", error);
+    }
+}
