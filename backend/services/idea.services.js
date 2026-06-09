@@ -114,11 +114,6 @@ export const fetchSavedIdeas = async (userId) => {
   try {
     const user = await User.findByPk(userId);
     const ideas = await user.getIdeas();
-    const orders = await Order.findAll({
-      where:{
-        userId, status: "paid"
-      }
-    })
 
     for (const idea of ideas) {
       const sectors = await idea.getSectors();
@@ -162,7 +157,7 @@ export const fetchSavedIdea = async (userId, ideaId) => {
         inspiredBy = inspiredBy.split(","); 
       }
     }
-    const order = await Order.findAll({
+    const order = await Order.findOne({
       where: { userId, status: "paid", ideaId }
     });
 
