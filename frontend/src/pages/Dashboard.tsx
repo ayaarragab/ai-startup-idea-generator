@@ -106,7 +106,8 @@ export function Dashboard() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-neutral-900 mb-2">Saved Ideas</h2>
-              <p className="text-neutral-600">Manage and review your generated startup ideas</p>
+              {/* <p className="text-neutral-600">Manage and review your generated startup ideas</p> */}
+              <p className='w-3/4'>If you saved an idea and later found that it was deleted without you deleting it, it means someone purchased it. That’s why it gets removed from the accounts of other users.</p>
             </div>
             <Button variant="primary" onClick={() => navigate('/generate')}>
               <Plus className="w-5 h-5" />
