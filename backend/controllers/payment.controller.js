@@ -30,7 +30,7 @@ export const createIdeaPayment = async (req, res) => {
             firstName: firstName,
             lastName: lastName,
             email: user.email,
-            phone: "NA"
+            phone: "+201000000000"
         };
 
         const paymentKey = await createPaymentKey(authToken, orderId, IDEA_FIXED_PRICE, userData);
