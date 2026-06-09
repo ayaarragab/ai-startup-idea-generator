@@ -5,8 +5,9 @@ import axiosInstance from '../utils/axiosInstance';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Tag } from '../components/Tag';
+import { Badge } from "../components/Badge";
 import { EmptyState } from '../components/EmptyState';
-import { Search, Plus, Grid, List, Eye, Trash2, Calendar, Bookmark, Loader2 } from 'lucide-react';
+import { Search, Plus, Grid, List, Eye, Trash2, Calendar, Bookmark, Loader2, Unlock } from 'lucide-react';
 
 // Updated Sector interface
 interface Sector {
@@ -21,7 +22,8 @@ interface Idea {
   solutionDescription: string;
   marketRegion: string;
   createdAt: string; 
-  sectors?: Sector[]; // Changed from tags?: string[]
+  sectors?: Sector[];
+  isPurchased?: Boolean; // Changed from tags?: string[]
 }
 
 export function Dashboard() {
@@ -189,6 +191,11 @@ export function Dashboard() {
             {filteredIdeas.map((idea) => (
               <Card key={idea.id} variant="elevated" padding="lg" className="hover:shadow-xl transition-shadow group">
                 <div className="space-y-4">
+                  {idea.isPurchased && (
+                    <Badge variant="success" size="md" className="flex items-center gap-1.5">
+                    <Unlock className="w-4 h-4" /> Unlocked
+                    </Badge>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h5 className="text-neutral-900 mb-1 truncate">{idea.solutionName}</h5>
                     <p className="text-neutral-600 line-clamp-2 text-sm">{idea.solutionDescription}</p>

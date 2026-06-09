@@ -42,7 +42,7 @@ export function Footer() {
           <div className="space-y-4">
             <h6 className="text-white font-semibold">Resources</h6>
             <div className="flex flex-col gap-3">
-              <a href="#" className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors">
+              <a href="https://github.com/ayaarragab/ai-startup-idea-generator" className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors">
                 <Github className="w-5 h-5" />
                 GitHub Repository
               </a>
