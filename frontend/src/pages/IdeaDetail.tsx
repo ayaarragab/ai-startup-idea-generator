@@ -143,6 +143,8 @@ export function IdeaDetail() {
       try {
         const response = await axiosInstance.get(`/idea/saved-ideas/${id}`);
         setIdea(response.data.idea);
+        console.log(response.data.idea);
+        
       } catch (err: any) {
         console.error("Error fetching idea details:", err);
         setError(
