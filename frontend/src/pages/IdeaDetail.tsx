@@ -23,6 +23,8 @@ import {
   Loader2,
   Globe,
   Rocket,
+  Lock,
+  Unlock,
 } from "lucide-react";
 
 interface Sector {
@@ -30,7 +32,6 @@ interface Sector {
   name: string;
 }
 
-// UPDATED: Aligned with the new Sequelize model
 interface IdeaData {
   id: number;
   messageId: number | null;
@@ -74,7 +75,51 @@ interface IdeaData {
   };
   sectors?: Sector[];
   createdAt: string;
+  isPurchased?: boolean;
 }
+
+const RequirePurchase = ({ children, isPurchased, onPurchase, loading }: any) => {
+  if (isPurchased) return <>{children}</>;
+
+  return (
+    <div className="relative">
+      <div className="blur-md select-none pointer-events-none">
+        {children}
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-transparent via-neutral-50/80 to-neutral-50 z-10 rounded-xl">
+        <div className="text-center px-4 py-8 w-full">
+          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto border border-neutral-100">
+            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8 text-primary-600" />
+            </div>
+            <h4 className="text-neutral-900 mb-3">Unlock Full Idea Details</h4>
+            <p className="text-neutral-600 mb-6 text-sm">
+              Get complete access to in-depth analysis, execution steps, market insights, and business models.
+            </p>
+            <div className="text-3xl font-bold text-neutral-900 mb-6">500 EGP</div>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={onPurchase}
+              disabled={loading}
+              className="w-full justify-center"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              ) : (
+                <Lock className="w-5 h-5 mr-2" />
+              )}
+              {loading ? "Processing..." : "Unlock Full Idea - 500 EGP"}
+            </Button>
+            <p className="text-neutral-500 mt-4 text-xs">
+              Secure payment via Paymob • One-time fee
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export function IdeaDetail() {
   const navigate = useNavigate();
@@ -88,6 +133,8 @@ export function IdeaDetail() {
   const [idea, setIdea] = useState<IdeaData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   useEffect(() => {
     const fetchIdeaDetails = async () => {
@@ -95,14 +142,12 @@ export function IdeaDetail() {
       setError(null);
       try {
         const response = await axiosInstance.get(`/idea/saved-ideas/${id}`);
-        console.log(response.data.idea);
-
         setIdea(response.data.idea);
       } catch (err: any) {
         console.error("Error fetching idea details:", err);
         setError(
           err.response?.data?.message ||
-            "Failed to load idea details. Please try again.",
+            "Failed to load idea details. Please try again."
         );
       } finally {
         setIsLoading(false);
@@ -114,7 +159,26 @@ export function IdeaDetail() {
     }
   }, [id]);
 
-  // UPDATED: Renamed tabs to fit new model data
+  const isPurchased = idea?.isPurchased || false;
+
+  const handlePurchase = async () => {
+    try {
+      setPaymentLoading(true);
+      const response = await axiosInstance.post("/api/payment/buy-idea", {
+        ideaId: idea?.id,
+      });
+
+      if (response.data.success && response.data.iframeUrl) {
+        window.location.href = response.data.iframeUrl;
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Failed to initiate payment. Please try again.");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "business", label: "Business & Market" },
@@ -122,11 +186,8 @@ export function IdeaDetail() {
     { id: "evidence", label: "Evidence & Signals" },
   ];
 
-  // UPDATED: Pitch slides generated from new fields
   const generatePitchSlides = () => {
     if (!idea) return [];
-    console.log(idea.inspiredBy);
-    console.log(typeof idea.inspiredBy);
     
     return [
       {
@@ -157,7 +218,7 @@ export function IdeaDetail() {
 
   const toggleIdeaSave = async (
     messageId: string | undefined,
-    ideaId: string | number | undefined,
+    ideaId: string | number | undefined
   ) => {
     try {
       if (!saved) {
@@ -202,15 +263,9 @@ export function IdeaDetail() {
       <div className="min-h-screen bg-neutral-50 py-12 px-4">
         <div className="container mx-auto max-w-2xl text-center space-y-4">
           <div className="text-red-500 bg-red-50 p-6 rounded-lg border border-red-200">
-            <h3 className="text-lg font-semibold mb-2">
-              Oops! Something went wrong
-            </h3>
+            <h3 className="text-lg font-semibold mb-2">Oops! Something went wrong</h3>
             <p>{error || "Idea not found."}</p>
-            <Button
-              variant="primary"
-              className="mt-4"
-              onClick={() => navigate("/dashboard")}
-            >
+            <Button variant="primary" className="mt-4" onClick={() => navigate("/dashboard")}>
               <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
             </Button>
           </div>
@@ -237,13 +292,25 @@ export function IdeaDetail() {
             <div className="space-y-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <h2 className="text-neutral-900 mb-2">{idea.solutionName}</h2>
-                  <p className="subtitle text-neutral-600">
-                    {idea.problemTitle}
-                  </p>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h2 className="text-neutral-900">{idea.solutionName}</h2>
+                    {isPurchased && (
+                      <Badge variant="success" size="md" className="flex items-center gap-1.5">
+                        <Unlock className="w-4 h-4" /> Unlocked
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="subtitle text-neutral-600">{idea.problemTitle}</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2 items-center">                  {idea.noveltyScore !== undefined && (
-                    <Badge variant="info" size="md">
+                <div className="flex flex-col sm:flex-row gap-2 items-center">
+                  {!isPurchased && (
+                     <Button variant="primary" size="md" onClick={handlePurchase} disabled={paymentLoading}>
+                       {paymentLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
+                       Unlock Idea
+                     </Button>
+                  )}
+                  {idea.noveltyScore !== undefined && (
+                    <Badge variant="info" size="md" className="p-2">
                       Novelty Score: {idea.noveltyScore}/100
                     </Badge>
                   )}
@@ -252,40 +319,30 @@ export function IdeaDetail() {
                     size="md"
                     onClick={() => toggleIdeaSave(messageid, id)}
                   >
-                    <Bookmark
-                      className={`w-5 h-5 ${saved ? "fill-current" : ""}`}
-                    />
+                    <Bookmark className={`w-5 h-5 ${saved ? "fill-current" : ""}`} />
                     {saved ? "Saved" : "Save"}
                   </Button>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                {/* 1. Sectors (Industry Categories) */}
                 <div className="flex flex-wrap gap-2">
                   {idea.sectors?.map((sector) => (
-                    <Tag key={sector.id} variant="primary">
-                      {sector.name}
-                    </Tag>
+                    <Tag key={sector.id} variant="primary">{sector.name}</Tag>
                   ))}
                 </div>
 
-                {/* Vertical Divider (Optional) */}
                 {idea.sectors && idea.sectors.length > 0 && (
                   <div className="hidden md:block w-px h-4 bg-neutral-300 mx-1" />
                 )}
 
-                {/* 2. Market Region (Geographic) */}
                 <Tag variant="accent">
                   <Globe className="w-3.5 h-3.5 inline mr-1.5" />
                   {idea.marketRegion}
                 </Tag>
 
-                {/* 3. Target Users */}
                 {idea.targetUsers.map((user, idx) => (
-                  <Tag key={idx} variant="secondary">
-                    {user.trim()}
-                  </Tag>
+                  <Tag key={idx} variant="secondary">{user.trim()}</Tag>
                 ))}
               </div>
             </div>
@@ -316,11 +373,10 @@ export function IdeaDetail() {
           {activeTab === "overview" && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
+                {/* Free Teaser Content */}
                 <Card variant="elevated" padding="lg">
                   <h4 className="text-neutral-900 mb-4">The Problem</h4>
-                  <p className="text-neutral-700 whitespace-pre-wrap">
-                    {idea.problemDescription}
-                  </p>
+                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.problemDescription}</p>
                   {idea.rootCause && (
                     <div className="mt-4 p-4 bg-red-50 rounded-lg text-sm text-red-900 border border-red-100">
                       <strong>Root Cause:</strong> {idea.rootCause}
@@ -330,31 +386,29 @@ export function IdeaDetail() {
 
                 <Card variant="elevated" padding="lg">
                   <h4 className="text-neutral-900 mb-4">The Solution</h4>
-                  <p className="text-neutral-700 whitespace-pre-wrap">
-                    {idea.solutionDescription}
-                  </p>
+                  <p className="text-neutral-700 whitespace-pre-wrap">{idea.solutionDescription}</p>
                 </Card>
-
-                <Card variant="elevated" padding="lg">
-                  <h4 className="text-neutral-900 mb-4">
-                    How it Works & Features
-                  </h4>
-                  <div className="space-y-4">
-                    <div>
-                      <h6 className="font-semibold text-neutral-800 mb-2">
-                        Key Features
-                      </h6>
-                      <ul className="list-disc pl-5 text-neutral-700 space-y-1">
-                        {idea.keyFeatures?.map((feature, i) => (
-                          <li key={i}>{feature}</li>
-                        ))}
-                      </ul>
+                
+                {/* Locked Section in Overview */}
+                <RequirePurchase isPurchased={isPurchased} onPurchase={handlePurchase} loading={paymentLoading}>
+                  <Card variant="elevated" padding="lg">
+                    <h4 className="text-neutral-900 mb-4">How it Works & Features</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <h6 className="font-semibold text-neutral-800 mb-2">Key Features</h6>
+                        <ul className="list-disc pl-5 text-neutral-700 space-y-1">
+                          {idea.keyFeatures?.map((feature, i) => (
+                            <li key={i}>{feature}</li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                </RequirePurchase>
               </div>
 
               <div className="space-y-6">
+                {/* Free Teaser Content */}
                 <Card variant="elevated" padding="lg">
                   <h5 className="text-neutral-900 mb-4">Target Audience</h5>
                   {idea.targetUsers?.length > 0 ? (
@@ -368,336 +422,234 @@ export function IdeaDetail() {
                   )}
                 </Card>
 
-                <Card variant="elevated" padding="lg">
-                  <h5 className="text-neutral-900 mb-4">Impact</h5>
-                  <div className="space-y-3">
-                    <div>
-                      <span className="text-xs text-neutral-500 uppercase font-semibold">
-                        Economic Impact
-                      </span>
-                      <p className="text-sm text-neutral-700">
-                        {idea.impact?.economic_impact || "N/A"}
-                      </p>
+                {/* Blurred Right Column Content without CTA (Controlled by isPurchased) */}
+                <div className={!isPurchased ? "blur-md select-none pointer-events-none opacity-60" : ""}>
+                  <Card variant="elevated" padding="lg">
+                    <h5 className="text-neutral-900 mb-4">Impact</h5>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-xs text-neutral-500 uppercase font-semibold">Economic Impact</span>
+                        <p className="text-sm text-neutral-700">{idea.impact?.economic_impact || "N/A"}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-neutral-500 uppercase font-semibold">Social Impact</span>
+                        <p className="text-sm text-neutral-700">{idea.impact?.social_impact || "N/A"}</p>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-xs text-neutral-500 uppercase font-semibold">
-                        Social Impact
-                      </span>
-                      <p className="text-sm text-neutral-700">
-                        {idea.impact?.social_impact || "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
 
-                <Card variant="elevated" padding="lg">
-                  <h5 className="text-neutral-900 mb-4">Technology Stack</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {idea.technologyStack?.length > 0 ? (
-                      idea.technologyStack.map((tech, idx) => (
-                        <Tag key={idx} variant="secondary">
-                          {tech}
-                        </Tag>
-                      ))
-                    ) : (
-                      <p className="text-neutral-500 text-sm">Not specified</p>
-                    )}
-                  </div>
-                </Card>
+                  <Card variant="elevated" padding="lg" className="mt-6">
+                    <h5 className="text-neutral-900 mb-4">Technology Stack</h5>
+                    <div className="flex flex-wrap gap-2">
+                      {idea.technologyStack?.length > 0 ? (
+                        idea.technologyStack.map((tech, idx) => (
+                          <Tag key={idx} variant="secondary">{tech}</Tag>
+                        ))
+                      ) : (
+                        <p className="text-neutral-500 text-sm">Not specified</p>
+                      )}
+                    </div>
+                  </Card>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Tab Content: Business & Market (Replaces old BMC) */}
+          {/* Tab Content: Business & Market */}
           {activeTab === "business" && (
-            <div className="space-y-6">
-              <Card variant="elevated" padding="lg">
-                <h4 className="text-neutral-900 mb-2">
-                  Business Model & Market Strategy
-                </h4>
-                <p className="text-neutral-600">
-                  Overview of the monetization strategy and market analysis.
-                </p>
-              </Card>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Value Proposition */}
-                <Card
-                  variant="bordered"
-                  padding="md"
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-yellow-100 text-yellow-700 flex items-center justify-center flex-shrink-0">
-                      <Star className="w-5 h-5" />
-                    </div>
-                    <h6 className="text-neutral-900 flex-1">
-                      Value Proposition
-                    </h6>
-                  </div>
-                  <p className="text-sm text-neutral-700">
-                    {idea.businessModel?.value_proposition}
-                  </p>
+            <RequirePurchase isPurchased={isPurchased} onPurchase={handlePurchase} loading={paymentLoading}>
+              <div className="space-y-6">
+                <Card variant="elevated" padding="lg">
+                  <h4 className="text-neutral-900 mb-2">Business Model & Market Strategy</h4>
+                  <p className="text-neutral-600">Overview of the monetization strategy and market analysis.</p>
                 </Card>
 
-                {/* Revenue Streams */}
-                <Card
-                  variant="bordered"
-                  padding="md"
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
-                      <BarChart3 className="w-5 h-5" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-yellow-100 text-yellow-700 flex items-center justify-center flex-shrink-0">
+                        <Star className="w-5 h-5" />
+                      </div>
+                      <h6 className="text-neutral-900 flex-1">Value Proposition</h6>
                     </div>
-                    <h6 className="text-neutral-900 flex-1">
-                      Revenue & Pricing
-                    </h6>
-                  </div>
-                  <div className="space-y-2 text-sm text-neutral-700">
-                    <p>
-                      <strong>Model:</strong>{" "}
-                      {idea.businessModel?.pricing_model}
-                    </p>
-                    <ul className="list-disc pl-4 mt-2 space-y-1">
-                      {idea.businessModel?.revenue_streams?.map((stream, i) => (
-                        <li key={i}>{stream}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </Card>
+                    <p className="text-sm text-neutral-700">{idea.businessModel?.value_proposition}</p>
+                  </Card>
 
-                {/* Market & Competitors */}
-                <Card
-                  variant="bordered"
-                  padding="md"
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0">
-                      <TrendingUp className="w-5 h-5" />
+                  <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                        <BarChart3 className="w-5 h-5" />
+                      </div>
+                      <h6 className="text-neutral-900 flex-1">Revenue & Pricing</h6>
                     </div>
-                    <h6 className="text-neutral-900 flex-1">Market Analysis</h6>
-                  </div>
-                  <div className="space-y-2 text-sm text-neutral-700">
-                    <p>
-                      <strong>Size:</strong> {idea.marketAnalysis?.market_size}
-                    </p>
-                    <p>
-                      <strong>Advantage:</strong>{" "}
-                      {idea.marketAnalysis?.competitive_advantage}
-                    </p>
-                    <div className="mt-2">
-                      <strong>Competitors:</strong>
-                      <ul className="list-disc pl-4 mt-1">
-                        {idea.marketAnalysis?.competitors?.map((comp, i) => (
-                          <li key={i}>{comp}</li>
+                    <div className="space-y-2 text-sm text-neutral-700">
+                      <p><strong>Model:</strong> {idea.businessModel?.pricing_model}</p>
+                      <ul className="list-disc pl-4 mt-2 space-y-1">
+                        {idea.businessModel?.revenue_streams?.map((stream, i) => (
+                          <li key={i}>{stream}</li>
                         ))}
                       </ul>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
 
-                {/* Customer Acquisition */}
-                <Card
-                  variant="bordered"
-                  padding="md"
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-pink-100 text-pink-700 flex items-center justify-center flex-shrink-0">
-                      <Heart className="w-5 h-5" />
+                  <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0">
+                        <TrendingUp className="w-5 h-5" />
+                      </div>
+                      <h6 className="text-neutral-900 flex-1">Market Analysis</h6>
                     </div>
-                    <h6 className="text-neutral-900 flex-1">
-                      Customer Acquisition
-                    </h6>
-                  </div>
-                  <ul className="list-disc pl-4 text-sm text-neutral-700 space-y-1">
-                    {idea.businessModel?.customer_acquisition?.map((ca, i) => (
-                      <li key={i}>{ca}</li>
-                    ))}
-                  </ul>
-                </Card>
+                    <div className="space-y-2 text-sm text-neutral-700">
+                      <p><strong>Size:</strong> {idea.marketAnalysis?.market_size}</p>
+                      <p><strong>Advantage:</strong> {idea.marketAnalysis?.competitive_advantage}</p>
+                      <div className="mt-2">
+                        <strong>Competitors:</strong>
+                        <ul className="list-disc pl-4 mt-1">
+                          {idea.marketAnalysis?.competitors?.map((comp, i) => (
+                            <li key={i}>{comp}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </Card>
 
-                {/* Feasibility & Risks */}
-                <Card
-                  variant="bordered"
-                  padding="md"
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-red-100 text-red-700 flex items-center justify-center flex-shrink-0">
-                      <CheckCircle2 className="w-5 h-5" />
+                  <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-pink-100 text-pink-700 flex items-center justify-center flex-shrink-0">
+                        <Heart className="w-5 h-5" />
+                      </div>
+                      <h6 className="text-neutral-900 flex-1">Customer Acquisition</h6>
                     </div>
-                    <h6 className="text-neutral-900 flex-1">
-                      Feasibility & Risks
-                    </h6>
-                  </div>
-                  <div className="space-y-2 text-sm text-neutral-700">
-                    <p>
-                      <strong>Tech Feasibility:</strong>{" "}
-                      {idea.feasibility?.technical_feasibility}
-                    </p>
-                    <p>
-                      <strong>Market Feasibility:</strong>{" "}
-                      {idea.feasibility?.market_feasibility}
-                    </p>
-                    <div className="mt-2">
-                      <strong>Risks:</strong>
+                    <ul className="list-disc pl-4 text-sm text-neutral-700 space-y-1">
+                      {idea.businessModel?.customer_acquisition?.map((ca, i) => (
+                        <li key={i}>{ca}</li>
+                      ))}
+                    </ul>
+                  </Card>
+
+                  <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-red-100 text-red-700 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle2 className="w-5 h-5" />
+                      </div>
+                      <h6 className="text-neutral-900 flex-1">Feasibility & Risks</h6>
+                    </div>
+                    <div className="space-y-2 text-sm text-neutral-700">
+                      <p><strong>Tech Feasibility:</strong> {idea.feasibility?.technical_feasibility}</p>
+                      <p><strong>Market Feasibility:</strong> {idea.feasibility?.market_feasibility}</p>
+                      <div className="mt-2">
+                        <strong>Risks:</strong>
+                        <ul className="list-disc pl-4 mt-1">
+                          {idea.feasibility?.risk_factors?.map((risk, i) => (
+                            <li key={i}>{risk}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card variant="bordered" padding="md" className="hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0">
+                        <Rocket className="w-5 h-5" />
+                      </div>
+                      <h6 className="text-neutral-900 flex-1">MVP Plan</h6>
+                    </div>
+                    <div className="space-y-2 text-sm text-neutral-700">
+                      <strong>First Steps:</strong>
+                      <ul className="list-disc pl-4 mt-1 mb-2">
+                        {idea.mvpPlan?.first_steps?.map((step, i) => (
+                          <li key={i}>{step}</li>
+                        ))}
+                      </ul>
+                      <strong>MVP Features:</strong>
                       <ul className="list-disc pl-4 mt-1">
-                        {idea.feasibility?.risk_factors?.map((risk, i) => (
-                          <li key={i}>{risk}</li>
+                        {idea.mvpPlan?.mvp_features?.map((feat, i) => (
+                          <li key={i}>{feat}</li>
                         ))}
                       </ul>
                     </div>
-                  </div>
-                </Card>
-
-                {/* MVP Plan */}
-                <Card
-                  variant="bordered"
-                  padding="md"
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0">
-                      <Rocket className="w-5 h-5" />
-                    </div>
-                    <h6 className="text-neutral-900 flex-1">MVP Plan</h6>
-                  </div>
-                  <div className="space-y-2 text-sm text-neutral-700">
-                    <strong>First Steps:</strong>
-                    <ul className="list-disc pl-4 mt-1 mb-2">
-                      {idea.mvpPlan?.first_steps?.map((step, i) => (
-                        <li key={i}>{step}</li>
-                      ))}
-                    </ul>
-                    <strong>MVP Features:</strong>
-                    <ul className="list-disc pl-4 mt-1">
-                      {idea.mvpPlan?.mvp_features?.map((feat, i) => (
-                        <li key={i}>{feat}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </Card>
+                  </Card>
+                </div>
               </div>
-            </div>
+            </RequirePurchase>
           )}
 
           {/* Tab Content: Pitch */}
           {activeTab === "pitch" && (
-            <div>
-              <Card variant="elevated" padding="lg" className="mb-6">
-                <h4 className="text-neutral-900 mb-2">Pitch Summary</h4>
-                <p className="text-neutral-600">
-                  A dynamically generated 4-slide pitch deck structure ready to
-                  present
-                </p>
-              </Card>
+            <RequirePurchase isPurchased={isPurchased} onPurchase={handlePurchase} loading={paymentLoading}>
+              <div>
+                <Card variant="elevated" padding="lg" className="mb-6">
+                  <h4 className="text-neutral-900 mb-2">Pitch Summary</h4>
+                  <p className="text-neutral-600">A dynamically generated 4-slide pitch deck structure ready to present</p>
+                </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {pitchSlides.map((slide, index) => (
-                  <Card
-                    key={index}
-                    variant="bordered"
-                    padding="lg"
-                    className="hover:shadow-lg transition-shadow"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <Badge variant="info" size="sm">
-                          Slide {index + 1}
-                        </Badge>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {pitchSlides.map((slide, index) => (
+                    <Card key={index} variant="bordered" padding="lg" className="hover:shadow-lg transition-shadow">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Badge variant="info" size="sm">Slide {index + 1}</Badge>
+                        </div>
+                        <div>
+                          <h5 className="text-neutral-900 mb-2">{slide.title}</h5>
+                          <p className="text-neutral-600 mb-3 font-medium">{slide.subtitle}</p>
+                          <p className="text-neutral-700 whitespace-pre-wrap">{slide.content}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h5 className="text-neutral-900 mb-2">{slide.title}</h5>
-                        <p className="text-neutral-600 mb-3 font-medium">
-                          {slide.subtitle}
-                        </p>
-                        <p className="text-neutral-700 whitespace-pre-wrap">
-                          {slide.content}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </div>
+            </RequirePurchase>
           )}
 
           {/* Tab Content: Evidence & References */}
           {activeTab === "evidence" && (
-            <div>
-              <Card variant="elevated" padding="lg" className="mb-6">
-                <h4 className="text-neutral-900 mb-2">
-                  Evidence & Inspiring Startups
-                </h4>
-                <p className="text-neutral-600">
-                  Market signals and startups the model was inspired by during
-                  idea generation.
-                </p>
-              </Card>
+            <RequirePurchase isPurchased={isPurchased} onPurchase={handlePurchase} loading={paymentLoading}>
+              <div>
+                <Card variant="elevated" padding="lg" className="mb-6">
+                  <h4 className="text-neutral-900 mb-2">Evidence & Inspiring Startups</h4>
+                  <p className="text-neutral-600">Market signals and startups the model was inspired by during idea generation.</p>
+                </Card>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Evidence Signals */}
-                <div>
-                  <h5 className="text-neutral-800 mb-4 border-b pb-2">
-                    Evidence Signals
-                  </h5>
-                  <div className="space-y-3">
-                    {idea.evidenceSignals?.length > 0 ? (
-                      idea.evidenceSignals.map((signal: any, index: number) => (
-                        <Card
-                          key={index}
-                          variant="bordered"
-                          padding="md"
-                          className="bg-white"
-                        >
-                          <p className="text-sm text-neutral-700">
-                            {typeof signal === "string"
-                              ? signal
-                              : JSON.stringify(signal)}
-                          </p>
-                        </Card>
-                      ))
-                    ) : (
-                      <p className="text-neutral-500 italic">
-                        No evidence signals provided.
-                      </p>
-                    )}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div>
+                    <h5 className="text-neutral-800 mb-4 border-b pb-2">Evidence Signals</h5>
+                    <div className="space-y-3">
+                      {idea.evidenceSignals?.length > 0 ? (
+                        idea.evidenceSignals.map((signal: any, index: number) => (
+                          <Card key={index} variant="bordered" padding="md" className="bg-white">
+                            <p className="text-sm text-neutral-700">
+                              {typeof signal === "string" ? signal : JSON.stringify(signal)}
+                            </p>
+                          </Card>
+                        ))
+                      ) : (
+                        <p className="text-neutral-500 italic">No evidence signals provided.</p>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Inspiring Startups */}
-                <div>
-                  <h5 className="text-neutral-800 mb-4 border-b pb-2">
-                    Inspiring Startups
-                  </h5>
-                  <div className="space-y-3">
-                    {idea.inspiredBy?.length > 0 ? (
-                      idea.inspiredBy?.map((startup: any, index: number) => (
-                        <Card
-                          key={index}
-                          variant="bordered"
-                          padding="md"
-                          className="bg-white"
-                        >
-                          <p className="text-sm text-neutral-700">
-                            {typeof startup === "string"
-                              ? startup
-                              : JSON.stringify(startup)}
-                          </p>
-                        </Card>
-                      ))
-                    ) : (
-                      <p className="text-neutral-500 italic">
-                        No similar startups retrieved.
-                      </p>
-                    )}
+                  <div>
+                    <h5 className="text-neutral-800 mb-4 border-b pb-2">Inspiring Startups</h5>
+                    <div className="space-y-3">
+                      {idea.inspiredBy?.length > 0 ? (
+                        idea.inspiredBy?.map((startup: any, index: number) => (
+                          <Card key={index} variant="bordered" padding="md" className="bg-white">
+                            <p className="text-sm text-neutral-700">
+                              {typeof startup === "string" ? startup : JSON.stringify(startup)}
+                            </p>
+                          </Card>
+                        ))
+                      ) : (
+                        <p className="text-neutral-500 italic">No similar startups retrieved.</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </RequirePurchase>
           )}
 
           {/* Feedback Section */}
@@ -706,18 +658,8 @@ export function IdeaDetail() {
             <div className="flex flex-col sm:flex-row gap-6 items-start">
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => setRating(star)}
-                    className="transition-colors"
-                  >
-                    <Star
-                      className={`w-8 h-8 ${
-                        star <= rating
-                          ? "text-yellow-500 fill-yellow-500"
-                          : "text-neutral-300"
-                      }`}
-                    />
+                  <button key={star} onClick={() => setRating(star)} className="transition-colors">
+                    <Star className={`w-8 h-8 ${star <= rating ? "text-yellow-500 fill-yellow-500" : "text-neutral-300"}`} />
                   </button>
                 ))}
               </div>
@@ -727,18 +669,10 @@ export function IdeaDetail() {
                   placeholder="Share your feedback or suggestions..."
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                   rows={3}
-                  onChange={(e) => {
-                    setText(e.target.value);
-                  }}
+                  onChange={(e) => setText(e.target.value)}
                 />
                 <div className="mt-3">
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() => {
-                      sendFeedback();
-                    }}
-                  >
+                  <Button variant="primary" size="md" onClick={() => sendFeedback()}>
                     Submit Feedback
                   </Button>
                 </div>

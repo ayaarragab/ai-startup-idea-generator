@@ -120,4 +120,15 @@ db.User.hasMany(db.Feedback, {
   onUpdate: "CASCADE"
 });
 
+db.Order.belongsTo(db.User,
+  { foreignKey: "userId", as: "user" }
+)
+
+db.User.hasMany(db.Order, {
+  foreignKey: "userId",
+  as: "orders",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE"
+})
+
 export default db;

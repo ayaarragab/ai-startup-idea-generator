@@ -14,6 +14,7 @@ import conversationRouter from "./routers/conversation.router.js";
 import ideaRouter from './routers/idea.router.js';
 import feedbackRouter from './routers/feedback.router.js';
 import sectorsRouter from './routers/sector.router.js';
+import paymentRouter from './routers/payment.router.js';
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use('/conversation', conversationRouter);
 app.use('/idea', ideaRouter);
 app.use('/feedback', feedbackRouter);
 app.use('/sector', sectorsRouter);
+app.use('/api/payment', paymentRouter);
 
 app.use((req,res,next)=>{
   console.log("METHOD:",req.method);

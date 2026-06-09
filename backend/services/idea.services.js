@@ -1,6 +1,6 @@
 import db from "../models/index.js";
 
-const { Idea, User, Message } = db;
+const { Idea, User, Message, Order } = db;
 
 export const createIdea = async (ideaDetails, convSectors) => {
   console.log(ideaDetails);
@@ -115,6 +115,12 @@ export const fetchSavedIdeas = async (userId) => {
   try {
     const user = await User.findByPk(userId);
     const ideas = await user.getIdeas();
+    const orders = await Order.findAll({
+      where:{
+        userId, status: "paid"
+      }
+    })
+
     for (const idea of ideas) {
       const sectors = await idea.getSectors();
       const sectorJson = Array.isArray(sectors)
@@ -122,6 +128,15 @@ export const fetchSavedIdeas = async (userId) => {
         : [];
       idea.dataValues.sectors = sectorJson;
     }
+
+    for (const order of orders) {
+      for (const idea of ideas) {
+        if (order.ideaId == idea.id && order.status == "paid") {
+          idea.dataValues.isPurchased = true
+        }
+      }
+    }
+
     console.log(ideas);
     
     return ideas.sort((a, b) => b.createdAt - a.createdAt);
