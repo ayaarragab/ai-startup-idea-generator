@@ -29,7 +29,7 @@ export const handleChat = async ({
   if (limitReached) {
     aiResponse = {
       content:
-        "You have reached your daily limit of 3 ideas. Please try again after 24 hours.",
+        "You have reached your daily limit of 4 ideas. Please try again after 24 hours.",
       conversationId,
       clientMessageId,
       createdAt: new Date().toISOString(),
