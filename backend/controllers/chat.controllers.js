@@ -10,7 +10,7 @@ export const handleAIChat = async (req, res) => {
 
     const dailyIdeasCount = await getDailyIdeasCount(userId);
 
-    const limitReached = dailyIdeasCount >= 3
+    const limitReached = dailyIdeasCount >= 4
 
     const aiResponse = await handleChat({ ...req.body, userId, limitReached });
     if (aiResponse) {
