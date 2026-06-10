@@ -254,30 +254,46 @@ export function IdeaDetail() {
                   </div>
                   <p className="subtitle text-neutral-600">{idea.problemTitle}</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2 items-center">
-                  {!isPurchased && (
-                     <Button className="text-lg" variant="outlined" size="md" onClick={handlePurchase} disabled={paymentLoading}>
-                       {paymentLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <DollarSign className="w-4 h-4 mr-2" />}
-                       Purchase Idea
-                     </Button>
-                  )}
-                  <Button
-                    variant={saved ? "primary" : "outlined"}
-                    size="md"
-                    className="text-lg"
-                    onClick={() => toggleIdeaSave(messageid, id)}
-                  >
-                    <Bookmark className={`w-5 h-5 ${saved ? "fill-current" : ""}`} />
-                    {saved ? "Saved" : "Save"}
-                  </Button>
-                </div>
-                <div>
-                  {idea.noveltyScore !== undefined && (
-                    <Badge variant="info" size="md" className="mt-1 text-lg py-2">
-                      Novelty Score: {idea.noveltyScore}/100
-                    </Badge>
-                  )}
-                </div>
+<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+    {!isPurchased && (
+      <Button
+        className="w-full sm:w-auto text-sm sm:text-lg"
+        variant="outlined"
+        size="md"
+        onClick={handlePurchase}
+        disabled={paymentLoading}
+      >
+        {paymentLoading ? (
+          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+        ) : (
+          <DollarSign className="w-4 h-4 mr-2" />
+        )}
+        Purchase Idea
+      </Button>
+    )}
+
+    <Button
+      variant={saved ? "primary" : "outlined"}
+      size="md"
+      className="w-full sm:w-auto text-sm sm:text-lg"
+      onClick={() => toggleIdeaSave(messageid, id)}
+    >
+      <Bookmark className={`w-5 h-5 ${saved ? "fill-current" : ""}`} />
+      {saved ? "Saved" : "Save"}
+    </Button>
+  </div>
+
+  {idea.noveltyScore !== undefined && (
+    <Badge
+      variant="info"
+      size="md"
+      className="w-fit text-sm sm:text-lg py-1 sm:py-2"
+    >
+      Novelty Score: {idea.noveltyScore}/100
+    </Badge>
+  )}
+</div>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
