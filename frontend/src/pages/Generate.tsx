@@ -215,13 +215,15 @@ export function Generate() {
       const payload = {
         content: newMessage.content,
         conversationId: currentConversationId,
-        isNewConversation: currentConversationId == null,
+        isNewConversation: chatMessages.length <= 1,
         lastIdea,
         history,
         clientMessageId,
         convSectors: selectedSectorIds,
       };
-
+      console.log(payload);
+      console.log(currentConversationId);
+      
       const response = isAuthenticated 
         ? await axiosInstance.post("/chat/", payload)
         : await axiosInstance.post("/chat/without-auth", payload);
