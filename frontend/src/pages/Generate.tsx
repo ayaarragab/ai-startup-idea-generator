@@ -215,7 +215,10 @@ export function Generate() {
       const payload = {
         content: newMessage.content,
         conversationId: currentConversationId,
-        isNewConversation: chatMessages.length <= 1,
+        // FIXED: Changed `chatMessages.length <= 1` to `chatMessages.length === 0`.
+        // React state updates are async, so 'chatMessages' holds the previous state here.
+        // If length is 0, it definitively means this is the very first message of the conversation.
+        isNewConversation: chatMessages.length === 0,
         lastIdea,
         history,
         clientMessageId,
