@@ -60,7 +60,7 @@ export function Footer() {
 
         <div className="border-t border-neutral-800 mt-12 pt-8">
           <p className="text-center text-neutral-500">
-            © 2026 Egyptian Fakarnalk — Graduation Project
+            © 2026 Fakarnalk
           </p>
         </div>
       </div>
