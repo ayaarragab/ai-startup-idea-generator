@@ -22,7 +22,7 @@ const app = express();
 
 app.use(cors({
   origin: [
-    "https://ai-startup-idea-generator.netlify.app", 
+    "https://ai-startup-idea-generator-mauve.vercel.app", 
     "http://localhost:5173",
     "http://localhost:3001"
   ],
