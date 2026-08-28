@@ -65,12 +65,12 @@ export const handleChat = async ({
 
   let idea__ = null;
 
-  if (aiResponse.is_full_idea) {
-    idea__ = await createIdea(
-      { ...aiResponse.data, messageId: message.id },
-      convSectors,
-    );
-  }
+  // if (aiResponse.is_full_idea) {
+  //   idea__ = await createIdea(
+  //     { ...aiResponse.idea, messageId: message.id },
+  //     convSectors,
+  //   );
+  // }
 
   if (aiResponse.conversation_title) {
     await updateConversationTitle(
@@ -106,12 +106,12 @@ export const handleChatWithoutAuth = async ({
       convSectors: sectorsNames,
       userId: -1,
     });
-    const { data: _, ...aiResponseWithoutIdea } = aiResponse;
+    const { idea: _, ...aiResponseWithoutIdea } = aiResponse;
     let idea__ = null;
 
-    if (aiResponse.is_full_idea) {
-      idea__ = await createIdea({ ...aiResponse.data }, convSectors);
-    }
+    // if (aiResponse.is_full_idea) {
+    //   idea__ = await createIdea({ ...aiResponse.idea }, convSectors);
+    // }
     return { ...aiResponseWithoutIdea, idea: idea__ };
   } catch (error) {
     throw error;
