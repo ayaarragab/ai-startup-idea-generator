@@ -63,7 +63,9 @@ router.get("/google/callback", (req, res, next) => {
   passport.authenticate("google", async (err, user, info) => {
     if (err) return next(err);
     if (!user)
-      return res.redirect(`https://ai-startup-idea-generator.netlify.app/`);
+      return res.redirect(
+        `https://ai-startup-idea-generator-mauve.vercel.app/`,
+      );
 
     await handleOAuthTokens(req, res, user, info);
   })(req, res, next);

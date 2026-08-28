@@ -22,7 +22,7 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await findUser(email);
-    
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -88,10 +88,12 @@ export const handleOAuthTokens = (req, res, user, info) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   if (info === "registered") {
-    return res.redirect(`https://ai-startup-idea-generator.netlify.app/login`);
+    return res.redirect(
+      `https://ai-startup-idea-generator-mauve.vercel.app/login`,
+    );
   } else if (info === "loggedin") {
     return res.redirect(
-      `https://ai-startup-idea-generator.netlify.app/auth/callback`,
+      `https://ai-startup-idea-generator-mauve.vercel.app/auth/callback`,
     );
   }
 };
